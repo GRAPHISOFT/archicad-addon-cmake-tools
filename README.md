@@ -1,0 +1,1 @@
+# archicad-addon-cmake-tools
