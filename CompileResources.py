@@ -101,12 +101,17 @@ class WinResourceCompiler (ResourceCompiler):
             return defaultNativeResourceFile
 
         existingNativeResourceFiles = self.CollectFilesFromFolderWithExtension (os.path.join (self.resourcesPath, 'RFIX.win'), '.rc2')
-        assert existingNativeResourceFiles, 'Native resource file was not found at RFIX.win folder'
+        
+        if len(existingNativeResourceFiles) == 0:
+            return None
 
         return existingNativeResourceFiles[0]
 
     def CompileNativeResource (self, resultResourcePath):
         nativeResourceFile = self.GetNativeResourceFile ()
+        if nativeResourceFile == None:
+            return
+        
         result = subprocess.call ([
             'rc',
             '/i', os.path.join (self.devKitPath, 'Inc'),

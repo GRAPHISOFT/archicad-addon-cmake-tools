@@ -115,14 +115,14 @@ function (GenerateAddOnProject acVersion devKitDir addOnName addOnFolder addOnLa
             ${AddOnResourcesFolder}/R${addOnLanguage}/*.grc
             ${AddOnResourcesFolder}/RFIX/*.grc
             ${AddOnResourcesFolder}/RFIX.win/*.rc2
-            ./*.py
+            ${AddOnResourcesFolder}/Tools/*.py
         )
     else ()
         file (GLOB AddOnResourceFiles CONFIGURE_DEPENDS
             ${AddOnResourcesFolder}/R${addOnLanguage}/*.grc
             ${AddOnResourcesFolder}/RFIX/*.grc
             ${AddOnResourcesFolder}/RFIX.mac/*.plist
-            ./*.py
+            ${AddOnResourcesFolder}/Tools/*.py
         )
     endif ()
 
@@ -134,7 +134,7 @@ function (GenerateAddOnProject acVersion devKitDir addOnName addOnFolder addOnLa
             DEPENDS ${AddOnResourceFiles} ${AddOnImageFiles}
             COMMENT "Compiling resources..."
             COMMAND ${CMAKE_COMMAND} -E make_directory "${ResourceObjectsDir}"
-            COMMAND ${Python_EXECUTABLE} "./CompileResources.py" "${addOnLanguage}" "${devKitDir}" "${AddOnSourcesFolderAbsolute}" "${AddOnResourcesFolderAbsolute}" "${ResourceObjectsDir}" "${ResourceObjectsDir}/${addOnName}.res"
+            COMMAND ${Python_EXECUTABLE} "${AddOnResourcesFolderAbsolute}/Tools/CompileResources.py" "${addOnLanguage}" "${devKitDir}" "${AddOnSourcesFolderAbsolute}" "${AddOnResourcesFolderAbsolute}" "${ResourceObjectsDir}" "${ResourceObjectsDir}/${addOnName}.res"
             COMMAND ${CMAKE_COMMAND} -E touch ${ResourceStampFile}
         )
     else ()
@@ -143,7 +143,7 @@ function (GenerateAddOnProject acVersion devKitDir addOnName addOnFolder addOnLa
             DEPENDS ${AddOnResourceFiles} ${AddOnImageFiles}
             COMMENT "Compiling resources..."
             COMMAND ${CMAKE_COMMAND} -E make_directory "${ResourceObjectsDir}"
-            COMMAND ${Python_EXECUTABLE} "./CompileResources.py" "${addOnLanguage}" "${devKitDir}" "${AddOnSourcesFolderAbsolute}" "${AddOnResourcesFolderAbsolute}" "${ResourceObjectsDir}" "${CMAKE_BINARY_DIR}/$<CONFIG>/${addOnName}.bundle/Contents/Resources"
+            COMMAND ${Python_EXECUTABLE} "${AddOnResourcesFolderAbsolute}/Tools/CompileResources.py" "${addOnLanguage}" "${devKitDir}" "${AddOnSourcesFolderAbsolute}" "${AddOnResourcesFolderAbsolute}" "${ResourceObjectsDir}" "${CMAKE_BINARY_DIR}/$<CONFIG>/${addOnName}.bundle/Contents/Resources"
             COMMAND ${CMAKE_COMMAND} -E copy "${devKitDir}/Inc/PkgInfo" "${CMAKE_BINARY_DIR}/$<CONFIG>/${addOnName}.bundle/Contents/PkgInfo"
             COMMAND ${CMAKE_COMMAND} -E touch ${ResourceStampFile}
         )
@@ -186,8 +186,10 @@ function (GenerateAddOnProject acVersion devKitDir addOnName addOnFolder addOnLa
     endif ()
 
     if (WIN32)
-        target_link_options (${addOnName} PUBLIC "${ResourceObjectsDir}/${addOnName}.res")
-        target_link_options (${addOnName} PUBLIC /export:GetExportedFuncAddrs,@1 /export:SetImportedFuncAddrs,@2)
+        if (EXISTS "${ResourceObjectsDir}/${addOnName}.res")
+            target_link_options (${addOnName} PUBLIC "${ResourceObjectsDir}/${addOnName}.res")
+            target_link_options (${addOnName} PUBLIC /export:GetExportedFuncAddrs,@1 /export:SetImportedFuncAddrs,@2)
+        endif ()
     endif ()
 
     target_include_directories (${addOnName} PUBLIC
