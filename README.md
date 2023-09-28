@@ -1,6 +1,6 @@
 # Archicad Add-on CMake tools
 
-This repository contains the part of the CMake build system and the resource compilation that should be common in all Archicad add-on builds.
+This repository contains the resource compilation necessary for Archicadd Add-On builds.
 
 ## Prerequisites
 
