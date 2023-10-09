@@ -97,7 +97,7 @@ function (LinkGSLibrariesToProject acVersion devKitDir addOnName)
 
 endfunction ()
 
-function (GenerateAddOnProject acVersion devKitDir addOnName addOnFolder addOnLanguage)
+function (GenerateAddOnProject acVersion devKitDir addOnName addOnFolder addOnLanguage toolsFolder)
 
     find_package (Python COMPONENTS Interpreter)
 
@@ -115,14 +115,14 @@ function (GenerateAddOnProject acVersion devKitDir addOnName addOnFolder addOnLa
             ${AddOnResourcesFolder}/R${addOnLanguage}/*.grc
             ${AddOnResourcesFolder}/RFIX/*.grc
             ${AddOnResourcesFolder}/RFIX.win/*.rc2
-            ${AddOnResourcesFolder}/Tools/*.py
+            ${toolsFolder}/*.py
         )
     else ()
         file (GLOB AddOnResourceFiles CONFIGURE_DEPENDS
             ${AddOnResourcesFolder}/R${addOnLanguage}/*.grc
             ${AddOnResourcesFolder}/RFIX/*.grc
             ${AddOnResourcesFolder}/RFIX.mac/*.plist
-            ${AddOnResourcesFolder}/Tools/*.py
+            ${toolsFolder}/*.py
         )
     endif ()
 
@@ -134,7 +134,7 @@ function (GenerateAddOnProject acVersion devKitDir addOnName addOnFolder addOnLa
             DEPENDS ${AddOnResourceFiles} ${AddOnImageFiles}
             COMMENT "Compiling resources..."
             COMMAND ${CMAKE_COMMAND} -E make_directory "${ResourceObjectsDir}"
-            COMMAND ${Python_EXECUTABLE} "${AddOnResourcesFolderAbsolute}/Tools/CompileResources.py" "${addOnLanguage}" "${devKitDir}" "${AddOnSourcesFolderAbsolute}" "${AddOnResourcesFolderAbsolute}" "${ResourceObjectsDir}" "${ResourceObjectsDir}/${addOnName}.res"
+            COMMAND ${Python_EXECUTABLE} "${toolsFolder}/CompileResources.py" "${addOnLanguage}" "${devKitDir}" "${AddOnSourcesFolderAbsolute}" "${AddOnResourcesFolderAbsolute}" "${ResourceObjectsDir}" "${ResourceObjectsDir}/${addOnName}.res"
             COMMAND ${CMAKE_COMMAND} -E touch ${ResourceStampFile}
         )
     else ()
@@ -143,7 +143,7 @@ function (GenerateAddOnProject acVersion devKitDir addOnName addOnFolder addOnLa
             DEPENDS ${AddOnResourceFiles} ${AddOnImageFiles}
             COMMENT "Compiling resources..."
             COMMAND ${CMAKE_COMMAND} -E make_directory "${ResourceObjectsDir}"
-            COMMAND ${Python_EXECUTABLE} "${AddOnResourcesFolderAbsolute}/Tools/CompileResources.py" "${addOnLanguage}" "${devKitDir}" "${AddOnSourcesFolderAbsolute}" "${AddOnResourcesFolderAbsolute}" "${ResourceObjectsDir}" "${CMAKE_BINARY_DIR}/$<CONFIG>/${addOnName}.bundle/Contents/Resources"
+            COMMAND ${Python_EXECUTABLE} "${toolsFolder}/CompileResources.py" "${addOnLanguage}" "${devKitDir}" "${AddOnSourcesFolderAbsolute}" "${AddOnResourcesFolderAbsolute}" "${ResourceObjectsDir}" "${CMAKE_BINARY_DIR}/$<CONFIG>/${addOnName}.bundle/Contents/Resources"
             COMMAND ${CMAKE_COMMAND} -E copy "${devKitDir}/Inc/PkgInfo" "${CMAKE_BINARY_DIR}/$<CONFIG>/${addOnName}.bundle/Contents/PkgInfo"
             COMMAND ${CMAKE_COMMAND} -E touch ${ResourceStampFile}
         )
