@@ -179,17 +179,12 @@ function (GenerateAddOnProject acVersion devKitDir addOnName addOnFolder addOnLa
     if (WIN32)
         set_target_properties (${addOnName} PROPERTIES SUFFIX ".apx")
         set_target_properties (${addOnName} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_$<CONFIG> "${CMAKE_BINARY_DIR}/$<CONFIG>")
+		target_link_options (${addOnName} PUBLIC "${ResourceObjectsDir}/${addOnName}.res")
+		target_link_options (${addOnName} PUBLIC /export:GetExportedFuncAddrs,@1 /export:SetImportedFuncAddrs,@2)
     else ()
         set_target_properties (${addOnName} PROPERTIES BUNDLE TRUE)
         set_target_properties (${addOnName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/${AddOnResourcesFolder}/RFIX.mac/Info.plist")
         set_target_properties (${addOnName} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>")
-    endif ()
-
-    if (WIN32)
-        if (EXISTS "${ResourceObjectsDir}/${addOnName}.res")
-            target_link_options (${addOnName} PUBLIC "${ResourceObjectsDir}/${addOnName}.res")
-            target_link_options (${addOnName} PUBLIC /export:GetExportedFuncAddrs,@1 /export:SetImportedFuncAddrs,@2)
-        endif ()
     endif ()
 
     target_include_directories (${addOnName} PUBLIC
