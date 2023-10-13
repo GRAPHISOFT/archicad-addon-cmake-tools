@@ -97,37 +97,34 @@ function (LinkGSLibrariesToProject acVersion devKitDir addOnName)
 
 endfunction ()
 
-function (GenerateAddOnProject acVersion devKitDir addOnName addOnFolder addOnLanguage)
+function (GenerateAddOnProject acVersion devKitDir addOnName addOnSourcesFolder addOnResourcesFolder addOnLanguage)
 
     find_package (Python COMPONENTS Interpreter)
-
-    set (AddOnSourcesFolder ${addOnFolder}/Src)
-    set (AddOnResourcesFolder ${addOnFolder})
 
     set (ResourceObjectsDir ${CMAKE_BINARY_DIR}/ResourceObjects)
     set (ResourceStampFile "${ResourceObjectsDir}/AddOnResources.stamp")
 
     file (GLOB AddOnImageFiles CONFIGURE_DEPENDS
-        ${AddOnResourcesFolder}/RFIX/Images/*.svg
+        ${addOnResourcesFolder}/RFIX/Images/*.svg
     )
     if (WIN32)
         file (GLOB AddOnResourceFiles CONFIGURE_DEPENDS
-            ${AddOnResourcesFolder}/R${addOnLanguage}/*.grc
-            ${AddOnResourcesFolder}/RFIX/*.grc
-            ${AddOnResourcesFolder}/RFIX.win/*.rc2
+            ${addOnResourcesFolder}/R${addOnLanguage}/*.grc
+            ${addOnResourcesFolder}/RFIX/*.grc
+            ${addOnResourcesFolder}/RFIX.win/*.rc2
             ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/*.py
         )
     else ()
         file (GLOB AddOnResourceFiles CONFIGURE_DEPENDS
-            ${AddOnResourcesFolder}/R${addOnLanguage}/*.grc
-            ${AddOnResourcesFolder}/RFIX/*.grc
-            ${AddOnResourcesFolder}/RFIX.mac/*.plist
+            ${addOnResourcesFolder}/R${addOnLanguage}/*.grc
+            ${addOnResourcesFolder}/RFIX/*.grc
+            ${addOnResourcesFolder}/RFIX.mac/*.plist
             ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/*.py
         )
     endif ()
 
-    get_filename_component (AddOnSourcesFolderAbsolute "${CMAKE_CURRENT_LIST_DIR}/${AddOnSourcesFolder}" ABSOLUTE)
-    get_filename_component (AddOnResourcesFolderAbsolute "${CMAKE_CURRENT_LIST_DIR}/${AddOnResourcesFolder}" ABSOLUTE)
+    get_filename_component (AddOnSourcesFolderAbsolute "${CMAKE_CURRENT_LIST_DIR}/${addOnSourcesFolder}" ABSOLUTE)
+    get_filename_component (AddOnResourcesFolderAbsolute "${CMAKE_CURRENT_LIST_DIR}/${addOnResourcesFolder}" ABSOLUTE)
     if (WIN32)
         add_custom_command (
             OUTPUT ${ResourceStampFile}
@@ -150,12 +147,12 @@ function (GenerateAddOnProject acVersion devKitDir addOnName addOnFolder addOnLa
     endif ()
 
     file (GLOB AddOnHeaderFiles CONFIGURE_DEPENDS
-        ${AddOnSourcesFolder}/*.h
-        ${AddOnSourcesFolder}/*.hpp
+        ${addOnSourcesFolder}/*.h
+        ${addOnSourcesFolder}/*.hpp
     )
     file (GLOB AddOnSourceFiles CONFIGURE_DEPENDS
-        ${AddOnSourcesFolder}/*.c
-        ${AddOnSourcesFolder}/*.cpp
+        ${addOnSourcesFolder}/*.c
+        ${addOnSourcesFolder}/*.cpp
     )
     set (
         AddOnFiles
@@ -183,12 +180,12 @@ function (GenerateAddOnProject acVersion devKitDir addOnName addOnFolder addOnLa
 		target_link_options (${addOnName} PUBLIC /export:GetExportedFuncAddrs,@1 /export:SetImportedFuncAddrs,@2)
     else ()
         set_target_properties (${addOnName} PROPERTIES BUNDLE TRUE)
-        set_target_properties (${addOnName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/${AddOnResourcesFolder}/RFIX.mac/Info.plist")
+        set_target_properties (${addOnName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/${addOnResourcesFolder}/RFIX.mac/Info.plist")
         set_target_properties (${addOnName} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>")
     endif ()
 
     target_include_directories (${addOnName} PUBLIC
-        ${AddOnSourcesFolder}
+        ${addOnSourcesFolder}
         ${devKitDir}/Inc
     )
 
