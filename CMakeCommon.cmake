@@ -22,6 +22,7 @@ function (SetCompilerOptions target acVersion)
             /Zc:wchar_t-
             /wd4499
             /EHsc
+			-D_CRT_SECURE_NO_WARNINGS
         )
     else ()
         target_compile_options (${target} PUBLIC -Wall -Wextra -Werror
