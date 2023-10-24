@@ -34,7 +34,19 @@ function (SetCompilerOptions target acVersion)
             -Wno-reorder
             -Wno-overloaded-virtual
             -Wno-unused-parameter
-            -Wno-deprecated)
+            -Wno-unused-value
+            -Wno-unused-private-field
+            -Wno-unused-but-set-variable
+            -Wno-deprecated
+            -Wno-unknown-pragmas
+            -Wno-missing-braces
+            -Wno-missing-field-initializers		
+            -Wno-non-c-typedef-for-linkage
+            -Wno-uninitialized-const-reference
+            -Wno-shorten-64-to-32
+            -Wno-sign-compare
+            -Wno-switch
+		)
         if (${acVersion} LESS_EQUAL "24")
             target_compile_options (${target} PUBLIC -Wno-non-c-typedef-for-linkage)
         endif ()
