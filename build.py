@@ -209,7 +209,7 @@ def Main():
                     return 1
 
     # Create directory for Build and Package
-    rootFolder = pathlib.Path(__file__).parent.absolute()
+    rootFolder = pathlib.Path(__file__).parent.parent.absolute()
     buildFolder = rootFolder / 'Build'
     packageRootFolder = buildFolder / 'Package' / addOnName
     devKitFolderList = {}
