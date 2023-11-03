@@ -120,8 +120,8 @@ def Main():
     parser.add_argument ('--acVersion', dest = 'acVersion', type = str, required = True, help = 'Archicad version number list. Ex: "26 27"')
     parser.add_argument ('--language', dest = 'language', type = str, required = False, help = 'Add-On language code list. Ex: "INT GER". Specify "ALL" for all languages in the configfile.' )
     parser.add_argument ('--devKitPath', dest = 'devKitPath', type = str, required = False, help = 'Path to local APIDevKit')
-    parser.add_argument ('--release', dest = 'release', required = False, action='store_true', help = 'Create zip package.')
-    parser.add_argument ('--package', dest = 'package', required = False, action='store_true', help = 'Create zip package.')
+    parser.add_argument ('--release', dest = 'release', required = False, action='store_true', help = 'Build in localized Release mode.')
+    parser.add_argument ('--package', dest = 'package', required = False, action='store_true', help = 'Create zip archive.')
     args = parser.parse_args ()
 
     if args.language is None and args.release:
