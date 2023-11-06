@@ -12,14 +12,15 @@ import zipfile
 
 def ParseArguments():
     parser = argparse.ArgumentParser ()
-    parser.add_argument ('--acVersion', dest = 'acVersion', type = str, required = True, help = 'Archicad version number list. Ex: "26 27"')
-    parser.add_argument ('--language', dest = 'language', type = str, required = False, help = 'Add-On language code list. Ex: "INT GER". Specify "ALL" for all languages in the configfile.' )
+    parser.add_argument ('--configFile', dest = 'configFile', required = True, help = 'JSON Configuration file')
+    parser.add_argument ('--acVersion', dest = 'acVersion', nargs = '+', type = str, required = True, help = 'Archicad version number list. Ex: "26 27"')
+    parser.add_argument ('--language', dest = 'language', nargs = '+', type = str, required = False, help = 'Add-On language code list. Ex: "INT GER". Specify "ALL" for all languages in the configfile.' )
     parser.add_argument ('--devKitPath', dest = 'devKitPath', type = str, required = False, help = 'Path to local APIDevKit')
     parser.add_argument ('--release', dest = 'release', required = False, action='store_true', help = 'Build in localized Release mode.')
     parser.add_argument ('--package', dest = 'package', required = False, action='store_true', help = 'Create zip archive.')
     return parser.parse_args ()
 
-def ChangePermission(devKitFolder):
+def AddRunPermissionToResConv(devKitFolder):
     permissionParams = []
     permissionParams.append ('chmod')
     permissionParams.append ('+x')
@@ -28,10 +29,6 @@ def ChangePermission(devKitFolder):
     return permissionResult == 0
 
 def PrepareDirectories(rootFolder, buildFolder, packageRootFolder, devKitFolderList, args, configData, platformName):
-    acVersionList = args.acVersion.split()
-
-    os.chdir (rootFolder)
-
     if not buildFolder.exists():
         buildFolder.mkdir(parents=True)
 
@@ -41,13 +38,13 @@ def PrepareDirectories(rootFolder, buildFolder, packageRootFolder, devKitFolderL
 
     # Set APIDevKit directory if local is used, else create new directories
     if args.devKitPath is not None:
-        devKitFolderList[acVersionList[0]] = pathlib.Path(args.devKitPath)
+        devKitFolderList[args.acVersion[0]] = pathlib.Path(args.devKitPath)
     else:
         # For every ACVersion
         # Check if APIDevKitLink is provided
         # Create directory for APIDevKit
         # Download APIDevKit
-        for version in acVersionList:
+        for version in args.acVersion:
             if version in configData['devKitLinks']:
 
                 devKitFolder = rootFolder / f'APIDevKit-{version}'
@@ -175,9 +172,7 @@ def Main():
         print('Must specify AddOn language on release version')
         return 1
 
-    acVersionList = args.acVersion.split()
-
-    if args.devKitPath is not None and len(acVersionList) != 1:
+    if args.devKitPath is not None and len(args.acVersion) != 1:
         print('Only one Archicad version supported with local APIDevKit option')
         return 1
 
@@ -189,7 +184,7 @@ def Main():
         platformName = 'MAC'
 
     # Load config data
-    configFile = open('config.json')
+    configFile = open(args.configFile)
     configData = json.load(configFile)
     addOnName = configData['addOnName']
 
@@ -199,7 +194,7 @@ def Main():
 
     if args.language:
         configUpper = [lang.upper() for lang in configData['languages']]
-        languageList = args.language.upper().split()
+        languageList = [lang.upper() for lang in args.language]
         if 'ALL' in languageList:
             languageList = configUpper
         else:
@@ -214,6 +209,8 @@ def Main():
     packageRootFolder = buildFolder / 'Package' / addOnName
     devKitFolderList = {}
 
+    os.chdir (rootFolder)
+
     if PrepareDirectories(rootFolder, buildFolder, packageRootFolder, devKitFolderList, args, configData, platformName) != 0:
         return 1
 
@@ -227,7 +224,7 @@ def Main():
         devKitFolder = devKitFolderList[version]
 
         if platformName == 'MAC':
-            if not ChangePermission(devKitFolder):
+            if not AddRunPermissionToResConv(devKitFolder):
                 print ('Failed to grant permission')
                 return 1
 
