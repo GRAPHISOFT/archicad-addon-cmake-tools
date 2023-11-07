@@ -14,8 +14,6 @@ def ParseArguments():
     parser = argparse.ArgumentParser ()
     parser.add_argument ('--configFile', dest = 'configFile', required = True, help = 'JSON Configuration file')
     parser.add_argument ('--acVersion', dest = 'acVersion', nargs = '+', type = str, required = True, help = 'Archicad version number list. Ex: 26 27')
-    parser.add_argument ('--winGenerator', dest = 'winGenerator', required = False, type = str, help = 'Local Visual Studio version. Should be 2019 or newer. Ex: "Visual Studio 16 2019"')
-    parser.add_argument ('--toolset', dest = 'toolset', required = False, type = str, help = 'Visual Studio platform toolset. Ex: v142')
     parser.add_argument ('--language', dest = 'language', nargs = '+', type = str, required = False, help = 'Add-On language code list. Ex: INT GER. Specify ALL for all languages in the configfile.' )
     parser.add_argument ('--devKitPath', dest = 'devKitPath', type = str, required = False, help = 'Path to local APIDevKit')
     parser.add_argument ('--release', dest = 'release', required = False, action='store_true', help = 'Build in localized Release mode.')
@@ -86,7 +84,12 @@ def DownloadAndUnzip (url, dest, platformName):
             '-d', dest
         ])
 
-def BuildAddOn (rootFolder, buildFolder, devKitFolder, args, version, addOnName, platformName, configuration, optionalParams, languageCode=None):
+def BuildAddOn (rootFolder, buildFolder, devKitFolder, version, configData, platformName, configuration, languageCode=None):
+    addOnName = configData['addOnName']
+    optionalParams = None
+    if 'addOnSpecificCMakeParameters' in configData:
+        optionalParams = configData['addOnSpecificCMakeParameters']
+
     buildPath = buildFolder / addOnName / version
     if languageCode is not None:
         buildPath = buildPath / languageCode
@@ -97,8 +100,8 @@ def BuildAddOn (rootFolder, buildFolder, devKitFolder, args, version, addOnName,
     projGenParams.extend (['-B', str(buildPath)])
 
     if platformName == 'WIN':
-        projGenParams.append (f'-G {args.winGenerator}')
-        projGenParams.append (f'-T {args.toolset}')
+        projGenParams.append (f'-G {configData["winCMakeProjectGenerator"]}')
+        projGenParams.append (f'-T {configData["winCMakePlatformToolset"]}')
     elif platformName == 'MAC':
         projGenParams.extend (['-G', 'Xcode'])
 
@@ -186,14 +189,6 @@ def Main():
     elif platform.system () == 'Darwin':
         platformName = 'MAC'
 
-    if platformName == 'WIN':
-        if args.winGenerator is None:
-            print('Missing generator for cmake project generation (Windows)')
-            return 1
-        if args.toolset is None:
-            print('Missing platform toolset for cmake project generation (Windows)')
-            return 1
-
     # Load config data
     configFile = open(args.configFile)
     configData = json.load(configFile)
@@ -241,15 +236,15 @@ def Main():
 
         if args.release is True:
             for languageCode in languageList:
-                if BuildAddOn(rootFolder, buildFolder, devKitFolder, args, version, addOnName, platformName, 'RelWithDebInfo', optionalParams, languageCode) != 0:
+                if BuildAddOn(rootFolder, buildFolder, devKitFolder, version, configData, platformName, 'RelWithDebInfo', languageCode) != 0:
                     return 1
                 if args.package:
                     CopyResultToPackage(packageRootFolder, buildFolder, version, addOnName, platformName, 'RelWithDebInfo', languageCode, True)
 
         else:
-            if BuildAddOn(rootFolder, buildFolder, devKitFolder, args, version, addOnName, platformName, 'Debug', optionalParams) != 0:
+            if BuildAddOn(rootFolder, buildFolder, devKitFolder, version, configData, platformName, 'Debug') != 0:
                 return 1
-            if BuildAddOn(rootFolder, buildFolder, devKitFolder, args, version, addOnName, platformName, 'RelWithDebInfo', optionalParams) != 0:
+            if BuildAddOn(rootFolder, buildFolder, devKitFolder, version, configData, platformName, 'RelWithDebInfo') != 0:
                 return 1
             if args.package:
                 CopyResultToPackage(packageRootFolder, buildFolder, version, addOnName, platformName, 'Debug')
