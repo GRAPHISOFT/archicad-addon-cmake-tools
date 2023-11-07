@@ -84,8 +84,8 @@ def DownloadAndUnzip (url, dest, platformName):
             '-d', dest
         ])
 
-def BuildAddOn (rootFolder, buildFolder, devKitFolder, addOnName, platformName, configuration, optionalParams, languageCode=None):
-    buildPath = buildFolder / addOnName
+def BuildAddOn (rootFolder, buildFolder, devKitFolder, version, addOnName, platformName, configuration, optionalParams, languageCode=None):
+    buildPath = buildFolder / addOnName / version
     if languageCode is not None:
         buildPath = buildPath / languageCode
 
@@ -129,9 +129,9 @@ def BuildAddOn (rootFolder, buildFolder, devKitFolder, addOnName, platformName, 
 
     return 0
 
-def CopyResultToPackage(packageRootFolder, buildFolder, addOnName, platformName, configuration, languageCode=None, isRelease=False):
-    packageFolder = packageRootFolder
-    sourceFolder = buildFolder / addOnName
+def CopyResultToPackage(packageRootFolder, buildFolder, version, addOnName, platformName, configuration, languageCode=None, isRelease=False):
+    packageFolder = packageRootFolder / version
+    sourceFolder = buildFolder / addOnName / version
 
     if languageCode is not None:
         packageFolder = packageFolder / languageCode
@@ -169,7 +169,7 @@ def Main():
     args = ParseArguments()
 
     if args.language is None and args.release:
-        print('Must specify AddOn language on release version')
+        print('Must specify AddOn language for release version')
         return 1
 
     if args.devKitPath is not None and len(args.acVersion) != 1:
@@ -230,28 +230,29 @@ def Main():
 
         if args.release is True:
             for languageCode in languageList:
-                if BuildAddOn(rootFolder, buildFolder, devKitFolder, addOnName, platformName, 'RelWithDebInfo', optionalParams, languageCode) != 0:
+                if BuildAddOn(rootFolder, buildFolder, devKitFolder, version, addOnName, platformName, 'RelWithDebInfo', optionalParams, languageCode) != 0:
                     return 1
                 if args.package:
-                    CopyResultToPackage(packageRootFolder, buildFolder, addOnName, platformName, 'RelWithDebInfo', languageCode, True)
+                    CopyResultToPackage(packageRootFolder, buildFolder, version, addOnName, platformName, 'RelWithDebInfo', languageCode, True)
 
         else:
-            if BuildAddOn(rootFolder, buildFolder, devKitFolder, addOnName, platformName, 'Debug', optionalParams) != 0:
+            if BuildAddOn(rootFolder, buildFolder, devKitFolder, version, addOnName, platformName, 'Debug', optionalParams) != 0:
                 return 1
-            if BuildAddOn(rootFolder, buildFolder, devKitFolder, addOnName, platformName, 'RelWithDebInfo', optionalParams) != 0:
+            if BuildAddOn(rootFolder, buildFolder, devKitFolder, version, addOnName, platformName, 'RelWithDebInfo', optionalParams) != 0:
                 return 1
             if args.package:
-                CopyResultToPackage(packageRootFolder, buildFolder, addOnName, platformName, 'Debug')
-                CopyResultToPackage(packageRootFolder, buildFolder, addOnName, platformName, 'RelWithDebInfo')
+                CopyResultToPackage(packageRootFolder, buildFolder, version, addOnName, platformName, 'Debug')
+                CopyResultToPackage(packageRootFolder, buildFolder, version, addOnName, platformName, 'RelWithDebInfo')
 
     # Zip packages
     if args.package:
         release = 'Release_Localized' if args.release else 'Daily'
-        subprocess.call ([
-            '7z', 'a',
-            str(packageRootFolder.parent / f'{addOnName}_{release}_{platformName}.zip'),
-            str(packageRootFolder / '*')
-        ])
+        for version in args.acVersion:
+            subprocess.call ([
+                '7z', 'a',
+                str(packageRootFolder.parent / f'{addOnName}-{version}_{release}_{platformName}.zip'),
+                str(packageRootFolder / version / '*')
+            ])
 
     print ('Build Successful')
     return 0
