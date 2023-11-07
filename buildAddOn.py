@@ -96,6 +96,7 @@ def BuildAddOn (rootFolder, buildFolder, devKitFolder, version, addOnName, platf
 
     if platformName == 'WIN':
         projGenParams.extend (['-G', 'Visual Studio 16 2019'])
+        projGenParams.extend (['-T', 'v142'])
     elif platformName == 'MAC':
         projGenParams.extend (['-G', 'Xcode'])
 
