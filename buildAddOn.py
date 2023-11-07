@@ -214,7 +214,6 @@ def Main():
 
     # At this point, devKitFolderList dictionary has all provided ACVersions as keys
     # For every ACVersion
-    # Enable execute permission if running on Mac
     # If release, build Add-On for all languages with RelWithDebInfo configuration
     # Else build Add-On with Debug and RelWithDebInfo configurations, without language specified   
     # In each case, if package creation is enabled, copy the .apx/.bundle files to the Package directory
