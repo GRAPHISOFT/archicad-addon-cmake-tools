@@ -20,14 +20,6 @@ def ParseArguments():
     parser.add_argument ('--package', dest = 'package', required = False, action='store_true', help = 'Create zip archive.')
     return parser.parse_args ()
 
-def AddRunPermissionToResConv(devKitFolder):
-    permissionParams = []
-    permissionParams.append ('chmod')
-    permissionParams.append ('+x')
-    permissionParams.append (str(devKitFolder / 'Support' / 'Tools' / 'OSX' / 'ResConv'))
-    permissionResult = subprocess.call (permissionParams)
-    return permissionResult == 0
-
 def PrepareDirectories(rootFolder, buildFolder, packageRootFolder, devKitFolderList, args, configData, platformName):
     if not buildFolder.exists():
         buildFolder.mkdir(parents=True)
@@ -228,11 +220,6 @@ def Main():
     # In each case, if package creation is enabled, copy the .apx/.bundle files to the Package directory
     for version in devKitFolderList:
         devKitFolder = devKitFolderList[version]
-
-        if platformName == 'MAC':
-            if not AddRunPermissionToResConv(devKitFolder):
-                print ('Failed to grant permission')
-                return 1
 
         if args.release is True:
             for languageCode in languageList:
