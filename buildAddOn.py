@@ -39,6 +39,7 @@ def PrepareParameters(args):
     addOnName = configData['addOnName']
     languageList = None
 
+    # Get needed language codes
     if args.release:
         configLangUpper = [lang.upper() for lang in configData['languages']]
         languageList = ['ALL']
@@ -57,7 +58,7 @@ def PrepareParameters(args):
 
 def PrepareDirectories(args, configData, platformName, addOnName):
     # Create directory for Build and Package
-    workspaceRootFolder = pathlib.Path(__file__).parent.absolute().parent.absolute()
+    workspaceRootFolder = pathlib.Path(__file__).parent.absolute().parent.absolute()        # needed, because parent.parent.absolute() doesn't work when not running from workspace root
     buildFolder = workspaceRootFolder / 'Build'
     packageRootFolder = buildFolder / 'Package' / addOnName
     devKitFolderList = {}
@@ -182,21 +183,19 @@ def BuildAddOns(args, configData, platformName, languageList, workspaceRootFolde
     # If release, build Add-On for all languages with RelWithDebInfo configuration
     # Else build Add-On with Debug and RelWithDebInfo configurations, without language specified   
     # In each case, if package creation is enabled, copy the .apx/.bundle files to the Package directory
-    for version in devKitFolderList:
-        devKitFolder = devKitFolderList[version]
+    try:
+        for version in devKitFolderList:
+            devKitFolder = devKitFolderList[version]
 
-        if args.release is True:
-            for languageCode in languageList:
-                try:
+            if args.release is True:
+                for languageCode in languageList:
                     BuildAddOn(configData, platformName, workspaceRootFolder, buildFolder, devKitFolder, version, 'RelWithDebInfo', languageCode)
-                except Exception as e:
-                    raise e
 
-        else:
-            try:
+            else:
                 BuildAddOn(configData, platformName, workspaceRootFolder, buildFolder, devKitFolder, version, 'Debug')
                 BuildAddOn(configData, platformName, workspaceRootFolder, buildFolder, devKitFolder, version, 'RelWithDebInfo')
-            except Exception as e:
+
+    except Exception as e:
                 raise e
 
 
