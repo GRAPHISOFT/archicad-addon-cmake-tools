@@ -200,6 +200,13 @@ def BuildAddOns(args, configData, platformName, languageList, workspaceRootFolde
 
 
 
+def checkIf7ZInstalled():
+    try:
+        subprocess.call('7z', stdout=subprocess.DEVNULL)
+    except:
+        raise Exception('7Zip not installed!')
+
+
 def CopyResultToPackage(packageRootFolder, buildFolder, version, addOnName, platformName, configuration, languageCode=None, isRelease=False):
     packageFolder = packageRootFolder / version
     sourceFolder = buildFolder / addOnName / version
@@ -236,6 +243,8 @@ def CopyResultToPackage(packageRootFolder, buildFolder, version, addOnName, plat
 
 # Zip packages
 def PackageAddOns(args, addOnName, platformName, languageList, buildFolder, packageRootFolder):
+    checkIf7ZInstalled()
+
     for version in args.acVersion:
         if args.release:
             for languageCode in languageList:
