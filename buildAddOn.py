@@ -12,7 +12,7 @@ import zipfile
 def ParseArguments():
     parser = argparse.ArgumentParser ()
     parser.add_argument ('-c', '--configFile', dest = 'configFile', required = True, help = 'JSON Configuration file')
-    parser.add_argument ('-v', '--acVersion', dest = 'acVersion', nargs = '+', type = str, required = True, help = 'Archicad version number list. Ex: 26 27')
+    parser.add_argument ('-v', '--acVersion', dest = 'acVersion', nargs = '+', type = str, required = False, help = 'Archicad version number list. Ex: 26 27')
     parser.add_argument ('-l', '--language', dest = 'language', nargs = '+', type = str, required = False, help = 'Add-On language code list. Ex: INT GER. Specify ALL for all languages in the configfile.' )
     parser.add_argument ('-d', '--devKitPath', dest = 'devKitPath', type = str, required = False, help = 'Path to local APIDevKit')
     parser.add_argument ('-r', '--release', dest = 'release', required = False, action='store_true', help = 'Build in localized Release mode.')
@@ -37,7 +37,15 @@ def PrepareParameters(args):
     configFile = open(args.configFile)
     configData = json.load(configFile)
     addOnName = configData['addOnName']
+    acVersionList = None
     languageList = None
+
+    if args.acVersion:
+        acVersionList = args.acVersion
+    else:
+        acVersionList = []
+        for version in configData['devKitLinks']:
+            acVersionList.append(version)
 
     # Get needed language codes
     if args.release:
@@ -53,10 +61,10 @@ def PrepareParameters(args):
                 if lang not in configLangUpper:
                     raise Exception('Language not supported!')
                 
-    return [configData, platformName, addOnName, languageList]
+    return [configData, platformName, addOnName, acVersionList, languageList]
 
 
-def PrepareDirectories(args, configData, platformName, addOnName):
+def PrepareDirectories(args, configData, platformName, addOnName, acVersionList):
     # Create directory for Build and Package
     workspaceRootFolder = pathlib.Path(__file__).parent.absolute().parent.absolute()        # needed, because parent.parent.absolute() doesn't work when not running from workspace root
     buildFolder = workspaceRootFolder / 'Build'
@@ -72,13 +80,13 @@ def PrepareDirectories(args, configData, platformName, addOnName):
 
     # Set APIDevKit directory if local is used, else create new directories
     if args.devKitPath is not None:
-        devKitFolderList[args.acVersion[0]] = pathlib.Path(args.devKitPath)
+        devKitFolderList[acVersionList[0]] = pathlib.Path(args.devKitPath)
     else:
         # For every ACVersion
         # Check if APIDevKitLink is provided
         # Create directory for APIDevKit
         # Download APIDevKit
-        for version in args.acVersion:
+        for version in acVersionList:
             if version in configData['devKitLinks']:
 
                 devKitFolder = workspaceRootFolder / f'APIDevKit-{version}'
@@ -242,10 +250,10 @@ def CopyResultToPackage(packageRootFolder, buildFolder, version, addOnName, plat
         ])
 
 # Zip packages
-def PackageAddOns(args, addOnName, platformName, languageList, buildFolder, packageRootFolder):
+def PackageAddOns(args, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder):
     checkIf7ZInstalled()
 
-    for version in args.acVersion:
+    for version in acVersionList:
         if args.release:
             for languageCode in languageList:
                 CopyResultToPackage(packageRootFolder, buildFolder, version, addOnName, platformName, 'RelWithDebInfo', languageCode, True)
@@ -264,16 +272,16 @@ def Main():
     try:
         args = ParseArguments()
 
-        [configData, platformName, addOnName, languageList] = PrepareParameters(args)
+        [configData, platformName, addOnName, acVersionList, languageList] = PrepareParameters(args)
 
-        [workspaceRootFolder, buildFolder, packageRootFolder, devKitFolderList] = PrepareDirectories(args, configData, platformName, addOnName)
+        [workspaceRootFolder, buildFolder, packageRootFolder, devKitFolderList] = PrepareDirectories(args, configData, platformName, addOnName, acVersionList)
 
         os.chdir (workspaceRootFolder)
         
         BuildAddOns(args, configData, platformName, languageList, workspaceRootFolder, buildFolder, devKitFolderList)
 
         if args.package:
-            PackageAddOns(args, addOnName, platformName, languageList, buildFolder, packageRootFolder)
+            PackageAddOns(args, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder)
 
         print ('Build succeeded!')
         return 0
