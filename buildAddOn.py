@@ -165,7 +165,7 @@ def BuildAddOn (configData, platformName, workspaceRootFolder, buildFolder, devK
             value = os.environ.get(key)
             if value is None:
                 raise Exception(f'{key} - Environment variable not found!')
-            optionalParams[key] = os.environ.get(key)
+            optionalParams[key] = value
 
     buildPath = buildFolder / addOnName / version
     if languageCode is not None:
