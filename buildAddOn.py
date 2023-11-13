@@ -159,8 +159,13 @@ def GetProjectGenerationParams(configData, workspaceRootFolder, buildPath, platf
 def BuildAddOn (configData, platformName, workspaceRootFolder, buildFolder, devKitFolder, version, configuration, languageCode=None):
     addOnName = configData['addOnName']
     optionalParams = None
-    if 'addOnSpecificCMakeParameters' in configData:
-        optionalParams = configData['addOnSpecificCMakeParameters']
+    if 'addOnSpecificCMakeParameterEnvVars' in configData:
+        optionalParams = {}
+        for key in configData['addOnSpecificCMakeParameterEnvVars']:
+            value = os.environ.get(key)
+            if value is None:
+                raise Exception(f'{key} - Environment variable not found!')
+            optionalParams[key] = value
 
     buildPath = buildFolder / addOnName / version
     if languageCode is not None:
