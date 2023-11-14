@@ -44,7 +44,7 @@ def PrepareParameters(args):
         acVersionList = args.acVersion
     else:
         acVersionList = []
-        for version in configData['devKitLinks']:
+        for version in configData['devKitLinks'][platformName]:
             acVersionList.append(version)
 
     # Get needed language codes
@@ -87,14 +87,14 @@ def PrepareDirectories(args, configData, platformName, addOnName, acVersionList)
         # Create directory for APIDevKit
         # Download APIDevKit
         for version in acVersionList:
-            if version in configData['devKitLinks']:
+            if version in configData['devKitLinks'][platformName]:
 
                 devKitFolder = workspaceRootFolder / f'APIDevKit-{version}'
                 if not devKitFolder.exists():
                     devKitFolder.mkdir()
 
                 devKitFolderList[version] = devKitFolder
-                DownloadAndUnzip(configData['devKitLinks'][version], devKitFolder, platformName)
+                DownloadAndUnzip(configData['devKitLinks'][platformName][version], devKitFolder, platformName)
 
             else:
                 raise Exception('APIDevKit download link not provided!')
@@ -103,12 +103,7 @@ def PrepareDirectories(args, configData, platformName, addOnName, acVersionList)
 
 
 def DownloadAndUnzip (url, dest, platformName):
-    # https://github.com/GRAPHISOFT/archicad-api-devkit/releases/download/<tag>/ <filename>
-    # https://github.com/GRAPHISOFT/archicad-api-devkit/releases/latest/download/ <filename>   - not used, as there isn't a single latest version
-
-    version = url.split('/')[-1]
-    fileName = f'API.Development.Kit.{platformName}.{version}.zip'
-    url = f'{url}/{fileName}'
+    fileName = url.split('/')[-1]
     filePath = pathlib.Path(dest, fileName)
     if filePath.exists():
         return
