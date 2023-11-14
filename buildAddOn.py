@@ -19,8 +19,11 @@ def ParseArguments():
     parser.add_argument ('-p', '--package', dest = 'package', required = False, action='store_true', help = 'Create zip archive.')
     args = parser.parse_args ()
 
-    if args.devKitPath is not None and len(args.acVersion) != 1:
-        raise Exception('Only one Archicad version supported with local APIDevKit option!')
+    if args.devKitPath is not None:
+        if args.acVersion is None:
+            raise Exception('Must provide one Archicad version with local APIDevKit option!')
+        if len(args.acVersion) != 1:
+            raise Exception('Only one Archicad version supported with local APIDevKit option!')
     
     return args
 
@@ -34,7 +37,10 @@ def PrepareParameters(args):
         platformName = 'MAC'
 
     # Load config data
-    configFile = open(args.configFile)
+    configPath = pathlib.Path(args.configFile)
+    if configPath.is_dir():
+        raise Exception(f'{configPath} is a directory!')
+    configFile = open(configPath)
     configData = json.load(configFile)
     addOnName = configData['addOnName']
     acVersionList = None
@@ -44,7 +50,7 @@ def PrepareParameters(args):
         acVersionList = args.acVersion
     else:
         acVersionList = []
-        for version in configData['devKitLinks']:
+        for version in configData['devKitLinks'][platformName]:
             acVersionList.append(version)
 
     # Get needed language codes
@@ -80,21 +86,24 @@ def PrepareDirectories(args, configData, platformName, addOnName, acVersionList)
 
     # Set APIDevKit directory if local is used, else create new directories
     if args.devKitPath is not None:
-        devKitFolderList[acVersionList[0]] = pathlib.Path(args.devKitPath)
+        devKitPath = pathlib.Path(args.devKitPath)
+        if not devKitPath.is_dir():
+            raise Exception(f'{devKitPath} is not a directory!')
+        devKitFolderList[acVersionList[0]] = devKitPath
     else:
         # For every ACVersion
         # Check if APIDevKitLink is provided
         # Create directory for APIDevKit
         # Download APIDevKit
         for version in acVersionList:
-            if version in configData['devKitLinks']:
+            if version in configData['devKitLinks'][platformName]:
 
                 devKitFolder = workspaceRootFolder / f'APIDevKit-{version}'
                 if not devKitFolder.exists():
                     devKitFolder.mkdir()
 
                 devKitFolderList[version] = devKitFolder
-                DownloadAndUnzip(configData['devKitLinks'][version], devKitFolder, platformName)
+                DownloadAndUnzip(configData['devKitLinks'][platformName][version], devKitFolder)
 
             else:
                 raise Exception('APIDevKit download link not provided!')
@@ -102,13 +111,8 @@ def PrepareDirectories(args, configData, platformName, addOnName, acVersionList)
     return [workspaceRootFolder, buildFolder, packageRootFolder, devKitFolderList]
 
 
-def DownloadAndUnzip (url, dest, platformName):
-    # https://github.com/GRAPHISOFT/archicad-api-devkit/releases/download/<tag>/ <filename>
-    # https://github.com/GRAPHISOFT/archicad-api-devkit/releases/latest/download/ <filename>   - not used, as there isn't a single latest version
-
-    version = url.split('/')[-1]
-    fileName = f'API.Development.Kit.{platformName}.{version}.zip'
-    url = f'{url}/{fileName}'
+def DownloadAndUnzip (url, dest):
+    fileName = url.split('/')[-1]
     filePath = pathlib.Path(dest, fileName)
     if filePath.exists():
         return
@@ -266,7 +270,7 @@ def PackageAddOns(args, addOnName, platformName, acVersionList, languageList, bu
             CopyResultToPackage(packageRootFolder, buildFolder, version, addOnName, platformName, 'Debug')
             CopyResultToPackage(packageRootFolder, buildFolder, version, addOnName, platformName, 'RelWithDebInfo')
         
-        buildType = 'Release_Localized' if args.release else 'Daily'
+        buildType = 'Release' if args.release else 'Daily'
         subprocess.call ([
             '7z', 'a',
             str(packageRootFolder.parent / f'{addOnName}-{version}_{buildType}_{platformName}.zip'),
