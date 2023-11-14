@@ -94,7 +94,7 @@ def PrepareDirectories(args, configData, platformName, addOnName, acVersionList)
                     devKitFolder.mkdir()
 
                 devKitFolderList[version] = devKitFolder
-                DownloadAndUnzip(configData['devKitLinks'][platformName][version], devKitFolder, platformName)
+                DownloadAndUnzip(configData['devKitLinks'][platformName][version], devKitFolder)
 
             else:
                 raise Exception('APIDevKit download link not provided!')
@@ -102,7 +102,7 @@ def PrepareDirectories(args, configData, platformName, addOnName, acVersionList)
     return [workspaceRootFolder, buildFolder, packageRootFolder, devKitFolderList]
 
 
-def DownloadAndUnzip (url, dest, platformName):
+def DownloadAndUnzip (url, dest):
     fileName = url.split('/')[-1]
     filePath = pathlib.Path(dest, fileName)
     if filePath.exists():
