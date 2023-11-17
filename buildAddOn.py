@@ -98,9 +98,9 @@ def PrepareDirectories (args, configData, platformName, addOnName, acVersionList
         for version in acVersionList:
             if version in configData['devKitLinks'][platformName]:
 
-                devKitFolder = workspaceRootFolder / f'APIDevKit-{version}'
+                devKitFolder = buildFolder / 'DevKit' / f'APIDevKit-{version}'
                 if not devKitFolder.exists ():
-                    devKitFolder.mkdir ()
+                    devKitFolder.mkdir (parents=True)
 
                 devKitFolderList[version] = devKitFolder
                 DownloadAndUnzip (configData['devKitLinks'][platformName][version], devKitFolder)
@@ -131,7 +131,7 @@ def DownloadAndUnzip (url, dest):
         ])
 
 
-def GetProjectGenerationParams (configData, workspaceRootFolder, buildPath, platformName, devKitFolder, version, configuration, languageCode, optionalParams):
+def GetProjectGenerationParams (configData, workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, optionalParams):
     # Add params to configure cmake
     projGenParams = [
         'cmake',
@@ -148,7 +148,6 @@ def GetProjectGenerationParams (configData, workspaceRootFolder, buildPath, plat
         projGenParams.extend (['-G', 'Xcode'])
 
     projGenParams.append (f'-DAC_API_DEVKIT_DIR={str (devKitFolder / "Support")}')
-    projGenParams.append (f'-DCMAKE_BUILD_TYPE={configuration}')
 
     if languageCode is not None:
         projGenParams.append (f'-DAC_ADDON_LANGUAGE={languageCode}')
@@ -178,7 +177,7 @@ def BuildAddOn (configData, platformName, workspaceRootFolder, buildFolder, devK
         buildPath = buildPath / languageCode
 
     # Add params to configure cmake
-    projGenParams = GetProjectGenerationParams (configData, workspaceRootFolder, buildPath, platformName, devKitFolder, version, configuration, languageCode, optionalParams)
+    projGenParams = GetProjectGenerationParams (configData, workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, optionalParams)
     projGenResult = subprocess.call (projGenParams)
     if projGenResult != 0:
         raise Exception ('Failed to generate project!')
