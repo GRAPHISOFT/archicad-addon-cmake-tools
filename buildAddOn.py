@@ -98,7 +98,7 @@ def PrepareDirectories (args, configData, platformName, addOnName, acVersionList
         for version in acVersionList:
             if version in configData['devKitLinks'][platformName]:
 
-                devKitFolder = workspaceRootFolder / f'APIDevKit-{version}'
+                devKitFolder = buildFolder / 'DevKit' / f'APIDevKit-{version}'
                 if not devKitFolder.exists ():
                     devKitFolder.mkdir ()
 
