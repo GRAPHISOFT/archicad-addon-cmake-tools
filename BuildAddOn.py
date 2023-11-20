@@ -131,7 +131,24 @@ def DownloadAndUnzip (url, dest):
         ])
 
 
-def GetProjectGenerationParams (configData, workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, optionalParams):
+def GetInstalledVisualStudioGenerator ():
+    vsWherePath = pathlib.Path (os.environ["ProgramFiles(x86)"]) / 'Microsoft Visual Studio' / 'Installer' / 'vswhere.exe'
+    if not vsWherePath.exists ():
+        raise Exception ('Microsoft Visual Studio Installer not found!')
+    vsWhereOutputStr = subprocess.check_output ([vsWherePath, '-sort', '-format', 'json'])
+    vsWhereOutput = json.loads (vsWhereOutputStr)
+    if len (vsWhereOutput) == 0:
+        raise Exception ('No installed Visual Studio detected!')
+    vsVersion = vsWhereOutput[0]['installationVersion'].split ('.')[0]
+    if vsVersion == '17':
+        return 'Visual Studio 17 2022'
+    elif vsVersion == '16':
+        return 'Visual Studio 16 2019'
+    else:
+        raise Exception ('Installed Visual Studio version not supported!')
+    
+
+def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, optionalParams):
     # Add params to configure cmake
     projGenParams = [
         'cmake',
@@ -139,7 +156,8 @@ def GetProjectGenerationParams (configData, workspaceRootFolder, buildPath, plat
     ]
 
     if platformName == 'WIN':
-        projGenParams.append (f'-G {configData["winCMakeProjectGenerator"]}')
+        vsGenerator = GetInstalledVisualStudioGenerator ()
+        projGenParams.append (f'-G {vsGenerator}')
         toolset = 'v142'
         if int (version) < 25:
             toolset = 'v141'
@@ -177,7 +195,7 @@ def BuildAddOn (configData, platformName, workspaceRootFolder, buildFolder, devK
         buildPath = buildPath / languageCode
 
     # Add params to configure cmake
-    projGenParams = GetProjectGenerationParams (configData, workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, optionalParams)
+    projGenParams = GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, optionalParams)
     projGenResult = subprocess.call (projGenParams)
     if projGenResult != 0:
         raise Exception ('Failed to generate project!')
