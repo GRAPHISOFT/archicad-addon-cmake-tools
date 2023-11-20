@@ -98,9 +98,9 @@ def PrepareDirectories (args, configData, platformName, addOnName, acVersionList
         for version in acVersionList:
             if version in configData['devKitLinks'][platformName]:
 
-                devKitFolder = workspaceRootFolder / f'APIDevKit-{version}'
+                devKitFolder = buildFolder / 'DevKit' / f'APIDevKit-{version}'
                 if not devKitFolder.exists ():
-                    devKitFolder.mkdir ()
+                    devKitFolder.mkdir (parents=True)
 
                 devKitFolderList[version] = devKitFolder
                 DownloadAndUnzip (configData['devKitLinks'][platformName][version], devKitFolder)
@@ -131,15 +131,34 @@ def DownloadAndUnzip (url, dest):
         ])
 
 
-def GetProjectGenerationParams (configData, workspaceRootFolder, buildPath, platformName, devKitFolder, version, configuration, languageCode, optionalParams):
+def GetInstalledVisualStudioGenerator ():
+    vsWherePath = pathlib.Path (os.environ["ProgramFiles(x86)"]) / 'Microsoft Visual Studio' / 'Installer' / 'vswhere.exe'
+    if not vsWherePath.exists ():
+        raise Exception ('Microsoft Visual Studio Installer not found!')
+    vsWhereOutputStr = subprocess.check_output ([vsWherePath, '-sort', '-format', 'json'])
+    vsWhereOutput = json.loads (vsWhereOutputStr)
+    if len (vsWhereOutput) == 0:
+        raise Exception ('No installed Visual Studio detected!')
+    vsVersion = vsWhereOutput[0]['installationVersion'].split ('.')[0]
+    if vsVersion == '17':
+        return 'Visual Studio 17 2022'
+    elif vsVersion == '16':
+        return 'Visual Studio 16 2019'
+    else:
+        raise Exception ('Installed Visual Studio version not supported!')
+    
+
+def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, optionalParams):
     # Add params to configure cmake
     projGenParams = [
         'cmake',
         '-B', str (buildPath)
     ]
 
+    vsGenerator = GetInstalledVisualStudioGenerator ()
+
     if platformName == 'WIN':
-        projGenParams.append (f'-G {configData["winCMakeProjectGenerator"]}')
+        projGenParams.append (f'-G {vsGenerator}')
         toolset = 'v142'
         if int (version) < 25:
             toolset = 'v141'
@@ -148,7 +167,6 @@ def GetProjectGenerationParams (configData, workspaceRootFolder, buildPath, plat
         projGenParams.extend (['-G', 'Xcode'])
 
     projGenParams.append (f'-DAC_API_DEVKIT_DIR={str (devKitFolder / "Support")}')
-    projGenParams.append (f'-DCMAKE_BUILD_TYPE={configuration}')
 
     if languageCode is not None:
         projGenParams.append (f'-DAC_ADDON_LANGUAGE={languageCode}')
@@ -178,7 +196,7 @@ def BuildAddOn (configData, platformName, workspaceRootFolder, buildFolder, devK
         buildPath = buildPath / languageCode
 
     # Add params to configure cmake
-    projGenParams = GetProjectGenerationParams (configData, workspaceRootFolder, buildPath, platformName, devKitFolder, version, configuration, languageCode, optionalParams)
+    projGenParams = GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, optionalParams)
     projGenResult = subprocess.call (projGenParams)
     if projGenResult != 0:
         raise Exception ('Failed to generate project!')
