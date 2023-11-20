@@ -155,9 +155,8 @@ def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, de
         '-B', str (buildPath)
     ]
 
-    vsGenerator = GetInstalledVisualStudioGenerator ()
-
     if platformName == 'WIN':
+        vsGenerator = GetInstalledVisualStudioGenerator ()
         projGenParams.append (f'-G {vsGenerator}')
         toolset = 'v142'
         if int (version) < 25:
