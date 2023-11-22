@@ -5,6 +5,7 @@ import pathlib
 import platform
 import shutil
 import subprocess
+import sys
 import urllib.parse
 import urllib.request
 import zipfile
@@ -312,11 +313,11 @@ def Main ():
             PackageAddOns (args, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder)
 
         print ('Build succeeded!')
-        return 0
+        sys.exit (0)
     
     except Exception as e:
         print (e)
-        return 1
+        sys.exit (1)
 
 if __name__ == "__main__":
     Main ()
