@@ -36,7 +36,6 @@ function (SetCompilerOptions target acVersion)
             -Wno-unused-parameter
             -Wno-unused-value
             -Wno-unused-private-field
-            -Wno-unused-but-set-variable
             -Wno-deprecated
             -Wno-unknown-pragmas
             -Wno-missing-braces
