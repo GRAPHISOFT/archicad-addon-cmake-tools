@@ -22,7 +22,7 @@ function (SetCompilerOptions target acVersion)
             /Zc:wchar_t-
             /wd4499
             /EHsc
-			-D_CRT_SECURE_NO_WARNINGS
+            -D_CRT_SECURE_NO_WARNINGS
         )
     else ()
         target_compile_options (${target} PUBLIC -Wall -Wextra -Werror
@@ -40,18 +40,18 @@ function (SetCompilerOptions target acVersion)
             -Wno-deprecated
             -Wno-unknown-pragmas
             -Wno-missing-braces
-            -Wno-missing-field-initializers		
+            -Wno-missing-field-initializers
             -Wno-non-c-typedef-for-linkage
             -Wno-uninitialized-const-reference
             -Wno-shorten-64-to-32
             -Wno-sign-compare
             -Wno-switch
-		)
+        )
         if (${acVersion} LESS_EQUAL "24")
             target_compile_options (${target} PUBLIC -Wno-non-c-typedef-for-linkage)
         endif ()
     endif ()
-	
+    
 endfunction ()
 
 function (DetectACVersion devKitDir acVersion)
@@ -104,8 +104,11 @@ function (LinkGSLibrariesToProject acVersion devKitDir addOnName)
         file (GLOB LibFilesInFolder ${devKitDir}/Modules/*/*/*.lib)
         target_link_libraries (${addOnName} ${LibFilesInFolder})
     else ()
-        file (GLOB FrameworkFilesInFolder ${devKitDir}/Frameworks/*.framework)
-        target_link_libraries (${addOnName} ${FrameworkFilesInFolder})
+        file (GLOB LibFilesInFolder
+            ${devKitDir}/Frameworks/*.framework
+            ${devKitDir}/Frameworks/*.dylib
+        )
+        target_link_libraries (${addOnName} ${LibFilesInFolder})
     endif ()
 
 endfunction ()
@@ -189,8 +192,8 @@ function (GenerateAddOnProject acVersion devKitDir addOnName addOnSourcesFolder 
     if (WIN32)
         set_target_properties (${addOnName} PROPERTIES SUFFIX ".apx")
         set_target_properties (${addOnName} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_$<CONFIG> "${CMAKE_BINARY_DIR}/$<CONFIG>")
-		target_link_options (${addOnName} PUBLIC "${ResourceObjectsDir}/${addOnName}.res")
-		target_link_options (${addOnName} PUBLIC /export:GetExportedFuncAddrs,@1 /export:SetImportedFuncAddrs,@2)
+        target_link_options (${addOnName} PUBLIC "${ResourceObjectsDir}/${addOnName}.res")
+        target_link_options (${addOnName} PUBLIC /export:GetExportedFuncAddrs,@1 /export:SetImportedFuncAddrs,@2)
     else ()
         set_target_properties (${addOnName} PROPERTIES BUNDLE TRUE)
         set_target_properties (${addOnName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/${addOnResourcesFolder}/RFIX.mac/Info.plist")
