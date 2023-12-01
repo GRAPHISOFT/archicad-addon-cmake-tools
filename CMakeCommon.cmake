@@ -40,7 +40,7 @@ function (SetCompilerOptions target acVersion)
             -Wno-deprecated
             -Wno-unknown-pragmas
             -Wno-missing-braces
-            -Wno-missing-field-initializers        
+            -Wno-missing-field-initializers
             -Wno-non-c-typedef-for-linkage
             -Wno-uninitialized-const-reference
             -Wno-shorten-64-to-32
