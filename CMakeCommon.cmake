@@ -1,9 +1,12 @@
-function (SetGlobalCompilerDefinitions)
+function (SetGlobalCompilerDefinitions acVersion)
 
     if (WIN32)
         add_definitions (-DUNICODE -D_UNICODE)
     else ()
         add_definitions (-Dmacintosh=1)
+        if (${acVersion} GREATER_EQUAL 26)
+            set (CMAKE_OSX_ARCHITECTURES x86_64;arm64 PARENT_SCOPE)
+        endif()
     endif ()
     add_definitions (-DACExtension)
 
