@@ -6,7 +6,7 @@ function (SetGlobalCompilerDefinitions acVersion)
         add_definitions (-Dmacintosh=1)
         if (${acVersion} GREATER_EQUAL 26)
             set (CMAKE_OSX_ARCHITECTURES x86_64;arm64 PARENT_SCOPE)
-        endif()
+        endif ()
     endif ()
     add_definitions (-DACExtension)
 
