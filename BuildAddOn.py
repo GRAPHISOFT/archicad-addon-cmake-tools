@@ -290,7 +290,7 @@ def PackageAddOns (args, configData, addOnName, platformName, acVersionList, lan
             CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, 'RelWithDebInfo')
         
         buildType = 'Release' if args.release else 'Daily'
-        buildNum = configData["devKitLinks"][platformName][version].split('.')[-2]
+        buildNum = configData["devKitLinks"][platformName][version].split ('.')[-2]
 
         subprocess.call ([
             '7z', 'a',
