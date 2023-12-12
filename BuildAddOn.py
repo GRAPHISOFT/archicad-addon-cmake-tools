@@ -278,7 +278,7 @@ def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, pla
 
 
 # Zip packages
-def PackageAddOns (args, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder):
+def PackageAddOns (args, configData, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder):
     Check7ZInstallation ()
 
     for version in acVersionList:
@@ -290,9 +290,11 @@ def PackageAddOns (args, addOnName, platformName, acVersionList, languageList, b
             CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, 'RelWithDebInfo')
         
         buildType = 'Release' if args.release else 'Daily'
+        buildNum = configData["devKitLinks"][platformName][version].split('.')[-2]
+
         subprocess.call ([
             '7z', 'a',
-            str (packageRootFolder.parent / f'{addOnName}-{version}_{buildType}_{platformName}.zip'),
+            str (packageRootFolder.parent / f'{addOnName}-{version}.{buildNum}_{buildType}_{platformName}.zip'),
             str (packageRootFolder / version / '*')
         ])
 
@@ -310,7 +312,7 @@ def Main ():
         BuildAddOns (args, configData, platformName, languageList, workspaceRootFolder, buildFolder, devKitFolderList)
 
         if args.package:
-            PackageAddOns (args, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder)
+            PackageAddOns (args, configData, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder)
 
         print ('Build succeeded!')
         sys.exit (0)
