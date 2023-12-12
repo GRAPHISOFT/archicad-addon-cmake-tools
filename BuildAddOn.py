@@ -277,8 +277,18 @@ def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, pla
         ])
 
 
+# Extract the DevKit build numbers for each ACVersion
+def GetBuildNums (acVersionList, devKitFolderList):
+    result = {}
+    for version in acVersionList:
+        zipFile = list (devKitFolderList[version].glob ('*.zip'))[0]
+        result[version] = str (zipFile).split ('.')[-2]
+
+    return result
+
+
 # Zip packages
-def PackageAddOns (args, configData, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder):
+def PackageAddOns (args, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder, buildNums):
     Check7ZInstallation ()
 
     for version in acVersionList:
@@ -290,11 +300,9 @@ def PackageAddOns (args, configData, addOnName, platformName, acVersionList, lan
             CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, 'RelWithDebInfo')
         
         buildType = 'Release' if args.release else 'Daily'
-        buildNum = configData["devKitLinks"][platformName][version].split ('.')[-2]
-
         subprocess.call ([
             '7z', 'a',
-            str (packageRootFolder.parent / f'{addOnName}-{version}.{buildNum}_{buildType}_{platformName}.zip'),
+            str (packageRootFolder.parent / f'{addOnName}-{version}.{buildNums[version]}_{buildType}_{platformName}.zip'),
             str (packageRootFolder / version / '*')
         ])
 
@@ -312,7 +320,8 @@ def Main ():
         BuildAddOns (args, configData, platformName, languageList, workspaceRootFolder, buildFolder, devKitFolderList)
 
         if args.package:
-            PackageAddOns (args, configData, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder)
+            buildNums = GetBuildNums (acVersionList, devKitFolderList)
+            PackageAddOns (args, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder, buildNums)
 
         print ('Build succeeded!')
         sys.exit (0)
