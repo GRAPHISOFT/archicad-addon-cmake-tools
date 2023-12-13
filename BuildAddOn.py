@@ -281,18 +281,8 @@ def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, pla
         ])
 
 
-# Extract the DevKit build numbers for each ACVersion
-def GetBuildNums (acVersionList, devKitFolderList):
-    result = {}
-    for version in acVersionList:
-        zipFile = list (devKitFolderList[version].glob ('*.zip'))[0]
-        result[version] = str (zipFile).split ('.')[-2]
-
-    return result
-
-
 # Zip packages
-def PackageAddOns (args, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder, buildNums):
+def PackageAddOns (args, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder):
     Check7ZInstallation ()
 
     for version in acVersionList:
@@ -306,7 +296,7 @@ def PackageAddOns (args, addOnName, platformName, acVersionList, languageList, b
         buildType = 'Release' if args.release else 'Daily'
         subprocess.call ([
             '7z', 'a',
-            str (packageRootFolder.parent / f'{addOnName}-{version}.{buildNums[version]}_{buildType}_{platformName}.zip'),
+            str (packageRootFolder.parent / f'{addOnName}-{version}_{buildType}_{platformName}.zip'),
             str (packageRootFolder / version / '*')
         ])
 
@@ -324,8 +314,7 @@ def Main ():
         BuildAddOns (args, configData, platformName, languageList, workspaceRootFolder, buildFolder, devKitFolderList)
 
         if args.package:
-            buildNums = GetBuildNums (acVersionList, devKitFolderList)
-            PackageAddOns (args, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder, buildNums)
+            PackageAddOns (args, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder)
 
         print ('Build succeeded!')
         sys.exit (0)
