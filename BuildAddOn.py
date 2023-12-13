@@ -18,6 +18,7 @@ def ParseArguments ():
     parser.add_argument ('-d', '--devKitPath', dest = 'devKitPath', type = str, required = False, help = 'Path to local APIDevKit')
     parser.add_argument ('-r', '--release', dest = 'release', required = False, action='store_true', help = 'Build in localized Release mode.')
     parser.add_argument ('-p', '--package', dest = 'package', required = False, action='store_true', help = 'Create zip archive.')
+    parser.add_argument ('-o', '--optionalCMakeParams', dest = 'optionalCMakeParams', type = str, required = False, help = 'Add-On specific CMake parameter list. Ex: dir="path/to/dir"')
     args = parser.parse_args ()
 
     if args.devKitPath is not None:
@@ -155,7 +156,7 @@ def GetInstalledVisualStudioGenerator ():
         raise Exception ('Installed Visual Studio version not supported!')
     
 
-def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, optionalParams):
+def GetProjectGenerationParams (optionalParams, workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode):
     # Add params to configure cmake
     projGenParams = [
         'cmake',
@@ -179,30 +180,32 @@ def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, de
 
     if optionalParams is not None:
         for key in optionalParams:
-            projGenParams.append (f'-D{key}={optionalParams[key]}')
+            projGenParams.append (f'-D{key}="{optionalParams[key]}"')
 
     projGenParams.append (str (workspaceRootFolder))
 
     return projGenParams
 
 
-def BuildAddOn (configData, platformName, workspaceRootFolder, buildFolder, devKitFolder, version, configuration, languageCode=None):
-    addOnName = configData['addOnName']
-    optionalParams = None
-    if 'addOnSpecificCMakeParameterEnvVars' in configData:
-        optionalParams = {}
-        for key in configData['addOnSpecificCMakeParameterEnvVars']:
-            value = os.environ.get (key)
-            if value is None:
-                raise Exception (f'{key} - Environment variable not found!')
-            optionalParams[key] = value
+def ParseOptionalCMakeParams (args):
+    if args.optionalCMakeParams is None:
+        return None
+    
+    params = {}
+    for pair in args.optionalCMakeParams:
+        pair = pair.split ('=', 1)
+        params[pair[0]] = pair[1]
 
+    return params
+
+
+def BuildAddOn (optionalParams, addOnName, platformName, workspaceRootFolder, buildFolder, devKitFolder, version, configuration, languageCode=None):
     buildPath = buildFolder / addOnName / version
     if languageCode is not None:
         buildPath = buildPath / languageCode
 
     # Add params to configure cmake
-    projGenParams = GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, optionalParams)
+    projGenParams = GetProjectGenerationParams (optionalParams, workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode)
     projGenResult = subprocess.call (projGenParams)
     if projGenResult != 0:
         raise Exception ('Failed to generate project!')
@@ -219,23 +222,25 @@ def BuildAddOn (configData, platformName, workspaceRootFolder, buildFolder, devK
         raise Exception ('Failed to build project!')
 
 
-def BuildAddOns (args, configData, platformName, languageList, workspaceRootFolder, buildFolder, devKitFolderList):
+def BuildAddOns (args, addOnName, platformName, languageList, workspaceRootFolder, buildFolder, devKitFolderList):
     # At this point, devKitFolderList dictionary has all provided ACVersions as keys
     # For every ACVersion
     # If release, build Add-On for all languages with RelWithDebInfo configuration
     # Else build Add-On with Debug and RelWithDebInfo configurations, without language specified   
     # In each case, if package creation is enabled, copy the .apx/.bundle files to the Package directory
+    optionalParams = ParseOptionalCMakeParams (args)
+
     try:
         for version in devKitFolderList:
             devKitFolder = devKitFolderList[version]
 
             if args.release is True:
                 for languageCode in languageList:
-                    BuildAddOn (configData, platformName, workspaceRootFolder, buildFolder, devKitFolder, version, 'RelWithDebInfo', languageCode)
+                    BuildAddOn (optionalParams, addOnName, platformName, workspaceRootFolder, buildFolder, devKitFolder, version, 'RelWithDebInfo', languageCode)
 
             else:
-                BuildAddOn (configData, platformName, workspaceRootFolder, buildFolder, devKitFolder, version, 'Debug')
-                BuildAddOn (configData, platformName, workspaceRootFolder, buildFolder, devKitFolder, version, 'RelWithDebInfo')
+                BuildAddOn (optionalParams, addOnName, platformName, workspaceRootFolder, buildFolder, devKitFolder, version, 'Debug')
+                BuildAddOn (optionalParams, addOnName, platformName, workspaceRootFolder, buildFolder, devKitFolder, version, 'RelWithDebInfo')
 
     except Exception as e:
         raise e
@@ -313,7 +318,7 @@ def Main ():
 
         os.chdir (workspaceRootFolder)
         
-        BuildAddOns (args, configData, platformName, languageList, workspaceRootFolder, buildFolder, devKitFolderList)
+        BuildAddOns (args, addOnName, platformName, languageList, workspaceRootFolder, buildFolder, devKitFolderList)
 
         if args.package:
             PackageAddOns (args, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder)
