@@ -37,6 +37,11 @@ def PrepareParameters (args):
     elif platform.system () == 'Darwin':
         platformName = 'MAC'
 
+    # Load DevKit download data
+    devKitDataPath = pathlib.Path (__file__).absolute ().parent / 'devKitLinks.json'
+    devKitDataFile = open (devKitDataPath)
+    devKitData = json.load (devKitDataFile)
+
     # Load config data
     configPath = pathlib.Path (args.configFile)
     if configPath.is_dir ():
@@ -44,6 +49,7 @@ def PrepareParameters (args):
     configFile = open (configPath)
     configData = json.load (configFile)
     addOnName = configData['addOnName']
+
     acVersionList = None
     languageList = None
 
@@ -51,7 +57,7 @@ def PrepareParameters (args):
         acVersionList = args.acVersion
     else:
         acVersionList = []
-        for version in configData['devKitLinks'][platformName]:
+        for version in devKitData[platformName]:
             acVersionList.append (version)
 
     # Get needed language codes
@@ -68,10 +74,30 @@ def PrepareParameters (args):
                 if lang not in configLangUpper:
                     raise Exception ('Language not supported!')
                 
-    return [configData, platformName, addOnName, acVersionList, languageList]
+    return [devKitData, configData, platformName, addOnName, acVersionList, languageList]
 
 
-def PrepareDirectories (args, configData, platformName, addOnName, acVersionList):
+def DownloadAndUnzip (url, dest):
+    fileName = url.split ('/')[-1]
+    filePath = pathlib.Path (dest, fileName)
+    if filePath.exists ():
+        return
+
+    print (f'Downloading {fileName}')
+    urllib.request.urlretrieve (url, filePath)
+
+    print (f'Unzipping {fileName}')
+    if platform.system () == 'Windows':
+        with zipfile.ZipFile (filePath, 'r') as zip:
+            zip.extractall (dest)
+    elif platform.system () == 'Darwin':
+        subprocess.call ([
+            'unzip', '-qq', filePath,
+            '-d', dest
+        ])
+
+
+def PrepareDirectories (args, devKitData, platformName, addOnName, acVersionList):
     # Create directory for Build and Package
     workspaceRootFolder = pathlib.Path (__file__).parent.absolute ().parent.absolute ()
     buildFolder = workspaceRootFolder / 'Build'
@@ -97,39 +123,19 @@ def PrepareDirectories (args, configData, platformName, addOnName, acVersionList
         # Create directory for APIDevKit
         # Download APIDevKit
         for version in acVersionList:
-            if version in configData['devKitLinks'][platformName]:
+            if version in devKitData[platformName]:
 
                 devKitFolder = buildFolder / 'DevKit' / f'APIDevKit-{version}'
                 if not devKitFolder.exists ():
                     devKitFolder.mkdir (parents=True)
 
                 devKitFolderList[version] = devKitFolder
-                DownloadAndUnzip (configData['devKitLinks'][platformName][version], devKitFolder)
+                DownloadAndUnzip (devKitData[platformName][version], devKitFolder)
 
             else:
                 raise Exception ('APIDevKit download link not provided!')
             
     return [workspaceRootFolder, buildFolder, packageRootFolder, devKitFolderList]
-
-
-def DownloadAndUnzip (url, dest):
-    fileName = url.split ('/')[-1]
-    filePath = pathlib.Path (dest, fileName)
-    if filePath.exists ():
-        return
-
-    print (f'Downloading {fileName}')
-    urllib.request.urlretrieve (url, filePath)
-
-    print (f'Unzipping {fileName}')
-    if platform.system () == 'Windows':
-        with zipfile.ZipFile (filePath, 'r') as zip:
-            zip.extractall (dest)
-    elif platform.system () == 'Darwin':
-        subprocess.call ([
-            'unzip', '-qq', filePath,
-            '-d', dest
-        ])
 
 
 def GetInstalledVisualStudioGenerator ():
@@ -301,9 +307,9 @@ def Main ():
     try:
         args = ParseArguments ()
 
-        [configData, platformName, addOnName, acVersionList, languageList] = PrepareParameters (args)
+        [devKitData, configData, platformName, addOnName, acVersionList, languageList] = PrepareParameters (args)
 
-        [workspaceRootFolder, buildFolder, packageRootFolder, devKitFolderList] = PrepareDirectories (args, configData, platformName, addOnName, acVersionList)
+        [workspaceRootFolder, buildFolder, packageRootFolder, devKitFolderList] = PrepareDirectories (args, devKitData, platformName, addOnName, acVersionList)
 
         os.chdir (workspaceRootFolder)
         
