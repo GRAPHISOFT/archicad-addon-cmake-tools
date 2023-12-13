@@ -1,4 +1,5 @@
 import argparse
+import cgi
 import json
 import os
 import pathlib
@@ -113,7 +114,10 @@ def PrepareDirectories (args, configData, platformName, addOnName, acVersionList
 
 
 def DownloadAndUnzip (url, dest):
-    fileName = url.split ('/')[-1]
+    remoteFile = urllib.request.urlopen (url)
+    contentDisposition = remoteFile.info ()['Content-Disposition']
+    _, params = cgi.parse_header (contentDisposition)
+    fileName = params["filename"]
     filePath = pathlib.Path (dest, fileName)
     if filePath.exists ():
         return
