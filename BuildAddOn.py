@@ -187,9 +187,6 @@ def GetProjectGenerationParams (optionalParams, workspaceRootFolder, buildPath, 
 
     projGenParams.append (str (workspaceRootFolder))
 
-    print('======================')
-    print(projGenParams)
-    print('======================')
     return projGenParams
 
 
