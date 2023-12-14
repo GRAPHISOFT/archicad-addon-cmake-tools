@@ -183,7 +183,7 @@ def GetProjectGenerationParams (optionalParams, workspaceRootFolder, buildPath, 
             if optionalParams[key] is None:
                 projGenParams.append (f'-D{key}')
             else:
-                projGenParams.append (f'-D{key}="{optionalParams[key]}"')
+                projGenParams.append (f'-D{key}={optionalParams[key]}')
 
     projGenParams.append (str (workspaceRootFolder))
 
