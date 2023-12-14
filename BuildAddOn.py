@@ -18,7 +18,7 @@ def ParseArguments ():
     parser.add_argument ('-d', '--devKitPath', dest = 'devKitPath', type = str, required = False, help = 'Path to local APIDevKit')
     parser.add_argument ('-r', '--release', dest = 'release', required = False, action='store_true', help = 'Build in localized Release mode.')
     parser.add_argument ('-p', '--package', dest = 'package', required = False, action='store_true', help = 'Create zip archive.')
-    parser.add_argument ('-o', '--optionalCMakeParams', dest = 'optionalCMakeParams', type = str, required = False, help = 'Add-On specific CMake parameter list of key=value pairs. Ex: var1=value1 var2="value 2"')
+    parser.add_argument ('-o', '--optionalCMakeParams', dest = 'optionalCMakeParams', nargs = '+', required = False, help = 'Add-On specific CMake parameter list of key=value pairs. Ex: var1=value1 var2="value 2"')
     args = parser.parse_args ()
 
     if args.devKitPath is not None:
@@ -187,6 +187,9 @@ def GetProjectGenerationParams (optionalParams, workspaceRootFolder, buildPath, 
 
     projGenParams.append (str (workspaceRootFolder))
 
+    print('======================')
+    print(projGenParams)
+    print('======================')
     return projGenParams
 
 
