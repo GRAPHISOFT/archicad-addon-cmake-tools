@@ -290,7 +290,7 @@ def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, pla
 
     elif platformName == 'MAC':
         subprocess.call ([
-            'cp', '-r',
+            'cp', '-R',
             sourceFolder / f'{addOnName}.bundle',
             packageFolder / f'{fileName}.bundle'
         ])
@@ -320,7 +320,7 @@ def Main ():
     try:
         args = ParseArguments ()
 
-        [devKitData, configData, platformName, addOnName, acVersionList, languageList] = PrepareParameters (args)
+        [devKitData, platformName, addOnName, acVersionList, languageList] = PrepareParameters (args)
 
         [workspaceRootFolder, buildFolder, packageRootFolder, devKitFolderList] = PrepareDirectories (args, devKitData, platformName, addOnName, acVersionList)
 
