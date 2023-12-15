@@ -136,7 +136,7 @@ def GetInstalledVisualStudioGenerator ():
     vsWherePath = pathlib.Path (os.environ["ProgramFiles(x86)"]) / 'Microsoft Visual Studio' / 'Installer' / 'vswhere.exe'
     if not vsWherePath.exists ():
         raise Exception ('Microsoft Visual Studio Installer not found!')
-    vsWhereOutputStr = subprocess.check_output ([vsWherePath, '-sort', '-format', 'json'])
+    vsWhereOutputStr = subprocess.check_output ([vsWherePath, '-sort', '-format', 'json', '-utf8'])
     vsWhereOutput = json.loads (vsWhereOutputStr)
     if len (vsWhereOutput) == 0:
         raise Exception ('No installed Visual Studio detected!')
