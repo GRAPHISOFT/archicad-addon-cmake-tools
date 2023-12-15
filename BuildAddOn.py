@@ -75,7 +75,7 @@ def PrepareParameters (args):
                 if lang not in configLangUpper:
                     raise Exception ('Language not supported!')
                 
-    return [devKitData, configData, platformName, addOnName, acVersionList, languageList]
+    return [devKitData, platformName, addOnName, acVersionList, languageList]
 
 
 def DownloadAndUnzip (url, dest):
