@@ -12,9 +12,9 @@ import zipfile
 
 def ParseArguments ():
     parser = argparse.ArgumentParser ()
-    parser.add_argument ('-c', '--configFile', dest = 'configFile', required = True, help = 'JSON Configuration file')
+    parser.add_argument ('-c', '--languageConfig', dest = 'languageConfig', required = True, help = 'JSON language configuration file')
     parser.add_argument ('-v', '--acVersion', dest = 'acVersion', nargs = '+', type = str, required = False, help = 'Archicad version number list. Ex: 26 27')
-    parser.add_argument ('-l', '--language', dest = 'language', nargs = '+', type = str, required = False, help = 'Add-On language code list. Ex: INT GER. Specify ALL for all languages in the configfile.' )
+    parser.add_argument ('-l', '--language', dest = 'language', nargs = '+', type = str, required = False, help = 'Add-On language code list. Ex: INT GER. Specify ALL for all languages in the languageConfig file.' )
     parser.add_argument ('-d', '--devKitPath', dest = 'devKitPath', type = str, required = False, help = 'Path to local APIDevKit')
     parser.add_argument ('-r', '--release', dest = 'release', required = False, action='store_true', help = 'Build in localized Release mode.')
     parser.add_argument ('-p', '--package', dest = 'package', required = False, action='store_true', help = 'Create zip archive.')
@@ -44,11 +44,11 @@ def PrepareParameters (args):
     devKitData = json.load (devKitDataFile)
 
     # Load config data
-    configPath = pathlib.Path (args.configFile)
+    configPath = pathlib.Path (args.languageConfig)
     if configPath.is_dir ():
         raise Exception (f'{configPath} is a directory!')
-    configFile = open (configPath)
-    configData = json.load (configFile)
+    languageConfig = open (configPath)
+    languageConfigData = json.load (languageConfig)
 
     acVersionList = None
     languageList = None
@@ -62,7 +62,7 @@ def PrepareParameters (args):
 
     # Get needed language codes
     if args.release:
-        configLangUpper = [lang.upper () for lang in configData['languages']]
+        configLangUpper = [lang.upper () for lang in languageConfigData['languages']]
         languageList = ['ALL']
         if args.language is not None:
             languageList = [lang.upper () for lang in args.language]
