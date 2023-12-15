@@ -188,7 +188,7 @@ def ParseCMakeCache (buildPath):
     addOnName = None
     for line in open (buildPath / 'CMakeCache.txt'):
         if 'AC_ADDON_NAME' in line:
-            addOnName = line.split ('=')[1]
+            addOnName = line.strip ().split ('=')[1]
 
     return addOnName
 
@@ -322,7 +322,7 @@ def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, pla
 
 
 # Zip packages
-def PackageAddOns (args, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder):
+def PackageAddOns (args, addOnName, platformName, acVersionList, languageList, buildFolder):
     Check7ZInstallation ()
 
     packageRootFolder = buildFolder / 'Package' / addOnName
