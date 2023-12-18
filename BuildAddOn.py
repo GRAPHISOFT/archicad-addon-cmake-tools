@@ -14,9 +14,8 @@ def ParseArguments ():
     parser = argparse.ArgumentParser ()
     parser.add_argument ('-c', '--configFile', dest = 'configFile', required = True, help = 'JSON Configuration file')
     parser.add_argument ('-v', '--acVersion', dest = 'acVersion', nargs = '+', type = str, required = False, help = 'Archicad version number list. Ex: 26 27')
-    parser.add_argument ('-l', '--language', dest = 'language', nargs = '+', type = str, required = False, help = 'Add-On language code list. Ex: INT GER. Specify ALL for all languages in the configfile.' )
+    parser.add_argument ('-l', '--allLocalizedVersions', dest = 'allLocalizedVersions', required = False, action='store_true', help = 'Create localized release builds for all configured languages.' )
     parser.add_argument ('-d', '--devKitPath', dest = 'devKitPath', type = str, required = False, help = 'Path to local APIDevKit')
-    parser.add_argument ('-r', '--release', dest = 'release', required = False, action='store_true', help = 'Build in localized Release mode.')
     parser.add_argument ('-p', '--package', dest = 'package', required = False, action='store_true', help = 'Create zip archive.')
     parser.add_argument ('-a', '--additionalCMakeParams', dest = 'additionalCMakeParams', nargs = '+', required = False, help = 'Add-On specific CMake parameter list of key=value pairs. Ex: var1=value1 var2="value 2"')
     args = parser.parse_args ()
@@ -51,7 +50,6 @@ def PrepareParameters (args):
     configData = json.load (configFile)
     addOnName = configData['addOnName']
     acVersionList = None
-    languageList = None
 
     if args.acVersion:
         acVersionList = args.acVersion
@@ -61,18 +59,9 @@ def PrepareParameters (args):
             acVersionList.append (version)
 
     # Get needed language codes
-    if args.release:
-        configLangUpper = [lang.upper () for lang in configData['languages']]
-        languageList = ['ALL']
-        if args.language is not None:
-            languageList = [lang.upper () for lang in args.language]
-
-        if 'ALL' in languageList:
-            languageList = configLangUpper
-        else:
-            for lang in languageList:
-                if lang not in configLangUpper:
-                    raise Exception ('Language not supported!')
+    languageList = [].append (configData['defaultLanguage'])
+    if args.allLocalizedVersions:
+        languageList = [lang.upper () for lang in configData['languages']]
                 
     # Get additional CMake parameters
     additionalParams = None
@@ -84,7 +73,7 @@ def PrepareParameters (args):
                 additionalParams[key] = configData['additionalCMakeParams'][key]
 
         if args.additionalCMakeParams:
-            for param in args.optionalCMakeParams:
+            for param in args.additionalCMakeParams:  #TODO
                 if '=' not in param:
                     additionalParams[param] = None
                 else:
@@ -238,7 +227,7 @@ def BuildAddOns (args, addOnName, platformName, languageList, additionalParams, 
         for version in devKitFolderList:
             devKitFolder = devKitFolderList[version]
 
-            if args.release is True:
+            if args.allLocalizedVersions is True:
                 for languageCode in languageList:
                     BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, 'RelWithDebInfo', languageCode)
 
@@ -297,14 +286,14 @@ def PackageAddOns (args, addOnName, platformName, acVersionList, languageList, b
     Check7ZInstallation ()
 
     for version in acVersionList:
-        if args.release:
+        if args.allLocalizedVersions:
             for languageCode in languageList:
                 CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, 'RelWithDebInfo', languageCode, True)
         else:
             CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, 'Debug')
             CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, 'RelWithDebInfo')
         
-        buildType = 'Release' if args.release else 'Daily'
+        buildType = 'Release' if args.allLocalizedVersions else 'Daily'
         subprocess.call ([
             '7z', 'a',
             str (packageRootFolder.parent / f'{addOnName}-{version}_{buildType}_{platformName}.zip'),
