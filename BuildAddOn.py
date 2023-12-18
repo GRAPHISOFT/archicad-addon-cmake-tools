@@ -38,7 +38,7 @@ def PrepareParameters (args):
         platformName = 'MAC'
 
     # Load DevKit download data
-    devKitDataPath = pathlib.Path (__file__).absolute ().parent / 'devKitLinks.json'
+    devKitDataPath = pathlib.Path (__file__).absolute ().parent / 'APIDevKitLinks.json'
     devKitDataFile = open (devKitDataPath)
     devKitData = json.load (devKitDataFile)
 
@@ -163,7 +163,7 @@ def GetInstalledVisualStudioGenerator ():
         raise Exception ('Installed Visual Studio version not supported!')
     
 
-def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, additionalParams):
+def GetProjectGenerationParams (workspaceRootFolder, buildPath, addOnName, platformName, devKitFolder, version, languageCode, additionalParams):
     # Add params to configure cmake
     projGenParams = [
         'cmake',
@@ -180,6 +180,7 @@ def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, de
     elif platformName == 'MAC':
         projGenParams.extend (['-G', 'Xcode'])
 
+    projGenParams.append (f'-DAC_ADDON_NAME={addOnName}')
     projGenParams.append (f'-DAC_API_DEVKIT_DIR={str (devKitFolder / "Support")}')
 
     if languageCode is not None:
@@ -200,7 +201,7 @@ def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, 
         buildPath = buildPath / languageCode
 
     # Add params to configure cmake
-    projGenParams = GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, additionalParams)
+    projGenParams = GetProjectGenerationParams (workspaceRootFolder, buildPath, addOnName, platformName, devKitFolder, version, languageCode, additionalParams)
     projGenResult = subprocess.call (projGenParams)
     if projGenResult != 0:
         raise Exception ('Failed to generate project!')
