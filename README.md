@@ -16,5 +16,5 @@ The repo includes a BuildAddOn.py python script, that handles the building of th
 - -d, --devKitPath (optional): path to a single local APIDevKit folder. When this argument is used, only one Archicad version should be provided in the --acVersion list.
 - -b, --buildNum (optional, but mandatory if --devKitPath is used): Build number of the used local APIDevKit. Ex: -b 3001.
 - -p, --package (optional): toggles creating zip archive with the built Add-On files.
-- -a, --additionalCMakeParams (optional): a list of additional addon-specific CMake parameters as key=value pairs. The build script will forward it to CMake. Ex: -a var1=value1 var2="value 2".
+- -a, --additionalCMakeParams (optional): a list of additional addon-specific CMake parameters as keys or key=value pairs. The build script will forward it to CMake. Ex: -a var1=value1 var2="value 2" var3.
 
