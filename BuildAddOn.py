@@ -39,15 +39,13 @@ def PrepareParameters (args):
 
     # Load DevKit download data
     devKitDataPath = pathlib.Path (__file__).absolute ().parent / 'APIDevKitLinks.json'
-    devKitDataFile = open (devKitDataPath)
-    devKitData = json.load (devKitDataFile)
+    devKitData = json.load (open (devKitDataPath))
 
     # Load config data
     configPath = pathlib.Path (args.configFile)
     if configPath.is_dir ():
         raise Exception (f'{configPath} is a directory!')
-    configFile = open (configPath)
-    configData = json.load (configFile)
+    configData = json.load (open (configPath))
     addOnName = configData['addOnName']
     acVersionList = None
 
