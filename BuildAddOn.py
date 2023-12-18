@@ -312,7 +312,7 @@ def PackageAddOns (args, devKitData, addOnName, platformName, acVersionList, lan
             buildNum = GetDevKitBuildNum (devKitData, version, platformName)
             subprocess.call ([
                 '7z', 'a',
-                str (packageRootFolder.parent / f'{addOnName}-{version}.{buildNum}_{buildType}_{platformName}.zip'),
+                str (packageRootFolder.parent / f'{addOnName}-{buildNum}_{buildType}_{platformName}.zip'),
                 str (packageRootFolder / version / '*')
             ])
 
