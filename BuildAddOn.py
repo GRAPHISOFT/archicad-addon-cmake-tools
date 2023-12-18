@@ -282,7 +282,7 @@ def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, pla
 
 def GetDevKitBuildNum (devKitData, version, platformName):
     url = devKitData[platformName][version]
-    buildNum = url.split('/')[-2]
+    buildNum = url.split ('/')[-2]
     return buildNum
 
 
