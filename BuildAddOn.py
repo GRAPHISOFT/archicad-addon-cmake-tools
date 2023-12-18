@@ -16,13 +16,14 @@ def ParseArguments ():
     parser.add_argument ('-v', '--acVersion', dest = 'acVersion', nargs = '+', type = str, required = False, help = 'Archicad version number list. Ex: 26 27')
     parser.add_argument ('-l', '--allLocalizedVersions', dest = 'allLocalizedVersions', required = False, action='store_true', help = 'Create localized release builds for all configured languages.' )
     parser.add_argument ('-d', '--devKitPath', dest = 'devKitPath', type = str, required = False, help = 'Path to local APIDevKit')
+    parser.add_argument ('-b', '--buildNum', dest = 'buildNum', type = str, required = False, help = 'Build number of local APIDevKit')
     parser.add_argument ('-p', '--package', dest = 'package', required = False, action='store_true', help = 'Create zip archive.')
     parser.add_argument ('-a', '--additionalCMakeParams', dest = 'additionalCMakeParams', nargs = '+', required = False, help = 'Add-On specific CMake parameter list of key=value pairs. Ex: var1=value1 var2="value 2"')
     args = parser.parse_args ()
 
     if args.devKitPath is not None:
-        if args.acVersion is None:
-            raise Exception ('Must provide one Archicad version with local APIDevKit option!')
+        if args.acVersion is None or args.buildNum is None:
+            raise Exception ('Must provide Archicad version and APIDevKit build number with local APIDevKit option!')
         if len (args.acVersion) != 1:
             raise Exception ('Only one Archicad version supported with local APIDevKit option!')
     
@@ -39,25 +40,26 @@ def PrepareParameters (args):
 
     # Load DevKit download data
     devKitDataPath = pathlib.Path (__file__).absolute ().parent / 'APIDevKitLinks.json'
-    devKitData = json.load (open (devKitDataPath))
+    with open (devKitDataPath, 'r') as devKitDataFile:
+        devKitData = json.load (devKitDataFile)
 
     # Load config data
     configPath = pathlib.Path (args.configFile)
     if configPath.is_dir ():
         raise Exception (f'{configPath} is a directory!')
-    configData = json.load (open (configPath))
+    with open (configPath, 'r') as configFile:
+        configData = json.load (configFile)
+
     addOnName = configData['addOnName']
     acVersionList = None
 
     if args.acVersion:
         acVersionList = args.acVersion
     else:
-        acVersionList = []
-        for version in devKitData[platformName]:
-            acVersionList.append (version)
+        acVersionList = devKitData[platformName].keys ()
 
     # Get needed language codes
-    languageList = [].append (configData['defaultLanguage'])
+    languageList = [configData['defaultLanguage'].upper ()]
     if args.allLocalizedVersions:
         languageList = [lang.upper () for lang in configData['languages']]
                 
@@ -67,13 +69,12 @@ def PrepareParameters (args):
         additionalParams = {}
 
         if 'additionalCMakeParams' in configData:
-            for key in configData['additionalCMakeParams']:
-                additionalParams[key] = configData['additionalCMakeParams'][key]
+            additionalParams = configData['additionalCMakeParams']
 
         if args.additionalCMakeParams:
             for param in args.additionalCMakeParams:
                 if '=' not in param:
-                    raise Exception ('Must provide KEY=VALUE pairs!')
+                    additionalParams[key] = None
                 else:
                     key, value = param.split ('=', 1)
                     if not value:
@@ -186,7 +187,10 @@ def GetProjectGenerationParams (workspaceRootFolder, buildPath, addOnName, platf
 
     if additionalParams is not None:
         for key in additionalParams:
-            projGenParams.append (f'-D{key}={additionalParams[key]}')
+            if additionalParams[key] is None:
+                projGenParams.append (f'-D{key}=ON')
+            else:
+                projGenParams.append (f'-D{key}={additionalParams[key]}')
 
     projGenParams.append (str (workspaceRootFolder))
 
@@ -226,7 +230,7 @@ def BuildAddOns (args, addOnName, platformName, languageList, additionalParams, 
         for version in devKitFolderList:
             devKitFolder = devKitFolderList[version]
 
-            if args.allLocalizedVersions is True:
+            if args.package is True:
                 for languageCode in languageList:
                     BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, 'RelWithDebInfo', languageCode)
 
@@ -245,7 +249,7 @@ def Check7ZInstallation ():
         raise Exception ('7Zip not installed!')
 
 
-def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, configuration, languageCode=None, isRelease=False):
+def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, configuration, languageCode=None):
     packageFolder = packageRootFolder / version
     sourceFolder = buildFolder / addOnName / version
 
@@ -257,32 +261,32 @@ def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, pla
     if not packageFolder.exists ():
         packageFolder.mkdir (parents=True)
 
-    fileName = addOnName
-    if not isRelease:
-        fileName = f'{fileName}_{configuration}'
-
     if platformName == 'WIN':
         shutil.copy (
             sourceFolder / f'{addOnName}.apx',
-            packageFolder / f'{fileName}.apx',
+            packageFolder / f'{addOnName}.apx',
         )
-        if configuration == 'Debug':
-            shutil.copy (
+        shutil.copy (
             sourceFolder / f'{addOnName}.pdb',
-            packageFolder / f'{fileName}.pdb',
+            packageFolder / f'{addOnName}.pdb',
         )
 
     elif platformName == 'MAC':
         subprocess.call ([
             'cp', '-R',
             sourceFolder / f'{addOnName}.bundle',
-            packageFolder / f'{fileName}.bundle'
+            packageFolder / f'{addOnName}.bundle'
         ])
 
 
-def GetDevKitBuildNum (devKitData, version, platformName):
-    url = devKitData[platformName][version]
-    buildNum = url.split ('/')[-2]
+def GetDevKitBuildNum (args, devKitData, version, platformName):
+    if args.devKitPath:
+        buildNum = f'{version}.{args.buildNum}'
+    else:
+        url = devKitData[platformName][version]
+        buildNum = url.split ('/')[-2]
+    
+    print(buildNum)
     return buildNum
 
 
@@ -291,28 +295,15 @@ def PackageAddOns (args, devKitData, addOnName, platformName, acVersionList, lan
     Check7ZInstallation ()
 
     for version in acVersionList:
-        if args.allLocalizedVersions:
-            for languageCode in languageList:
-                CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, 'RelWithDebInfo', languageCode, True)
-        else:
-            CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, 'Debug')
-            CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, 'RelWithDebInfo')
-        
-        if args.allLocalizedVersions:
-            buildType = 'Release'
-            subprocess.call ([
-                '7z', 'a',
-                str (packageRootFolder.parent / f'{addOnName}-{version}_{buildType}_{platformName}.zip'),
-                str (packageRootFolder / version / '*')
-            ])
-        else:
-            buildType = 'Daily'
-            buildNum = GetDevKitBuildNum (devKitData, version, platformName)
-            subprocess.call ([
-                '7z', 'a',
-                str (packageRootFolder.parent / f'{addOnName}-{buildNum}_{buildType}_{platformName}.zip'),
-                str (packageRootFolder / version / '*')
-            ])
+        for languageCode in languageList:
+            CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, 'RelWithDebInfo', languageCode)
+    
+        versionAndBuildNum = GetDevKitBuildNum (args, devKitData, version, platformName)
+        subprocess.call ([
+            '7z', 'a',
+            str (packageRootFolder.parent / f'{addOnName}-{versionAndBuildNum}_{platformName}.zip'),
+            str (packageRootFolder / version / '*')
+        ])
 
 
 def Main ():

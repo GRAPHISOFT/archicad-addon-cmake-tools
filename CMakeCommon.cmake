@@ -122,7 +122,6 @@ function (GenerateAddOnProject acVersion devKitDir addOnName addOnSourcesFolder 
 
     set (ResourceObjectsDir ${CMAKE_BINARY_DIR}/ResourceObjects)
     set (ResourceStampFile "${ResourceObjectsDir}/AddOnResources.stamp")
-    set (AC_ADDON_NAME ${addOnName} CACHE STRING "Name of the Add-On" FORCE)
 
     file (GLOB AddOnImageFiles CONFIGURE_DEPENDS
         ${addOnResourcesFolder}/RFIX/Images/*.svg
