@@ -73,13 +73,13 @@ def PrepareParameters (args):
                 additionalParams[key] = configData['additionalCMakeParams'][key]
 
         if args.additionalCMakeParams:
-            for param in args.additionalCMakeParams:  #TODO
+            for param in args.additionalCMakeParams:
                 if '=' not in param:
-                    additionalParams[param] = None
+                    raise Exception ('Must provide KEY=VALUE pairs!')
                 else:
                     key, value = param.split ('=', 1)
                     if not value:
-                        value = None
+                        raise Exception (f'Value not provided for {key}!')
                     additionalParams[key] = value
                 
     return [devKitData, platformName, addOnName, acVersionList, languageList, additionalParams]
