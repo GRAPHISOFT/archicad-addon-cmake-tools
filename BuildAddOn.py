@@ -282,8 +282,14 @@ def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, pla
         ])
 
 
+def GetDevKitBuildNum (devKitData, version, platformName):
+    url = devKitData[platformName][version]
+    buildNum = url.split('/')[-2]
+    return buildNum
+
+
 # Zip packages
-def PackageAddOns (args, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder):
+def PackageAddOns (args, devKitData, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder):
     Check7ZInstallation ()
 
     for version in acVersionList:
@@ -294,12 +300,21 @@ def PackageAddOns (args, addOnName, platformName, acVersionList, languageList, b
             CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, 'Debug')
             CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, 'RelWithDebInfo')
         
-        buildType = 'Release' if args.allLocalizedVersions else 'Daily'
-        subprocess.call ([
-            '7z', 'a',
-            str (packageRootFolder.parent / f'{addOnName}-{version}_{buildType}_{platformName}.zip'),
-            str (packageRootFolder / version / '*')
-        ])
+        if args.allLocalizedVersions:
+            buildType = 'Release'
+            subprocess.call ([
+                '7z', 'a',
+                str (packageRootFolder.parent / f'{addOnName}-{version}_{buildType}_{platformName}.zip'),
+                str (packageRootFolder / version / '*')
+            ])
+        else:
+            buildType = 'Daily'
+            buildNum = GetDevKitBuildNum (devKitData, version, platformName)
+            subprocess.call ([
+                '7z', 'a',
+                str (packageRootFolder.parent / f'{addOnName}-{version}.{buildNum}_{buildType}_{platformName}.zip'),
+                str (packageRootFolder / version / '*')
+            ])
 
 
 def Main ():
@@ -315,7 +330,7 @@ def Main ():
         BuildAddOns (args, addOnName, platformName, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList)
 
         if args.package:
-            PackageAddOns (args, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder)
+            PackageAddOns (args, devKitData, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder)
 
         print ('Build succeeded!')
         sys.exit (0)
