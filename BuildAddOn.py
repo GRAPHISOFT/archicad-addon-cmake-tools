@@ -74,7 +74,7 @@ def PrepareParameters (args):
         if args.additionalCMakeParams:
             for param in args.additionalCMakeParams:
                 if '=' not in param:
-                    additionalParams[key] = None
+                    additionalParams[key] = "ON"
                 else:
                     key, value = param.split ('=', 1)
                     if not value:
@@ -181,26 +181,19 @@ def GetProjectGenerationParams (workspaceRootFolder, buildPath, addOnName, platf
 
     projGenParams.append (f'-DAC_ADDON_NAME={addOnName}')
     projGenParams.append (f'-DAC_API_DEVKIT_DIR={str (devKitFolder / "Support")}')
-
-    if languageCode is not None:
-        projGenParams.append (f'-DAC_ADDON_LANGUAGE={languageCode}')
+    projGenParams.append (f'-DAC_ADDON_LANGUAGE={languageCode}')
 
     if additionalParams is not None:
         for key in additionalParams:
-            if additionalParams[key] is None:
-                projGenParams.append (f'-D{key}=ON')
-            else:
-                projGenParams.append (f'-D{key}={additionalParams[key]}')
+            projGenParams.append (f'-D{key}={additionalParams[key]}')
 
     projGenParams.append (str (workspaceRootFolder))
 
     return projGenParams
 
 
-def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, configuration, languageCode=None):
-    buildPath = buildFolder / addOnName / version
-    if languageCode is not None:
-        buildPath = buildPath / languageCode
+def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, configuration, languageCode):
+    buildPath = buildFolder / addOnName / version / languageCode
 
     # Add params to configure cmake
     projGenParams = GetProjectGenerationParams (workspaceRootFolder, buildPath, addOnName, platformName, devKitFolder, version, languageCode, additionalParams)
@@ -230,13 +223,10 @@ def BuildAddOns (args, addOnName, platformName, languageList, additionalParams, 
         for version in devKitFolderList:
             devKitFolder = devKitFolderList[version]
 
-            if args.package is True:
-                for languageCode in languageList:
-                    BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, 'RelWithDebInfo', languageCode)
-
-            else:
-                BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, 'Debug')
-                BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, 'RelWithDebInfo')
+            for languageCode in languageList:
+                BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, 'RelWithDebInfo', languageCode)
+                if args.package is False:
+                    BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, 'Debug', languageCode)
 
     except Exception as e:
         raise e
@@ -249,14 +239,9 @@ def Check7ZInstallation ():
         raise Exception ('7Zip not installed!')
 
 
-def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, configuration, languageCode=None):
-    packageFolder = packageRootFolder / version
-    sourceFolder = buildFolder / addOnName / version
-
-    if languageCode is not None:
-        packageFolder = packageFolder / languageCode
-        sourceFolder = sourceFolder / languageCode
-    sourceFolder = sourceFolder / configuration
+def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, configuration, languageCode):
+    packageFolder = packageRootFolder / version / languageCode
+    sourceFolder = buildFolder / addOnName / version / languageCode / configuration
 
     if not packageFolder.exists ():
         packageFolder.mkdir (parents=True)
@@ -279,7 +264,7 @@ def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, pla
         ])
 
 
-def GetDevKitBuildNum (args, devKitData, version, platformName):
+def GetDevKitVersion (args, devKitData, version, platformName):
     if args.devKitPath:
         buildNum = f'{version}.{args.buildNum}'
     else:
@@ -297,7 +282,7 @@ def PackageAddOns (args, devKitData, addOnName, platformName, acVersionList, lan
         for languageCode in languageList:
             CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, 'RelWithDebInfo', languageCode)
     
-        versionAndBuildNum = GetDevKitBuildNum (args, devKitData, version, platformName)
+        versionAndBuildNum = GetDevKitVersion (args, devKitData, version, platformName)
         subprocess.call ([
             '7z', 'a',
             str (packageRootFolder.parent / f'{addOnName}-{versionAndBuildNum}_{platformName}.zip'),
