@@ -11,8 +11,8 @@ There is a configuration file that consists of an object containing key-value pa
 The repo includes a BuildAddOn.py python script, that handles the building of the Add-Ons. This script takes up to 6 arguments:
 
 - -c, --configFile (mandatory): path to the JSON configuration file.
-- -v, --acVersion (optional, but mandatory if --devKitPath is used): a list of Archicad version numbers, that the Add-On is built for. These versions must be present in the APIDevKitLinks file's object keys. When not specified, the script takes all versions specified in the configuration file.
-- -l, --allLocalizedVersions (optional): Toggles creating localized release builds for the configured languages. If not enabled, the configured defaultLanguage will be used.
+- -v, --acVersion (optional, but mandatory if --devKitPath is used): a list of Archicad version numbers, that the Add-On is built for. These versions must be present in the object keys of the APIDevKitLinks file. When not specified, the script takes all versions specified in the APIDevKitLinks file.
+- -l, --allLocalizedVersions (optional): Toggles creating localized builds for all languages listed in the language object of the JSON configuration file . If not enabled, the configured defaultLanguage will be used.
 - -d, --devKitPath (optional): path to a single local APIDevKit folder. When this argument is used, only one Archicad version should be provided in the --acVersion list.
 - -b, --buildNum (optional, but mandatory if --devKitPath is used): Build number of the used local APIDevKit. Ex: -b 3001.
 - -p, --package (optional): toggles creating zip archive with the built Add-On files.
