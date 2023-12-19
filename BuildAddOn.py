@@ -286,7 +286,6 @@ def GetDevKitBuildNum (args, devKitData, version, platformName):
         url = devKitData[platformName][version]
         buildNum = url.split ('/')[-2]
     
-    print(buildNum)
     return buildNum
 
 
