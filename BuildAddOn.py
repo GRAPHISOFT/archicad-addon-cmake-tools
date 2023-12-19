@@ -74,7 +74,7 @@ def PrepareParameters (args):
         if args.additionalCMakeParams:
             for param in args.additionalCMakeParams:
                 if '=' not in param:
-                    additionalParams[key] = "ON"
+                    additionalParams[param] = "ON"
                 else:
                     key, value = param.split ('=', 1)
                     if not value:
