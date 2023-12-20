@@ -57,19 +57,6 @@ function (SetCompilerOptions target acVersion)
     
 endfunction ()
 
-function (DetectACVersion devKitDir acVersion)
-
-    set (ACAPIncFileLocation ${devKitDir}/Inc/ACAPinc.h)
-    if (EXISTS ${ACAPIncFileLocation})
-        file (READ ${ACAPIncFileLocation} ACAPIncContent)
-        string (REGEX MATCHALL "#define[ \t]+ServerMainVers_([0-9][0-9])" VersionList ${ACAPIncContent})
-        set (${acVersion} ${CMAKE_MATCH_1} PARENT_SCOPE)
-    else ()
-        message (FATAL_ERROR "Failed to detect Archicad version, please check the value of the AC_API_DEVKIT_DIR variable.")
-    endif ()
-
-endfunction ()
-
 function (LinkGSLibrariesToProject acVersion devKitDir addOnName)
 
     if (WIN32)

@@ -179,6 +179,7 @@ def GetProjectGenerationParams (workspaceRootFolder, buildPath, addOnName, platf
     elif platformName == 'MAC':
         projGenParams.extend (['-G', 'Xcode'])
 
+    projGenParams.append (f'-DAC_VERSION={version}')
     projGenParams.append (f'-DAC_ADDON_NAME={addOnName}')
     projGenParams.append (f'-DAC_API_DEVKIT_DIR={str (devKitFolder / "Support")}')
     projGenParams.append (f'-DAC_ADDON_LANGUAGE={languageCode}')
