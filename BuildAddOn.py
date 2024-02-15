@@ -149,7 +149,7 @@ def GetInstalledVisualStudioGenerator ():
     vsWherePath = pathlib.Path (os.environ["ProgramFiles(x86)"]) / 'Microsoft Visual Studio' / 'Installer' / 'vswhere.exe'
     if not vsWherePath.exists ():
         raise Exception ('Microsoft Visual Studio Installer not found!')
-    vsWhereOutputStr = subprocess.check_output ([vsWherePath, '-sort', '-format', 'json'])
+    vsWhereOutputStr = subprocess.check_output ([vsWherePath, '-sort', '-format', 'json', '-utf8'])
     vsWhereOutput = json.loads (vsWhereOutputStr)
     if len (vsWhereOutput) == 0:
         raise Exception ('No installed Visual Studio detected!')
@@ -283,12 +283,12 @@ def PackageAddOns (args, devKitData, addOnName, platformName, acVersionList, lan
         for languageCode in languageList:
             CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, 'RelWithDebInfo', languageCode)
     
-        versionAndBuildNum = GetDevKitVersion (args, devKitData, version, platformName)
-        subprocess.call ([
-            '7z', 'a',
-            str (packageRootFolder.parent / f'{addOnName}-{versionAndBuildNum}_{platformName}.zip'),
-            str (packageRootFolder / version / '*')
-        ])
+            versionAndBuildNum = GetDevKitVersion (args, devKitData, version, platformName)
+            subprocess.call ([
+                '7z', 'a',
+                str (packageRootFolder.parent / version / f'{addOnName}-{versionAndBuildNum}_{platformName}_{languageCode}.zip'),
+                str (packageRootFolder / version / languageCode / '*')
+            ])
 
 
 def Main ():
