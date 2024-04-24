@@ -9,6 +9,7 @@ import sys
 import urllib.parse
 import urllib.request
 import zipfile
+import tarfile
 
 def ParseArguments ():
     parser = argparse.ArgumentParser ()
@@ -134,15 +135,13 @@ def DownloadAndUnzip (url, dest):
     print (f'Downloading {fileName}')
     urllib.request.urlretrieve (url, filePath)
 
-    print (f'Unzipping {fileName}')
-    if platform.system () == 'Windows':
-        with zipfile.ZipFile (filePath, 'r') as zip:
-            zip.extractall (dest)
-    elif platform.system () == 'Darwin':
-        subprocess.call ([
-            'unzip', '-qq', filePath,
-            '-d', dest
-        ])
+    print (f'Extracting {fileName}')
+    if zipfile.is_zipfile(filePath):
+        with zipfile.ZipFile(filePath, 'r') as zip:
+            zip.extractall(path=dest)
+    if tarfile.is_tarfile(filePath):
+        with tarfile.open(filePath, "r:gz") as tar:
+            tar.extractall(path=dest)
 
 
 def GetInstalledVisualStudioGenerator ():
