@@ -136,12 +136,21 @@ def DownloadAndUnzip (url, dest):
     urllib.request.urlretrieve (url, filePath)
 
     print (f'Extracting {fileName}')
-    if zipfile.is_zipfile (filePath):
-        with zipfile.ZipFile (filePath, 'r') as zip:
-            zip.extractall (path=dest)
-    if tarfile.is_tarfile (filePath):
-        with tarfile.open (filePath, "r:gz") as tar:
-            tar.extractall (path=dest)
+    
+    if platform.system () == 'Windows': 
+        if zipfile.is_zipfile (filePath):
+            with zipfile.ZipFile (filePath, 'r') as zip:
+                zip.extractall (path=dest)
+    elif platform.system () == 'Darwin':
+        if tarfile.is_tarfile (filePath):
+            with tarfile.open (filePath, "r:gz") as tar:
+                tar.extractall (path=dest)
+        else:
+            subprocess.call ([
+            'unzip', '-qq', filePath,
+            '-d', dest
+        ])
+    
 
 
 def GetInstalledVisualStudioGenerator ():
