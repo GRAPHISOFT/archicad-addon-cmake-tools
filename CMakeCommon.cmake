@@ -57,27 +57,27 @@ function (SetCompilerOptions target acVersion)
     
 endfunction ()
 
-function (LinkGSLibrariesToProject acVersion devKitDir addOnName)
+function (LinkGSLibrariesToProject target acVersion devKitDir)
 
     if (WIN32)
         if (${acVersion} LESS 27)
-            target_link_libraries (${addOnName}
+            target_link_libraries (${target}
                 "${devKitDir}/Lib/Win/ACAP_STAT.lib"
             )
         else ()
-            target_link_libraries (${addOnName}
+            target_link_libraries (${target}
                 "${devKitDir}/Lib/ACAP_STAT.lib"
             )
         endif ()
     else ()
         find_library (CocoaFramework Cocoa)
         if (${acVersion} LESS 27)
-            target_link_libraries (${addOnName}
+            target_link_libraries (${target}
                 "${devKitDir}/Lib/Mactel/libACAP_STAT.a"
                 ${CocoaFramework}
             )
         else ()
-            target_link_libraries (${addOnName}
+            target_link_libraries (${target}
                 "${devKitDir}/Lib/libACAP_STAT.a"
                 ${CocoaFramework}
             )
@@ -85,21 +85,21 @@ function (LinkGSLibrariesToProject acVersion devKitDir addOnName)
     endif ()
 
     file (GLOB ModuleFolders ${devKitDir}/Modules/*)
-    target_include_directories (${addOnName} PUBLIC ${ModuleFolders})
+    target_include_directories (${target} PUBLIC ${ModuleFolders})
     if (WIN32)
         file (GLOB LibFilesInFolder ${devKitDir}/Modules/*/*/*.lib)
-        target_link_libraries (${addOnName} ${LibFilesInFolder})
+        target_link_libraries (${target} ${LibFilesInFolder})
     else ()
         file (GLOB LibFilesInFolder
             ${devKitDir}/Frameworks/*.framework
             ${devKitDir}/Frameworks/*.dylib
         )
-        target_link_libraries (${addOnName} ${LibFilesInFolder})
+        target_link_libraries (${target} ${LibFilesInFolder})
     endif ()
 
 endfunction ()
 
-function (GenerateAddOnProject acVersion devKitDir addOnName addOnSourcesFolder addOnResourcesFolder addOnLanguage)
+function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSourcesFolder addOnResourcesFolder addOnLanguage)
 
     find_package (Python COMPONENTS Interpreter)
 
@@ -169,31 +169,31 @@ function (GenerateAddOnProject acVersion devKitDir addOnName addOnSourcesFolder 
     source_group ("Images" FILES ${AddOnImageFiles})
     source_group ("Resources" FILES ${AddOnResourceFiles})
     if (WIN32)
-        add_library (${addOnName} SHARED ${AddOnFiles})
+        add_library (${target} SHARED ${AddOnFiles})
     else ()
-        add_library (${addOnName} MODULE ${AddOnFiles})
+        add_library (${target} MODULE ${AddOnFiles})
     endif ()
 
-    set_target_properties (${addOnName} PROPERTIES OUTPUT_NAME ${addOnName})
+    set_target_properties (${target} PROPERTIES OUTPUT_NAME ${addOnName})
     if (WIN32)
-        set_target_properties (${addOnName} PROPERTIES SUFFIX ".apx")
-        set_target_properties (${addOnName} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_$<CONFIG> "${CMAKE_BINARY_DIR}/$<CONFIG>")
-        target_link_options (${addOnName} PUBLIC "${ResourceObjectsDir}/${addOnName}.res")
-        target_link_options (${addOnName} PUBLIC /export:GetExportedFuncAddrs,@1 /export:SetImportedFuncAddrs,@2)
+        set_target_properties (${target} PROPERTIES SUFFIX ".apx")
+        set_target_properties (${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_$<CONFIG> "${CMAKE_BINARY_DIR}/$<CONFIG>")
+        target_link_options (${target} PUBLIC "${ResourceObjectsDir}/${addOnName}.res")
+        target_link_options (${target} PUBLIC /export:GetExportedFuncAddrs,@1 /export:SetImportedFuncAddrs,@2)
     else ()
-        set_target_properties (${addOnName} PROPERTIES BUNDLE TRUE)
-        set_target_properties (${addOnName} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/${addOnResourcesFolder}/RFIX.mac/Info.plist")
-        set_target_properties (${addOnName} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>")
+        set_target_properties (${target} PROPERTIES BUNDLE TRUE)
+        set_target_properties (${target} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/${addOnResourcesFolder}/RFIX.mac/Info.plist")
+        set_target_properties (${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>")
     endif ()
 
-    target_include_directories (${addOnName} PUBLIC
+    target_include_directories (${target} PUBLIC
         ${addOnSourcesFolder}
         ${devKitDir}/Inc
     )
 
-    LinkGSLibrariesToProject (${acVersion} ${devKitDir} ${addOnName})
+    LinkGSLibrariesToProject (${target} ${acVersion} ${devKitDir})
 
     set_source_files_properties (${AddOnSourceFiles} PROPERTIES LANGUAGE CXX)
-    SetCompilerOptions (${addOnName} ${acVersion})
+    SetCompilerOptions (${target} ${acVersion})
 
 endfunction ()
