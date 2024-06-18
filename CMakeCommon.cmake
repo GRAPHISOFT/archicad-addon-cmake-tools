@@ -103,6 +103,10 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
 
     find_package (Python COMPONENTS Interpreter)
 
+    if (APPLE)
+        set(CMAKE_INSTALL_RPATH "@loader_path/../Frameworks")
+    endif ()
+
     set (ResourceObjectsDir ${CMAKE_BINARY_DIR}/ResourceObjects)
     set (ResourceStampFile "${ResourceObjectsDir}/AddOnResources.stamp")
 
@@ -196,4 +200,19 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
     set_source_files_properties (${AddOnSourceFiles} PROPERTIES LANGUAGE CXX)
     SetCompilerOptions (${target} ${acVersion})
 
+    install(
+        TARGETS ${target}
+        DESTINATION .
+    )
+
+    if (WIN32)
+        install(
+            FILES $<TARGET_PDB_FILE:${target}>
+            DESTINATION .
+            OPTIONAL
+        )
+    else ()
+        install(CODE "MESSAGE(\"codesign $<TARGET_BUNDLE_DIR_NAME:${target}>\")")
+        install(CODE "execute_process(COMMAND codesign --force --deep --sign - $<INSTALL_PREFIX>/$<TARGET_BUNDLE_DIR_NAME:${target}>)")
+    endif ()
 endfunction ()

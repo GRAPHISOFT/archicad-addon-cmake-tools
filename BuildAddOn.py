@@ -1,4 +1,5 @@
 import argparse
+import glob
 import json
 import os
 import pathlib
@@ -221,6 +222,17 @@ def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, 
     if buildResult != 0:
         raise Exception ('Failed to build project!')
 
+    installParams = [
+        'cmake',
+        '--install', str (buildPath),
+        '--config', configuration,
+        '--prefix', str (buildPath / 'Publish' / configuration)
+    ]
+
+    installResult = subprocess.call (installParams)
+    if installResult != 0:
+        raise Exception ('Failed to install project!')
+
 
 def BuildAddOns (args, addOnName, platformName, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList):
     # At this point, devKitFolderList dictionary has all provided ACVersions as keys
@@ -250,7 +262,7 @@ def Check7ZInstallation ():
 
 def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, configuration, languageCode):
     packageFolder = packageRootFolder / version / languageCode
-    sourceFolder = buildFolder / addOnName / version / languageCode / configuration
+    sourceFolder = buildFolder / addOnName / version / languageCode / 'Publish' / configuration
 
     if not packageFolder.exists ():
         packageFolder.mkdir (parents=True)
@@ -264,6 +276,11 @@ def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, pla
             sourceFolder / f'{addOnName}.pdb',
             packageFolder / f'{addOnName}.pdb',
         )
+        for file in glob.glob (str (sourceFolder / '*.dll')):
+            shutil.copy(
+                file,
+                packageFolder
+            )
 
     elif platformName == 'MAC':
         subprocess.call ([
