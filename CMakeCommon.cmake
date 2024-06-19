@@ -202,7 +202,8 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
 
     install(
         TARGETS ${target}
-        DESTINATION .
+        LIBRARY DESTINATION .
+        RUNTIME DESTINATION .
     )
 
     if (WIN32)
