@@ -260,36 +260,6 @@ def Check7ZInstallation ():
         raise Exception ('7Zip not installed!')
 
 
-def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, configuration, languageCode):
-    packageFolder = packageRootFolder / version / languageCode
-    sourceFolder = buildFolder / addOnName / version / languageCode / 'Publish' / configuration
-
-    if not packageFolder.exists ():
-        packageFolder.mkdir (parents=True)
-
-    if platformName == 'WIN':
-        shutil.copy (
-            sourceFolder / f'{addOnName}.apx',
-            packageFolder / f'{addOnName}.apx',
-        )
-        shutil.copy (
-            sourceFolder / f'{addOnName}.pdb',
-            packageFolder / f'{addOnName}.pdb',
-        )
-        for file in glob.glob (str (sourceFolder / '*.dll')):
-            shutil.copy(
-                file,
-                packageFolder
-            )
-
-    elif platformName == 'MAC':
-        subprocess.call ([
-            'cp', '-R',
-            sourceFolder / f'{addOnName}.bundle',
-            packageFolder / f'{addOnName}.bundle'
-        ])
-
-
 def GetDevKitVersion (args, devKitData, version, platformName):
     if args.devKitPath:
         buildNum = f'{version}.{args.buildNum}'
@@ -306,13 +276,12 @@ def PackageAddOns (args, devKitData, addOnName, platformName, acVersionList, lan
 
     for version in acVersionList:
         for languageCode in languageList:
-            CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, 'RelWithDebInfo', languageCode)
-    
             versionAndBuildNum = GetDevKitVersion (args, devKitData, version, platformName)
+            packageFolder = buildFolder / addOnName / version / languageCode / 'Publish' / 'RelWithDebInfo'
             subprocess.call ([
                 '7z', 'a',
                 str (packageRootFolder.parent / version / f'{addOnName}-{versionAndBuildNum}_{platformName}_{languageCode}.zip'),
-                str (packageRootFolder / version / languageCode / '*')
+                str (packageFolder / '*')
             ])
 
 
