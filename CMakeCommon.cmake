@@ -148,11 +148,11 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
         )
     endif ()
 
-    file (GLOB AddOnHeaderFiles CONFIGURE_DEPENDS
+    file (GLOB_RECURSE AddOnHeaderFiles CONFIGURE_DEPENDS
         ${addOnSourcesFolder}/*.h
         ${addOnSourcesFolder}/*.hpp
     )
-    file (GLOB AddOnSourceFiles CONFIGURE_DEPENDS
+    file (GLOB_RECURSE AddOnSourceFiles CONFIGURE_DEPENDS
         ${addOnSourcesFolder}/*.c
         ${addOnSourcesFolder}/*.cpp
     )
