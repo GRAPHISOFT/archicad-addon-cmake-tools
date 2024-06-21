@@ -152,7 +152,6 @@ def DownloadAndUnzip (url, dest):
         ])
     
 
-
 def GetInstalledVisualStudioGenerator ():
     vsWherePath = pathlib.Path (os.environ["ProgramFiles(x86)"]) / 'Microsoft Visual Studio' / 'Installer' / 'vswhere.exe'
     if not vsWherePath.exists ():
@@ -201,7 +200,7 @@ def GetProjectGenerationParams (workspaceRootFolder, buildPath, addOnName, platf
     return projGenParams
 
 
-def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, configuration, languageCode):
+def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, packageRootFolder, version, configuration, languageCode):
     buildPath = buildFolder / addOnName / version / languageCode
 
     # Add params to configure cmake
@@ -225,7 +224,7 @@ def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, 
         'cmake',
         '--install', str (buildPath),
         '--config', configuration,
-        '--prefix', str (buildPath / 'Publish' / configuration)
+        '--prefix', str (packageRootFolder / version / languageCode)
     ]
 
     installResult = subprocess.call (installParams)
@@ -233,7 +232,7 @@ def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, 
         raise Exception ('Failed to install project!')
 
 
-def BuildAddOns (args, addOnName, platformName, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList):
+def BuildAddOns (args, addOnName, platformName, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, packageRootFolder):
     # At this point, devKitFolderList dictionary has all provided ACVersions as keys
     # For every ACVersion
     # If release, build Add-On for all languages with RelWithDebInfo configuration
@@ -244,9 +243,9 @@ def BuildAddOns (args, addOnName, platformName, languageList, additionalParams, 
             devKitFolder = devKitFolderList[version]
 
             for languageCode in languageList:
-                BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, 'RelWithDebInfo', languageCode)
+                BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, packageRootFolder, version, 'RelWithDebInfo', languageCode)
                 if args.package is False:
-                    BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, 'Debug', languageCode)
+                    BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, packageRootFolder, version, 'Debug', languageCode)
 
     except Exception as e:
         raise e
@@ -276,7 +275,7 @@ def PackageAddOns (args, devKitData, addOnName, platformName, acVersionList, lan
     for version in acVersionList:
         for languageCode in languageList:
             versionAndBuildNum = GetDevKitVersion (args, devKitData, version, platformName)
-            packageFolder = buildFolder / addOnName / version / languageCode / 'Publish' / 'RelWithDebInfo'
+            packageFolder = packageRootFolder / version / languageCode
             subprocess.call ([
                 '7z', 'a',
                 str (packageRootFolder.parent / version / f'{addOnName}-{versionAndBuildNum}_{platformName}_{languageCode}.zip'),
@@ -294,7 +293,7 @@ def Main ():
 
         os.chdir (workspaceRootFolder)
         
-        BuildAddOns (args, addOnName, platformName, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList)
+        BuildAddOns (args, addOnName, platformName, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, packageRootFolder)
 
         if args.package:
             PackageAddOns (args, devKitData, addOnName, platformName, acVersionList, languageList, buildFolder, packageRootFolder)
@@ -305,6 +304,7 @@ def Main ():
     except Exception as e:
         print (e)
         sys.exit (1)
+
 
 if __name__ == "__main__":
     Main ()

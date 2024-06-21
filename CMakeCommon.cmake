@@ -217,3 +217,34 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
         install(CODE "execute_process(COMMAND codesign --force --deep --sign - $<INSTALL_PREFIX>/$<TARGET_BUNDLE_DIR_NAME:${target}>)")
     endif ()
 endfunction ()
+
+
+function(AddOnLinkLibraries target UsedPackages)
+    target_link_libraries(${target} ${UsedPackages})
+
+    if (WIN32)
+        set(linkLibrariesInstallPath .)
+    else ()
+        set(linkLibrariesInstallPath $<TARGET_BUNDLE_DIR_NAME:${target}>/Contents/Frameworks)
+    endif()
+
+    install(
+        IMPORTED_RUNTIME_ARTIFACTS ${UsedPackages}
+        DESTINATION ${linkLibrariesInstallPath}
+    )
+
+    if (WIN32)
+	    foreach(UsedPackage ${UsedPackages})
+            get_target_property(LibraryPath UsedPackage IMPORTED_LOCATION_$<CONFIG>)
+            string (REPLACE ".dll" ".pdb" LibraryPDBPath ${libraryPath})
+            if(EXISTS "${LibraryPDBPath}")
+                install(
+                    FILES ${LibraryPDBPath}
+                    DESTINATION ${linkLibrariesInstallPath}
+                    CONFIGURATIONS $<CONFIG>
+                    OPTIONAL
+                )
+            endif()
+        endforeach()
+    endif ()
+endfunction()
