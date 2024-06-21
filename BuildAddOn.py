@@ -220,17 +220,6 @@ def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, 
     if buildResult != 0:
         raise Exception ('Failed to build project!')
 
-    installParams = [
-        'cmake',
-        '--install', str (buildPath),
-        '--config', configuration,
-        '--prefix', str (packageRootFolder / version / languageCode)
-    ]
-
-    installResult = subprocess.call (installParams)
-    if installResult != 0:
-        raise Exception ('Failed to install project!')
-
 
 def BuildAddOns (args, addOnName, platformName, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, packageRootFolder):
     # At this point, devKitFolderList dictionary has all provided ACVersions as keys
@@ -274,8 +263,21 @@ def PackageAddOns (args, devKitData, addOnName, platformName, acVersionList, lan
 
     for version in acVersionList:
         for languageCode in languageList:
-            versionAndBuildNum = GetDevKitVersion (args, devKitData, version, platformName)
+            buildPath = buildFolder / addOnName / version / languageCode
             packageFolder = packageRootFolder / version / languageCode
+
+            installParams = [
+                'cmake',
+                '--install', str (buildPath),
+                '--config', 'RelWithDebInfo',
+                '--prefix', str (packageFolder)
+            ]
+
+            installResult = subprocess.call (installParams)
+            if installResult != 0:
+                raise Exception ('Failed to install project!')
+
+            versionAndBuildNum = GetDevKitVersion (args, devKitData, version, platformName)
             subprocess.call ([
                 '7z', 'a',
                 str (packageRootFolder.parent / version / f'{addOnName}-{versionAndBuildNum}_{platformName}_{languageCode}.zip'),

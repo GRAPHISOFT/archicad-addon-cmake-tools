@@ -234,14 +234,14 @@ function(AddOnLinkLibraries target UsedPackages)
     )
 
     if (WIN32)
-	    foreach(UsedPackage ${UsedPackages})
-            get_target_property(LibraryPath UsedPackage IMPORTED_LOCATION_$<CONFIG>)
-            string (REPLACE ".dll" ".pdb" LibraryPDBPath ${libraryPath})
+        foreach(UsedPackage ${UsedPackages})
+            get_target_property(LibraryPath ${UsedPackage} IMPORTED_LOCATION_RELWITHDEBINFO)
+            string (REGEX REPLACE "(.*)\\.(dll|lib)" "\\1.pdb" LibraryPDBPath ${LibraryPath})
             if(EXISTS "${LibraryPDBPath}")
                 install(
                     FILES ${LibraryPDBPath}
                     DESTINATION ${linkLibrariesInstallPath}
-                    CONFIGURATIONS $<CONFIG>
+                    CONFIGURATIONS RELWITHDEBINFO
                     OPTIONAL
                 )
             endif()
