@@ -195,6 +195,8 @@ def GetProjectGenerationParams (workspaceRootFolder, buildPath, addOnName, platf
         for key in additionalParams:
             projGenParams.append (f'-D{key}={additionalParams[key]}')
 
+    projGenParams.append ('-DCMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO="RelWithDebInfo;Release;"')
+
     projGenParams.append (str (workspaceRootFolder))
 
     return projGenParams
