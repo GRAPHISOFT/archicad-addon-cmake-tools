@@ -54,7 +54,7 @@ function (SetCompilerOptions target acVersion)
             target_compile_options (${target} PUBLIC -Wno-non-c-typedef-for-linkage)
         endif ()
     endif ()
-    
+
 endfunction ()
 
 function (LinkGSLibrariesToProject target acVersion devKitDir)
@@ -164,7 +164,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
         ${AddOnResourceFiles}
         ${ResourceStampFile}
     )
-    
+
     source_group ("Sources" FILES ${AddOnHeaderFiles} ${AddOnSourceFiles})
     source_group ("Images" FILES ${AddOnImageFiles})
     source_group ("Resources" FILES ${AddOnResourceFiles})
@@ -181,9 +181,41 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
         target_link_options (${target} PUBLIC "${ResourceObjectsDir}/${addOnName}.res")
         target_link_options (${target} PUBLIC /export:GetExportedFuncAddrs,@1 /export:SetImportedFuncAddrs,@2)
     else ()
-        set_target_properties (${target} PROPERTIES BUNDLE TRUE)
-        set_target_properties (${target} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/${addOnResourcesFolder}/RFIX.mac/Info.plist")
-        set_target_properties (${target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>")
+        # Prepare various variables for the Info.plist
+        string(TOLOWER "${addOnName}" lowerAddOnName)
+        string(REGEX REPLACE " " "_" addOnNameIdentifier "${lowerAddOnName}")
+        string(TIMESTAMP copyright "Copyright © GRAPHISOFT SE, 1984-%Y")
+        # BE on the safe side; load the info from an existing framework
+        file(READ "${devKitDir}/Frameworks/APICore.framework/Versions/A/Resources/Info.plist" plist_content NEWLINE_CONSUME)
+        string(REGEX REPLACE ".*GSBuildNum[^0-9]+([0-9]+).*" "\\1" gsBuildNum "${plist_content}")
+        string(REGEX REPLACE ".*LSMinimumSystemVersion[^0-9]+([0-9\.]+).*" "\\1" lsMinimumSystemVersion "${plist_content}")
+
+        set(MACOSX_BUNDLE_EXECUTABLE_NAME ${addOnName})
+        set(MACOSX_BUNDLE_INFO_STRING ${addOnName})
+        set(MACOSX_BUNDLE_GUI_IDENTIFIER com.graphisoft.${addOnNameIdentifier})
+        set(MACOSX_BUNDLE_LONG_VERSION_STRING ${copyright})
+        set(MACOSX_BUNDLE_BUNDLE_NAME ${addOnName})
+        set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${acVersion}.0.0.${gsBuildNum})
+        set(MACOSX_BUNDLE_BUNDLE_VERSION ${acVersion}.0.0.${gsBuildNum})
+        set(MACOSX_BUNDLE_COPYRIGHT ${copyright})
+        set(MINIMUM_SYSTEM_VERSION "${lsMinimumSystemVersion}")
+
+        # Configure the Info.plist file
+        configure_file(
+            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/AddOnInfo.plist.in"
+            "${CMAKE_BINARY_DIR}/AddOnInfo.plist"
+            @ONLY
+        )
+        set_target_properties(${target} PROPERTIES
+            BUNDLE TRUE
+            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_BINARY_DIR}/AddOnInfo.plist"
+
+            # Align parameters for Xcode and in Info.plist to avoid warnings
+            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER com.graphisoft.${addOnNameIdentifier}
+            XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET ${lsMinimumSystemVersion}
+
+            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>"
+        )
     endif ()
 
     target_include_directories (${target} PUBLIC
