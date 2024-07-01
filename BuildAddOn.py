@@ -6,6 +6,7 @@ import platform
 import shutil
 import subprocess
 import sys
+import traceback
 import urllib.parse
 import urllib.request
 import zipfile
@@ -319,6 +320,7 @@ def Main ():
     
     except Exception as e:
         print (e)
+        print (traceback.format_exc())
         sys.exit (1)
 
 if __name__ == "__main__":
