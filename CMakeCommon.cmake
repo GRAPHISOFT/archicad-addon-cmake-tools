@@ -183,7 +183,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
     else ()
         # Prepare various variables for the Info.plist
         string(TOLOWER "${addOnName}" lowerAddOnName)
-        string(REGEX REPLACE " " "_" addOnNameIdentifier "${lowerAddOnName}")
+        string(REGEX REPLACE " " "-" addOnNameIdentifier "${lowerAddOnName}")
         string(TIMESTAMP copyright "Copyright © GRAPHISOFT SE, 1984-%Y")
         # BE on the safe side; load the info from an existing framework
         file(READ "${devKitDir}/Frameworks/APICore.framework/Versions/A/Resources/Info.plist" plist_content NEWLINE_CONSUME)
