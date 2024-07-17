@@ -186,7 +186,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
         string(REGEX REPLACE "[ _]" "-" addOnNameIdentifier "${lowerAddOnName}")
         string(TIMESTAMP copyright "Copyright © GRAPHISOFT SE, 1984-%Y")
         # BE on the safe side; load the info from an existing framework
-        file(READ "${devKitDir}/Frameworks/APICore.framework/Versions/A/Resources/Info.plist" plist_content NEWLINE_CONSUME)
+        file(READ "${devKitDir}/Frameworks/GSRoot.framework/Versions/A/Resources/Info.plist" plist_content NEWLINE_CONSUME)
         string(REGEX REPLACE ".*GSBuildNum[^0-9]+([0-9]+).*" "\\1" gsBuildNum "${plist_content}")
         string(REGEX REPLACE ".*LSMinimumSystemVersion[^0-9]+([0-9\.]+).*" "\\1" lsMinimumSystemVersion "${plist_content}")
 
