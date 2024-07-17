@@ -17,3 +17,4 @@ The repo includes a BuildAddOn.py python script, that handles the building of th
 - -b, --buildNum (optional, but mandatory if --devKitPath is used): Build number of the used local APIDevKit. Ex: -b 3001.
 - -p, --package (optional): toggles creating zip archive with the built Add-On files.
 - -a, --additionalCMakeParams (optional): a list of additional addon-specific CMake parameters as keys or key=value pairs. The build script will forward it to CMake. Ex: -a var1=value1 var2="value 2" var3.
+- -q, --quiet (optional): minimal / less verbose output from the build tool.

@@ -85,7 +85,7 @@ function (LinkGSLibrariesToProject target acVersion devKitDir)
     endif ()
 
     file (GLOB ModuleFolders ${devKitDir}/Modules/*)
-    target_include_directories (${target} PUBLIC ${ModuleFolders})
+    target_include_directories (${target} SYSTEM PUBLIC ${ModuleFolders})
     if (WIN32)
         file (GLOB LibFilesInFolder ${devKitDir}/Modules/*/*/*.lib)
         target_link_libraries (${target} ${LibFilesInFolder})
@@ -183,7 +183,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
     else ()
         # Prepare various variables for the Info.plist
         string(TOLOWER "${addOnName}" lowerAddOnName)
-        string(REGEX REPLACE " " "_" addOnNameIdentifier "${lowerAddOnName}")
+        string(REGEX REPLACE "[ _]" "-" addOnNameIdentifier "${lowerAddOnName}")
         string(TIMESTAMP copyright "Copyright © GRAPHISOFT SE, 1984-%Y")
         # BE on the safe side; load the info from an existing framework
         file(READ "${devKitDir}/Frameworks/APICore.framework/Versions/A/Resources/Info.plist" plist_content NEWLINE_CONSUME)
@@ -218,10 +218,8 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
         )
     endif ()
 
-    target_include_directories (${target} PUBLIC
-        ${addOnSourcesFolder}
-        ${devKitDir}/Inc
-    )
+    target_include_directories (${target} SYSTEM PUBLIC ${devKitDir}/Inc)
+    target_include_directories (${target} PUBLIC ${addOnSourcesFolder})
 
     LinkGSLibrariesToProject (${target} ${acVersion} ${devKitDir})
 
