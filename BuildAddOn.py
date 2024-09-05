@@ -81,7 +81,7 @@ def PrepareParameters (args):
     if args.buildConfig:
         buildConfigList = [ConfigToUpperCamelCase (config) for config in args.buildConfig]
     else:
-        buildConfigList = ["RelWithDebInfo"]    
+        buildConfigList = ['RelWithDebInfo']    
 
     # Get needed language codes
     languageList = [configData['defaultLanguage'].upper ()]
@@ -99,7 +99,7 @@ def PrepareParameters (args):
         if args.additionalCMakeParams:
             for param in args.additionalCMakeParams:
                 if '=' not in param:
-                    additionalParams[param] = "ON"
+                    additionalParams[param] = 'ON'
                 else:
                     key, value = param.split ('=', 1)
                     if not value:
@@ -165,7 +165,7 @@ def DownloadAndUnzip (url, dest):
                 zip.extractall (path=dest)
     elif platform.system () == 'Darwin':
         if tarfile.is_tarfile (filePath):
-            with tarfile.open (filePath, "r:gz") as tar:
+            with tarfile.open (filePath, 'r:gz') as tar:
                 tar.extractall (path=dest)
         else:
             subprocess.call ([
@@ -176,7 +176,7 @@ def DownloadAndUnzip (url, dest):
 
 
 def GetInstalledVisualStudioGenerator ():
-    vsWherePath = pathlib.Path (os.environ["ProgramFiles(x86)"]) / 'Microsoft Visual Studio' / 'Installer' / 'vswhere.exe'
+    vsWherePath = pathlib.Path (os.environ['ProgramFiles(x86)']) / 'Microsoft Visual Studio' / 'Installer' / 'vswhere.exe'
     if not vsWherePath.exists ():
         raise Exception ('Microsoft Visual Studio Installer not found!')
     vsWhereOutputStr = subprocess.check_output ([vsWherePath, '-sort', '-format', 'json', '-utf8'])
@@ -228,7 +228,11 @@ def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, 
 
     # Add params to configure cmake
     projGenParams = GetProjectGenerationParams (workspaceRootFolder, buildPath, addOnName, platformName, devKitFolder, version, languageCode, additionalParams)
-    projGenResult = subprocess.call (projGenParams)
+    if quiet:
+        projGenResult = subprocess.call (projGenParams, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    else:
+        projGenResult = subprocess.call (projGenParams)
+
     if projGenResult != 0:
         raise Exception ('Failed to generate project!')
 
@@ -240,19 +244,15 @@ def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, 
     ]
 
     if quiet:
-        buildParams.append ("--")
-        if platformName == "WIN":
-            buildParams.append ("/nologo")
-            buildParams.append ("/verbosity:minimal")
-        elif platformName == "MAC":
-            buildParams.append ("-quiet")
+        buildResult = subprocess.call (buildParams, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    else:
+        buildResult = subprocess.call (buildParams)
 
-    buildResult = subprocess.call (buildParams)
     if buildResult != 0:
         raise Exception ('Failed to build project!')
 
 
-def BuildAddOns (args, addOnName, buildConfigList, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList):
+def BuildAddOns (addOnName, buildConfigList, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, quiet):
     platformName = GetPlatformName ()
 
     try:
@@ -261,7 +261,7 @@ def BuildAddOns (args, addOnName, buildConfigList, languageList, additionalParam
 
             for languageCode in languageList:
                 for config in buildConfigList:
-                    BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, config, languageCode, args.quiet)
+                    BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, config, languageCode, quiet)
 
     except Exception as e:
         raise e
@@ -322,11 +322,18 @@ def PackageAddOns (args, devKitData, addOnName, buildConfigList, acVersionList, 
             for config in buildConfigList:
                 CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, config, languageCode)
 
-                subprocess.call ([
-                    '7z', 'a',
-                    str (packageRootFolder.parent / version / f'{addOnName}-{versionAndBuildNum}_{platformName}_{languageCode}_{config}.zip'),
-                    str (packageRootFolder / version / languageCode / config / '*')
-                ])
+                if args.quiet:
+                    subprocess.call ([
+                        '7z', 'a',
+                        str (packageRootFolder.parent / version / f'{addOnName}-{versionAndBuildNum}_{platformName}_{languageCode}_{config}.zip'),
+                        str (packageRootFolder / version / languageCode / config / '*')
+                    ], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+                else:
+                    subprocess.call ([
+                        '7z', 'a',
+                        str (packageRootFolder.parent / version / f'{addOnName}-{versionAndBuildNum}_{platformName}_{languageCode}_{config}.zip'),
+                        str (packageRootFolder / version / languageCode / config / '*')
+                    ])
 
 
 def Main ():
@@ -339,7 +346,7 @@ def Main ():
 
         os.chdir (workspaceRootFolder)
 
-        BuildAddOns (args, addOnName, buildConfigList, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList)
+        BuildAddOns (addOnName, buildConfigList, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, args.quiet)
 
         if args.package:
             PackageAddOns (args, devKitData, addOnName, buildConfigList, acVersionList, languageList, buildFolder, packageRootFolder)
