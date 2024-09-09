@@ -33,24 +33,25 @@ def ParseArguments ():
 
     if args.buildConfig is not None:
         for config in args.buildConfig:
-            configuration = ConfigToUpperCamelCase (config)
-            if configuration != 'Debug' and configuration != 'RelWithDebInfo' and configuration != 'Release':
+            if config != 'Debug' and config != 'RelWithDebInfo' and config != 'Release':
                 raise Exception ('Invalid build configuration! Options are: Debug, Release, RelWithDebInfo')
 
     return args
 
 
 def GetPlatformName ():
-    return 'WIN' if platform.system () == 'Windows' else 'MAC' 
+    if platform.system () == 'Windows':
+        return 'WIN'
+    elif platform.system () == 'Darwin':
+        return 'MAC'
 
 
-def ConfigToUpperCamelCase (configuration):
-    if (configuration.lower () == 'debug'):
-        return 'Debug'
-    if (configuration.lower () == 'relwithdebinfo'):
-        return 'RelWithDebInfo'
-    if (configuration.lower () == 'release'):
-        return 'Release'
+def CallCommand (params, quiet = False):
+    if quiet:
+        result = subprocess.call (params, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    else:
+        result = subprocess.call (params)
+    return result
 
 
 def PrepareParameters (args):
@@ -79,7 +80,7 @@ def PrepareParameters (args):
         acVersionList = devKitData[platformName].keys ()
 
     if args.buildConfig:
-        buildConfigList = [ConfigToUpperCamelCase (config) for config in args.buildConfig]
+        buildConfigList = args.buildConfig
     else:
         buildConfigList = ['RelWithDebInfo']    
 
@@ -168,11 +169,10 @@ def DownloadAndUnzip (url, dest):
             with tarfile.open (filePath, 'r:gz') as tar:
                 tar.extractall (path=dest)
         else:
-            subprocess.call ([
+            CallCommand ([
             'unzip', '-qq', filePath,
             '-d', dest
         ])
-
 
 
 def GetInstalledVisualStudioGenerator ():
@@ -228,10 +228,7 @@ def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, 
 
     # Add params to configure cmake
     projGenParams = GetProjectGenerationParams (workspaceRootFolder, buildPath, addOnName, platformName, devKitFolder, version, languageCode, additionalParams)
-    if quiet:
-        projGenResult = subprocess.call (projGenParams, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    else:
-        projGenResult = subprocess.call (projGenParams)
+    projGenResult = CallCommand (projGenParams, quiet)
 
     if projGenResult != 0:
         raise Exception ('Failed to generate project!')
@@ -243,10 +240,7 @@ def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, 
         '--config', configuration
     ]
 
-    if quiet:
-        buildResult = subprocess.call (buildParams, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    else:
-        buildResult = subprocess.call (buildParams)
+    buildResult = CallCommand (buildParams, quiet)
 
     if buildResult != 0:
         raise Exception ('Failed to build project!')
@@ -269,7 +263,7 @@ def BuildAddOns (addOnName, buildConfigList, languageList, additionalParams, wor
 
 def Check7ZInstallation ():
     try:
-        subprocess.call ('7z', stdout=subprocess.DEVNULL)
+        CallCommand ('7z', True)
     except:
         raise Exception ('7Zip not installed!')
 
@@ -293,7 +287,7 @@ def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, pla
             )
 
     elif platformName == 'MAC':
-        subprocess.call ([
+        CallCommand ([
             'cp', '-R',
             sourceFolder / f'{addOnName}-{version}.bundle',
             packageFolder / f'{addOnName}-{version}.bundle'
@@ -321,19 +315,11 @@ def PackageAddOns (args, devKitData, addOnName, buildConfigList, acVersionList, 
         for languageCode in languageList:
             for config in buildConfigList:
                 CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, config, languageCode)
-
-                if args.quiet:
-                    subprocess.call ([
+                CallCommand ([
                         '7z', 'a',
                         str (packageRootFolder.parent / version / f'{addOnName}-{versionAndBuildNum}_{platformName}_{languageCode}_{config}.zip'),
                         str (packageRootFolder / version / languageCode / config / '*')
-                    ], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-                else:
-                    subprocess.call ([
-                        '7z', 'a',
-                        str (packageRootFolder.parent / version / f'{addOnName}-{versionAndBuildNum}_{platformName}_{languageCode}_{config}.zip'),
-                        str (packageRootFolder / version / languageCode / config / '*')
-                    ])
+                    ], args.quiet)
 
 
 def Main ():
