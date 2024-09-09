@@ -16,7 +16,7 @@ def ParseArguments ():
     parser = argparse.ArgumentParser ()
     parser.add_argument ('-c', '--configFile', dest = 'configFile', required = True, help = 'JSON Configuration file')
     parser.add_argument ('-v', '--acVersion', dest = 'acVersion', nargs = '+', type = str, required = False, help = 'Archicad version number list. Ex: 26 27')
-    parser.add_argument ('-b', '--buildConfig', dest = 'buildConfig', nargs = '+', type = str, required = False, help = 'Build configuration list. Ex: debug RELEASE RelWithDebInfo')
+    parser.add_argument ('-b', '--buildConfig', dest = 'buildConfig', nargs = '+', type = str, required = False, help = 'Build configuration list. Ex: Debug Release RelWithDebInfo')
     parser.add_argument ('-l', '--allLocalizedVersions', dest = 'allLocalizedVersions', required = False, action='store_true', help = 'Create localized release builds for all configured languages.')
     parser.add_argument ('-d', '--devKitPath', dest = 'devKitPath', type = str, required = False, help = 'Path to local APIDevKit')
     parser.add_argument ('-n', '--buildNum', dest = 'buildNum', type = str, required = False, help = 'Build number of local APIDevKit')

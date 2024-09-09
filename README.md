@@ -12,7 +12,7 @@ The repo includes a BuildAddOn.py python script, that handles the building of th
 
 - -c, --configFile (mandatory): Path to the JSON configuration file.
 - -v, --acVersion (optional, but mandatory if --devKitPath is used): A list of Archicad version numbers, that the Add-On is built for. These versions must be present in the object keys of the APIDevKitLinks file. When not specified, the script takes all versions specified in the APIDevKitLinks file.
-- -b, --buildConfig (optional): List of Archicad build configurations. If not specified, defaults to RelWithDebInfo only. Ex: -b debug RELEASE RelWithDebInfo.
+- -b, --buildConfig (optional): List of Archicad build configurations. If not specified, defaults to RelWithDebInfo only. Ex: -b Debug Release RelWithDebInfo.
 - -l, --allLocalizedVersions (optional): Toggles creating localized builds for all languages listed in the language object of the JSON configuration file. If not enabled, the configured defaultLanguage will be used.
 - -d, --devKitPath (optional): Path to a single local APIDevKit folder. When this argument is used, only one Archicad version should be provided in the --acVersion list.
 - -n, --buildNum (optional, but mandatory if --devKitPath is used): Build number of the used local APIDevKit. Ex: -n 3001.
