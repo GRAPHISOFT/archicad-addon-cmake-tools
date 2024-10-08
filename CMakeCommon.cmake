@@ -221,6 +221,13 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
     target_include_directories (${target} SYSTEM PUBLIC ${devKitDir}/Inc)
     target_include_directories (${target} PUBLIC ${addOnSourcesFolder})
 
+    # use GSRoot custom allocators consistently in the Add-On
+    target_precompile_headers(${target} 
+        PRIVATE 
+        ${devKitDir}/Modules/GSRoot/GSNew.hpp 
+        ${devKitDir}/Modules/GSRoot/GSMalloc.hpp
+        )
+
     LinkGSLibrariesToProject (${target} ${acVersion} ${devKitDir})
 
     set_source_files_properties (${AddOnSourceFiles} PROPERTIES LANGUAGE CXX)
