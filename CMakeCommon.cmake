@@ -221,6 +221,25 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
     target_include_directories (${target} SYSTEM PUBLIC ${devKitDir}/Inc)
     target_include_directories (${target} PUBLIC ${addOnSourcesFolder})
 
+    # use GSRoot custom allocators consistently in the Add-On
+    get_filename_component(new_hpp "${devKitDir}/Modules/GSRoot/GSNew.hpp" REALPATH)
+    get_filename_component(malloc_hpp "${devKitDir}/Modules/GSRoot/GSMalloc.hpp" REALPATH)
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+        target_compile_options(
+            "${target}" PRIVATE
+            "SHELL:/FI \"${new_hpp}\""
+            "SHELL:/FI \"${malloc_hpp}\""
+        )
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang\$")
+        target_compile_options(
+            "${target}" PRIVATE
+            "SHELL:-include \"${new_hpp}\""
+            "SHELL:-include \"${malloc_hpp}\""
+        )
+    else()
+        message(FATAL_ERROR "Unknown compiler ID. Please open an issue at https://github.com/GRAPHISOFT/archicad-addon-cmake-tools")
+    endif()
+
     LinkGSLibrariesToProject (${target} ${acVersion} ${devKitDir})
 
     set_source_files_properties (${AddOnSourceFiles} PROPERTIES LANGUAGE CXX)
