@@ -210,7 +210,7 @@ def GetProjectGenerationParams (workspaceRootFolder, buildPath, addOnName, platf
         projGenParams.extend (['-G', 'Xcode'])
 
     projGenParams.append (f'-DAC_VERSION={version}')
-    projGenParams.append (f'-DAC_ADDON_NAME={addOnName}-{version}')
+    projGenParams.append (f'-DAC_ADDON_NAME={addOnName}')
     projGenParams.append (f'-DAC_API_DEVKIT_DIR={str (devKitFolder / "Support")}')
     projGenParams.append (f'-DAC_ADDON_LANGUAGE={languageCode}')
 
@@ -277,20 +277,20 @@ def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, pla
 
     if platformName == 'WIN':
         shutil.copy (
-            sourceFolder / f'{addOnName}-{version}.apx',
-            packageFolder / f'{addOnName}-{version}.apx',
+            sourceFolder / f'{addOnName}.apx',
+            packageFolder / f'{addOnName}.apx',
         )
         if configuration != 'Release':
             shutil.copy (
-                sourceFolder / f'{addOnName}-{version}.pdb',
-                packageFolder / f'{addOnName}-{version}.pdb',
+                sourceFolder / f'{addOnName}.pdb',
+                packageFolder / f'{addOnName}.pdb',
             )
 
     elif platformName == 'MAC':
         CallCommand ([
             'cp', '-R',
-            sourceFolder / f'{addOnName}-{version}.bundle',
-            packageFolder / f'{addOnName}-{version}.bundle'
+            sourceFolder / f'{addOnName}.bundle',
+            packageFolder / f'{addOnName}.bundle'
         ])
 
 
