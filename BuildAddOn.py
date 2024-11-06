@@ -192,6 +192,14 @@ def GetInstalledVisualStudioGenerator ():
         raise Exception ('Installed Visual Studio version not supported!')
 
 
+def GetToolset (version):
+    if version < 25:
+        return 'v141'
+    if version < 29:
+        return 'v142'
+    return 'v143'
+
+
 def GetProjectGenerationParams (workspaceRootFolder, buildPath, addOnName, platformName, devKitFolder, version, languageCode, additionalParams):
     # Add params to configure cmake
     projGenParams = [
@@ -202,9 +210,7 @@ def GetProjectGenerationParams (workspaceRootFolder, buildPath, addOnName, platf
     if platformName == 'WIN':
         vsGenerator = GetInstalledVisualStudioGenerator ()
         projGenParams.append (f'-G {vsGenerator}')
-        toolset = 'v142'
-        if int (version) < 25:
-            toolset = 'v141'
+        toolset = GetToolset (int (version))
         projGenParams.append (f'-T {toolset}')
     elif platformName == 'MAC':
         projGenParams.extend (['-G', 'Xcode'])
