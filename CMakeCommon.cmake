@@ -99,8 +99,103 @@ function (LinkGSLibrariesToProject target acVersion devKitDir)
 
 endfunction ()
 
-function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSourcesFolder addOnResourcesFolder addOnLanguage)
+function (ParseVersion inValue outList)
+    set (v1 0)
+    set (v2 0)
+    set (v3 0)
+    unset (CMAKE_MATCH_COUNT)
+    if (inValue MATCHES [[^([0-9]+)\.([0-9]+)\.([0-9]+)$]])
+    elseif (inValue MATCHES [[^([0-9]+)\.([0-9]+)$]])
+    elseif (inValue MATCHES [[^([0-9]+)$]])
+    endif ()
+    if (DEFINED CMAKE_MATCH_COUNT)
+        foreach (i RANGE 1 "${CMAKE_MATCH_COUNT}")
+            set ("v${i}" "${CMAKE_MATCH_${i}}")
+        endforeach ()
+        set ("${outList}" "${v1};${v2};${v3}" PARENT_SCOPE)
+    else ()
+        unset ("${outList}" PARENT_SCOPE)
+    endif ()
+endfunction ()
 
+function (GenerateAddOnVersionInfo target)
+    get_target_property (devKitDir "${target}" GSdevKitDir)
+    get_target_property (addOnName "${target}" GSaddOnName)
+    get_target_property (acVersion "${target}" GSacVersion)
+    if (NOT DEFINED devKitDir OR NOT DEFINED addOnName OR NOT DEFINED acVersion)
+        message (FATAL_ERROR "Target '${target}' was not created with GenerateAddOnProject.")
+    endif ()
+
+    cmake_parse_arguments (PARSE_ARGV 1 vers "" VERSION "")
+    if (DEFINED vers_KEYWORDS_MISSING_VALUES AND "VERSION" IN_LIST vers_KEYWORDS_MISSING_VALUES)
+        message (FATAL_ERROR "\
+'VERSION' argument is missing its value. Please make sure you replaced the placeholder in CMakeLists.txt:
+
+    GenerateAddOnVersionInfo (CMakeTarget VERSION #[[version goes here]])
+
+Replace the '#[[version goes here]]' comment with a version number that you wish see in the file's properties and bug reports.
+Accepted version number formats are:
+
+    123
+    1.23
+    1.2.3")
+    endif ()
+
+    ParseVersion ("${vers_VERSION}" vers)
+    if (NOT DEFINED vers)
+        message (FATAL_ERROR "'${vers_VERSION}' does not follow the '1.2.3' version format, where the 2nd and 3rd components are optional.")
+    endif ()
+
+    set (company "GRAPHISOFT SE")
+    string (TIMESTAMP copyright "Copyright © ${company}, 1984-%Y")
+
+    if (WIN32)
+        # FIXME(HVA): include GS build num in Windows release as well
+        list (APPEND vers "${acVersion}")
+        list (JOIN vers , version_comma)
+        list (JOIN vers . version)
+
+        set (out "${CMAKE_CURRENT_BINARY_DIR}/${target}-VersionInfo.rc")
+        configure_file ("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/VersionInfo.rc.in" "${out}" @ONLY)
+        target_sources ("${target}" PRIVATE "${out}")
+    else ()
+        # BE on the safe side; load the info from an existing framework
+        file (READ "${devKitDir}/Frameworks/GSRoot.framework/Versions/A/Resources/Info.plist" plist_content NEWLINE_CONSUME)
+        string (REGEX MATCH "GSBuildNum[^0-9]+([0-9]+)" unused "${plist_content}")
+        set (gsBuildNum "${CMAKE_MATCH_1}")
+        string (REGEX MATCH "LSMinimumSystemVersion[^0-9]+([0-9.]+)" unused "${plist_content}")
+        set (lsMinimumSystemVersion "${CMAKE_MATCH_1}")
+
+        list (APPEND vers "${gsBuildNum}")
+        list (JOIN vers . version)
+
+        string (TOLOWER "${addOnName}" lowerAddOnName)
+        string (REGEX REPLACE "[ _]" "-" addOnNameIdentifier "${lowerAddOnName}")
+
+        set (MACOSX_BUNDLE_EXECUTABLE_NAME "${addOnName}")
+        set (MACOSX_BUNDLE_INFO_STRING "${addOnName}")
+        set (MACOSX_BUNDLE_GUI_IDENTIFIER "com.graphisoft.${addOnNameIdentifier}")
+        set (MACOSX_BUNDLE_LONG_VERSION_STRING "${copyright}")
+        set (MACOSX_BUNDLE_BUNDLE_NAME "${addOnName}")
+        set (MACOSX_BUNDLE_SHORT_VERSION_STRING "${version}.${gsBuildNum}")
+        set (MACOSX_BUNDLE_BUNDLE_VERSION "${version}.${gsBuildNum}")
+        set (MACOSX_BUNDLE_COPYRIGHT "${copyright}")
+        set (MINIMUM_SYSTEM_VERSION "${lsMinimumSystemVersion}")
+
+        set (out "${CMAKE_CURRENT_BINARY_DIR}/AddOnInfo.plist")
+        configure_file ("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/AddOnInfo.plist.in" "${out}" @ONLY)
+        set_target_properties (
+            "${target}" PROPERTIES
+            MACOSX_BUNDLE_INFO_PLIST "${out}"
+
+            # Align parameters for Xcode and in Info.plist to avoid warnings
+            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "${MACOSX_BUNDLE_GUI_IDENTIFIER}"
+            XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET "${lsMinimumSystemVersion}"
+        )
+    endif ()
+endfunction ()
+
+function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSourcesFolder addOnResourcesFolder addOnLanguage)
     find_package (Python COMPONENTS Interpreter)
 
     set (ResourceObjectsDir ${CMAKE_BINARY_DIR}/ResourceObjects)
@@ -174,46 +269,25 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
         add_library (${target} MODULE ${AddOnFiles})
     endif ()
 
-    set_target_properties (${target} PROPERTIES OUTPUT_NAME ${addOnName})
+    set_target_properties (
+        "${target}" PROPERTIES
+        OUTPUT_NAME "${addOnName}"
+        GSdevKitDir "${devKitDir}"
+        GSaddOnName "${addOnName}"
+        GSacVersion "${acVersion}"
+    )
     if (WIN32)
-        set_target_properties (${target} PROPERTIES SUFFIX ".apx")
-        set_target_properties (${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_$<CONFIG> "${CMAKE_BINARY_DIR}/$<CONFIG>")
-        target_link_options (${target} PUBLIC "${ResourceObjectsDir}/${addOnName}.res")
-        target_link_options (${target} PUBLIC /export:GetExportedFuncAddrs,@1 /export:SetImportedFuncAddrs,@2)
-    else ()
-        # Prepare various variables for the Info.plist
-        string(TOLOWER "${addOnName}" lowerAddOnName)
-        string(REGEX REPLACE "[ _]" "-" addOnNameIdentifier "${lowerAddOnName}")
-        string(TIMESTAMP copyright "Copyright © GRAPHISOFT SE, 1984-%Y")
-        # BE on the safe side; load the info from an existing framework
-        file(READ "${devKitDir}/Frameworks/GSRoot.framework/Versions/A/Resources/Info.plist" plist_content NEWLINE_CONSUME)
-        string(REGEX REPLACE ".*GSBuildNum[^0-9]+([0-9]+).*" "\\1" gsBuildNum "${plist_content}")
-        string(REGEX REPLACE ".*LSMinimumSystemVersion[^0-9]+([0-9\.]+).*" "\\1" lsMinimumSystemVersion "${plist_content}")
-
-        set(MACOSX_BUNDLE_EXECUTABLE_NAME ${addOnName})
-        set(MACOSX_BUNDLE_INFO_STRING ${addOnName})
-        set(MACOSX_BUNDLE_GUI_IDENTIFIER com.graphisoft.${addOnNameIdentifier})
-        set(MACOSX_BUNDLE_LONG_VERSION_STRING ${copyright})
-        set(MACOSX_BUNDLE_BUNDLE_NAME ${addOnName})
-        set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${acVersion}.0.0.${gsBuildNum})
-        set(MACOSX_BUNDLE_BUNDLE_VERSION ${acVersion}.0.0.${gsBuildNum})
-        set(MACOSX_BUNDLE_COPYRIGHT ${copyright})
-        set(MINIMUM_SYSTEM_VERSION "${lsMinimumSystemVersion}")
-
-        # Configure the Info.plist file
-        configure_file(
-            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/AddOnInfo.plist.in"
-            "${CMAKE_BINARY_DIR}/AddOnInfo.plist"
-            @ONLY
+        set_property (TARGET "${target}" PROPERTY SUFFIX .apx)
+        target_link_options (
+            "${target}" PRIVATE
+            "${ResourceObjectsDir}/${addOnName}.res"
+            "/export:GetExportedFuncAddrs,@1"
+            "/export:SetImportedFuncAddrs,@2"
         )
-        set_target_properties(${target} PROPERTIES
+    else ()
+        set_target_properties (
+            ${target} PROPERTIES
             BUNDLE TRUE
-            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_BINARY_DIR}/AddOnInfo.plist"
-
-            # Align parameters for Xcode and in Info.plist to avoid warnings
-            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER com.graphisoft.${addOnNameIdentifier}
-            XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET ${lsMinimumSystemVersion}
-
             LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>"
         )
     endif ()
