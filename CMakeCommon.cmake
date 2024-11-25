@@ -101,8 +101,8 @@ endfunction ()
 
 function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSourcesFolder addOnResourcesFolder addOnLanguage)
 
-    verify_api_devkit_folder (${devKitDir})
-    check_valid_language_code ("${CMAKE_SOURCE_DIR}/config.json" ${addOnLanguage})
+    verify_api_devkit_folder ("${devKitDir}")
+    check_valid_language_code ("${CMAKE_SOURCE_DIR}/config.json" "${addOnLanguage}")
 
     find_package (Python COMPONENTS Interpreter)
 
@@ -253,13 +253,13 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
 endfunction ()
 
 function (check_valid_language_code configFile languageCode)
-    file (READ ${configFile} configsContent)
+    file (READ "${configFile}" configsContent)
     string (JSON configuredLanguagesList GET "${configsContent}" "languages")
     string (JSON configuredLanguagesListLen LENGTH "${configsContent}" "languages")
     set (i 0)
-    while (${i} LESS ${configuredLanguagesListLen})
-        string (JSON language GET "${configuredLanguagesList}" ${i})
-        if (${language} STREQUAL ${languageCode})
+    while (i LESS configuredLanguagesListLen)
+        string (JSON language GET "${configuredLanguagesList}" "${i}")
+        if ("${language}" STREQUAL "${languageCode}")
             return ()
         endif ()
         math (EXPR i "${i} + 1")
@@ -269,7 +269,7 @@ function (check_valid_language_code configFile languageCode)
 endfunction ()
 
 function (verify_api_devkit_folder devKitPath)
-    if (NOT EXISTS ${devKitPath})
+    if (NOT EXISTS "${devKitPath}")
         message (FATAL_ERROR "The supplied API DevKit path ${devKitPath} does not exist")
     endif ()
 
