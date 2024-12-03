@@ -6,7 +6,7 @@ function (SetGlobalCompilerDefinitions acVersion)
     else ()
         add_definitions (-Dmacintosh=1)
         if (${acVersion} GREATER_EQUAL 26)
-            set (CMAKE_OSX_ARCHITECTURES "x86_64;arm64" PARENT_SCOPE CACHE STRING "" FORCE)
+            set (CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "" FORCE)
         endif ()
     endif ()
     add_definitions (-DACExtension)
@@ -101,6 +101,9 @@ endfunction ()
 
 function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSourcesFolder addOnResourcesFolder addOnLanguage)
 
+    verify_api_devkit_folder ("${devKitDir}")
+    check_valid_language_code ("${CMAKE_SOURCE_DIR}/config.json" "${addOnLanguage}")
+
     find_package (Python COMPONENTS Interpreter)
 
     set (ResourceObjectsDir ${CMAKE_BINARY_DIR}/ResourceObjects)
@@ -176,8 +179,10 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
 
     set_target_properties (${target} PROPERTIES OUTPUT_NAME ${addOnName})
     if (WIN32)
-        set_target_properties (${target} PROPERTIES SUFFIX ".apx")
-        set_target_properties (${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_$<CONFIG> "${CMAKE_BINARY_DIR}/$<CONFIG>")
+        set_target_properties (${target} PROPERTIES
+            SUFFIX ".apx"
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+        )
         target_link_options (${target} PUBLIC "${ResourceObjectsDir}/${addOnName}.res")
         target_link_options (${target} PUBLIC /export:GetExportedFuncAddrs,@1 /export:SetImportedFuncAddrs,@2)
     else ()
@@ -245,4 +250,43 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
     set_source_files_properties (${AddOnSourceFiles} PROPERTIES LANGUAGE CXX)
     SetCompilerOptions (${target} ${acVersion})
 
+endfunction ()
+
+function (check_valid_language_code configFile languageCode)
+    file (READ "${configFile}" configsContent)
+    string (JSON configuredLanguagesList GET "${configsContent}" "languages")
+    string (JSON configuredLanguagesListLen LENGTH "${configsContent}" "languages")
+    set (i 0)
+    while (i LESS configuredLanguagesListLen)
+        string (JSON language GET "${configuredLanguagesList}" "${i}")
+        if (language STREQUAL languageCode)
+            return ()
+        endif ()
+        math (EXPR i "${i} + 1")
+    endwhile()
+
+    message (FATAL_ERROR "Language code ${languageCode} is not part of the configured languages in ${configFile}.")
+endfunction ()
+
+function (verify_api_devkit_folder devKitPath)
+    if (NOT EXISTS "${devKitPath}")
+        message (FATAL_ERROR "The supplied API DevKit path ${devKitPath} does not exist")
+    endif ()
+
+    cmake_path (GET devKitPath FILENAME currentFolderName)
+    if (NOT currentFolderName STREQUAL "Support")
+        message (FATAL_ERROR "The supplied API DevKit path should point to the /Support subfolder of the API DevKit. Actual path: ${devKitPath}")
+    endif ()
+
+    if (NOT EXISTS "${devKitPath}/Lib")
+        message (FATAL_ERROR "${devKitPath}/Lib does not exist")
+    endif ()
+
+    if (NOT EXISTS "${devKitPath}/Modules")
+        message (FATAL_ERROR "${devKitPath}/Modules does not exist")
+    endif ()
+
+    if (APPLE AND NOT EXISTS "${devKitPath}/Frameworks")
+        message (FATAL_ERROR "${devKitPath}/Frameworks does not exist")
+    endif ()
 endfunction ()
