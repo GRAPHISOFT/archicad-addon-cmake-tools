@@ -144,7 +144,7 @@ function (generate_add_on_version_info)
 
         list (JOIN vers . shortVersion)
 
-        math (EXPR combined "${acVersion} * 10000 + ${gsBuildNum}")
+        math (EXPR combined "${acVersion} * 100000 + ${gsBuildNum}")
         list (APPEND vers "${combined}")
         list (JOIN vers . longVersion)
         if (NOT AC_ADDON_FOR_DISTRIBUTION)
