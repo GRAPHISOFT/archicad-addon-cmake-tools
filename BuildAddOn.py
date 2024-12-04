@@ -200,7 +200,7 @@ def GetToolset (version):
     return 'v143'
 
 
-def GetProjectGenerationParams (workspaceRootFolder, buildPath, addOnName, platformName, devKitFolder, version, languageCode, additionalParams):
+def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, additionalParams):
     # Add params to configure cmake
     projGenParams = [
         'cmake',
@@ -208,17 +208,15 @@ def GetProjectGenerationParams (workspaceRootFolder, buildPath, addOnName, platf
     ]
 
     if platformName == 'WIN':
-        vsGenerator = GetInstalledVisualStudioGenerator ()
-        projGenParams.append (f'-G {vsGenerator}')
-        toolset = GetToolset (int (version))
-        projGenParams.append (f'-T {toolset}')
+        projGenParams.extend ([
+            '-G', GetInstalledVisualStudioGenerator (),
+            '-T', GetToolset (int (version)),
+        ])
     elif platformName == 'MAC':
-        projGenParams.extend (['-G', 'Xcode'])
+        projGenParams.append ('-GXcode')
 
     projGenParams.append (f'-DAC_VERSION={version}')
-    projGenParams.append (f'-DAC_ADDON_NAME={addOnName}')
     projGenParams.append (f'-DAC_API_DEVKIT_DIR={str (devKitFolder / "Support")}')
-    projGenParams.append (f'-DAC_ADDON_LANGUAGE={languageCode}')
 
     if additionalParams is not None:
         for key in additionalParams:
@@ -233,7 +231,7 @@ def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, 
     buildPath = buildFolder / addOnName / version / languageCode
 
     # Add params to configure cmake
-    projGenParams = GetProjectGenerationParams (workspaceRootFolder, buildPath, addOnName, platformName, devKitFolder, version, languageCode, additionalParams)
+    projGenParams = GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, additionalParams)
     projGenResult = CallCommand (projGenParams, quiet)
 
     if projGenResult != 0:
