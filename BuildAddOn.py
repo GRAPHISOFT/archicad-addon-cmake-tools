@@ -200,7 +200,7 @@ def GetToolset (version):
     return 'v143'
 
 
-def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, additionalParams):
+def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, additionalParams):
     # Add params to configure cmake
     projGenParams = [
         'cmake',
@@ -217,6 +217,7 @@ def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, de
 
     projGenParams.append (f'-DAC_VERSION={version}')
     projGenParams.append (f'-DAC_API_DEVKIT_DIR={str (devKitFolder / "Support")}')
+    projGenParams.append (f'-DAC_ADDON_LANGUAGE={languageCode}')
 
     if additionalParams is not None:
         for key in additionalParams:
@@ -231,7 +232,7 @@ def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, 
     buildPath = buildFolder / addOnName / version / languageCode
 
     # Add params to configure cmake
-    projGenParams = GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, additionalParams)
+    projGenParams = GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, additionalParams)
     projGenResult = CallCommand (projGenParams, quiet)
 
     if projGenResult != 0:
