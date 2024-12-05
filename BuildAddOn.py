@@ -21,6 +21,7 @@ def ParseArguments ():
     parser.add_argument ('-d', '--devKitPath', dest = 'devKitPath', type = str, required = False, help = 'Path to local APIDevKit')
     parser.add_argument ('-n', '--buildNum', dest = 'buildNum', type = str, required = False, help = 'Build number of local APIDevKit')
     parser.add_argument ('-p', '--package', dest = 'package', required = False, action='store_true', help = 'Create zip archive.')
+    parser.add_argument ('-r', '--forDistribution', dest = 'release', required = False, action='store_true', help = 'Mark the add-on "for distribution". Will be marked "private" otherwise.')
     parser.add_argument ('-a', '--additionalCMakeParams', dest = 'additionalCMakeParams', nargs = '+', required = False, help = 'Add-On specific CMake parameter list of key=value pairs. Ex: var1=value1 var2="value 2"')
     parser.add_argument ('-q', '--quiet', dest = 'quiet', required = False, action='store_true', help = 'Less verbose cmake output.')
     args = parser.parse_args ()
@@ -200,7 +201,7 @@ def GetToolset (version):
     return 'v143'
 
 
-def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, additionalParams):
+def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, release, additionalParams):
     # Add params to configure cmake
     projGenParams = [
         'cmake',
@@ -219,6 +220,9 @@ def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, de
     projGenParams.append (f'-DAC_API_DEVKIT_DIR={str (devKitFolder / "Support")}')
     projGenParams.append (f'-DAC_ADDON_LANGUAGE={languageCode}')
 
+    if release:
+        projGenParams.append ('-DAC_ADDON_FOR_DISTRIBUTION=ON')
+
     if additionalParams is not None:
         for key in additionalParams:
             projGenParams.append (f'-D{key}={additionalParams[key]}')
@@ -228,11 +232,11 @@ def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, de
     return projGenParams
 
 
-def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, configuration, languageCode, quiet):
+def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, configuration, languageCode, release, quiet):
     buildPath = buildFolder / addOnName / version / languageCode
 
     # Add params to configure cmake
-    projGenParams = GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, additionalParams)
+    projGenParams = GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, release, additionalParams)
     projGenResult = CallCommand (projGenParams, quiet)
 
     if projGenResult != 0:
@@ -251,7 +255,7 @@ def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, 
         raise Exception ('Failed to build project!')
 
 
-def BuildAddOns (addOnName, buildConfigList, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, quiet):
+def BuildAddOns (addOnName, buildConfigList, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, release, quiet):
     platformName = GetPlatformName ()
 
     try:
@@ -260,7 +264,7 @@ def BuildAddOns (addOnName, buildConfigList, languageList, additionalParams, wor
 
             for languageCode in languageList:
                 for config in buildConfigList:
-                    BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, config, languageCode, quiet)
+                    BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, config, languageCode, release, quiet)
 
     except Exception as e:
         raise e
@@ -337,7 +341,7 @@ def Main ():
 
         os.chdir (workspaceRootFolder)
 
-        BuildAddOns (addOnName, buildConfigList, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, args.quiet)
+        BuildAddOns (addOnName, buildConfigList, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, args.release, args.quiet)
 
         if args.package:
             PackageAddOns (args, devKitData, addOnName, buildConfigList, acVersionList, languageList, buildFolder, packageRootFolder)
