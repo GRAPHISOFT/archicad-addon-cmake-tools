@@ -21,7 +21,7 @@
 /* https://learn.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource */
 VS_VERSION_INFO VERSIONINFO
     FILEVERSION @versionComma@
-    PRODUCTVERSION @versionComma@
+    PRODUCTVERSION 0,@acVersion@,0,@gsBuildNum@
     FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
     FILEFLAGS (PRERELEASE_FLAGS|DEBUG_FLAG)
     FILEOS VOS_NT_WINDOWS32
