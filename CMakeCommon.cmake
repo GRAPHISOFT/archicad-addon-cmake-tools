@@ -151,8 +151,10 @@ function (generate_add_on_version_info)
         math (EXPR combined "${acVersion} * 100000 + ${gsBuildNum}")
         list (APPEND vers "${combined}")
         list (JOIN vers . longVersion)
+
+        set (privateBuild "\n\t\t<key>GSPrivateBuild</key>\n\t\t<string>1</string>")
         if (NOT AC_ADDON_FOR_DISTRIBUTION)
-            string (APPEND longVersion -private)
+            set (privateBuild "")
         endif ()
 
         string (TOLOWER "${addOnName}" lowerAddOnName)
