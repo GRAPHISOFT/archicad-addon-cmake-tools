@@ -99,10 +99,86 @@ function (LinkGSLibrariesToProject target acVersion devKitDir)
 
 endfunction ()
 
-function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSourcesFolder addOnResourcesFolder addOnLanguage)
+function (parse_version inValue outList)
+    set (v1 0)
+    set (v2 0)
+    set (v3 0)
+    unset (CMAKE_MATCH_COUNT)
+    if (inValue MATCHES [[^([0-9]+)\.([0-9]+)\.([0-9]+)$]])
+    elseif (inValue MATCHES [[^([0-9]+)\.([0-9]+)$]])
+    elseif (inValue MATCHES [[^([0-9]+)$]])
+    endif ()
+    if (DEFINED CMAKE_MATCH_COUNT)
+        foreach (i RANGE 1 "${CMAKE_MATCH_COUNT}")
+            set ("v${i}" "${CMAKE_MATCH_${i}}")
+            if ("${v${i}}" LESS "0" OR "${v${i}}" GREATER "65535")
+                message (FATAL_ERROR "Component ${i} of version number '${inValue}' is outside the 0-65535 range.")
+            endif ()
+        endforeach ()
+        set ("${outList}" "${v1};${v2};${v3}" PARENT_SCOPE)
+    else ()
+        unset ("${outList}" PARENT_SCOPE)
+    endif ()
+endfunction ()
 
+function (generate_add_on_version_info)
+    parse_version ("${addOnVersion}" vers)
+    if (NOT DEFINED vers)
+        message (FATAL_ERROR "'${addOnVersion}' does not follow the '123' or '1.23' or '1.2.3' version format.")
+    endif ()
+    string (TIMESTAMP copyright "Copyright © ${addOnCompanyName}, ${addOnCopyrightYear}")
+
+    if (WIN32)
+        # FIXME(HVA): include GS build num in Windows release as well
+        set (gsBuildNum 0)
+        list (APPEND vers 0)
+        list (JOIN vers , versionComma)
+        list (JOIN vers . version)
+
+        set (out "${CMAKE_CURRENT_BINARY_DIR}/${target}-VersionInfo.rc")
+        configure_file ("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/VersionInfo.rc.in" "${out}" @ONLY)
+        target_sources ("${target}" PRIVATE "${out}")
+    else ()
+        # BE on the safe side; load the info from an existing framework
+        file (READ "${devKitDir}/Frameworks/GSRoot.framework/Versions/A/Resources/Info.plist" plist_content NEWLINE_CONSUME)
+        string (REGEX MATCH "GSBuildNum[^0-9]+([0-9]+)" unused "${plist_content}")
+        set (gsBuildNum "${CMAKE_MATCH_1}")
+        string (REGEX MATCH "LSMinimumSystemVersion[^0-9]+([0-9.]+)" unused "${plist_content}")
+        set (lsMinimumSystemVersion "${CMAKE_MATCH_1}")
+
+        list (JOIN vers . shortVersion)
+
+        math (EXPR combined "${acVersion} * 100000 + ${gsBuildNum}")
+        list (APPEND vers "${combined}")
+        list (JOIN vers . longVersion)
+
+        set (privateBuild "\n\t\t<key>GSPrivateBuild</key>\n\t\t<string>1</string>")
+        if (NOT AC_ADDON_FOR_DISTRIBUTION)
+            set (privateBuild "")
+        endif ()
+
+        string (TOLOWER "${addOnName}" lowerAddOnName)
+        string (REGEX REPLACE "[ _]" "-" addOnNameIdentifier "${lowerAddOnName}")
+        set (bundleIdentifier "com.graphisoft.${addOnNameIdentifier}")
+
+        set (out "${CMAKE_CURRENT_BINARY_DIR}/AddOnInfo.plist")
+        configure_file ("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/AddOnInfo.plist.in" "${out}" @ONLY)
+        set_target_properties (
+            "${target}" PROPERTIES
+            MACOSX_BUNDLE_INFO_PLIST "${out}"
+
+            # Align parameters for Xcode and in Info.plist to avoid warnings
+            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "${bundleIdentifier}"
+            XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET "${lsMinimumSystemVersion}"
+        )
+    endif ()
+endfunction ()
+
+function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder addOnResourcesFolder addOnLanguage)
     verify_api_devkit_folder ("${devKitDir}")
-    check_valid_language_code ("${CMAKE_SOURCE_DIR}/config.json" "${addOnLanguage}")
+    if (NOT addOnLanguage IN_LIST addOnLanguages)
+        message (FATAL_ERROR "Language '${addOnLanguage}' is not among the configured languages in config.json.")
+    endif ()
 
     find_package (Python COMPONENTS Interpreter)
 
@@ -179,49 +255,25 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
 
     set_target_properties (${target} PROPERTIES OUTPUT_NAME ${addOnName})
     if (WIN32)
-        set_target_properties (${target} PROPERTIES
-            SUFFIX ".apx"
+        set_target_properties (
+            "${target}" PROPERTIES
+            SUFFIX .apx
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
         )
-        target_link_options (${target} PUBLIC "${ResourceObjectsDir}/${addOnName}.res")
-        target_link_options (${target} PUBLIC /export:GetExportedFuncAddrs,@1 /export:SetImportedFuncAddrs,@2)
-    else ()
-        # Prepare various variables for the Info.plist
-        string(TOLOWER "${addOnName}" lowerAddOnName)
-        string(REGEX REPLACE "[ _]" "-" addOnNameIdentifier "${lowerAddOnName}")
-        string(TIMESTAMP copyright "Copyright © GRAPHISOFT SE, 1984-%Y")
-        # BE on the safe side; load the info from an existing framework
-        file(READ "${devKitDir}/Frameworks/GSRoot.framework/Versions/A/Resources/Info.plist" plist_content NEWLINE_CONSUME)
-        string(REGEX REPLACE ".*GSBuildNum[^0-9]+([0-9]+).*" "\\1" gsBuildNum "${plist_content}")
-        string(REGEX REPLACE ".*LSMinimumSystemVersion[^0-9]+([0-9\.]+).*" "\\1" lsMinimumSystemVersion "${plist_content}")
-
-        set(MACOSX_BUNDLE_EXECUTABLE_NAME ${addOnName})
-        set(MACOSX_BUNDLE_INFO_STRING ${addOnName})
-        set(MACOSX_BUNDLE_GUI_IDENTIFIER com.graphisoft.${addOnNameIdentifier})
-        set(MACOSX_BUNDLE_LONG_VERSION_STRING ${copyright})
-        set(MACOSX_BUNDLE_BUNDLE_NAME ${addOnName})
-        set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${acVersion}.0.0.${gsBuildNum})
-        set(MACOSX_BUNDLE_BUNDLE_VERSION ${acVersion}.0.0.${gsBuildNum})
-        set(MACOSX_BUNDLE_COPYRIGHT ${copyright})
-        set(MINIMUM_SYSTEM_VERSION "${lsMinimumSystemVersion}")
-
-        # Configure the Info.plist file
-        configure_file(
-            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/AddOnInfo.plist.in"
-            "${CMAKE_BINARY_DIR}/AddOnInfo.plist"
-            @ONLY
+        target_link_options (
+            "${target}" PRIVATE
+            "${ResourceObjectsDir}/${addOnName}.res"
+            "/export:GetExportedFuncAddrs,@1"
+            "/export:SetImportedFuncAddrs,@2"
         )
-        set_target_properties(${target} PROPERTIES
+    else ()
+        set_target_properties(
+            "${target}" PROPERTIES
             BUNDLE TRUE
-            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_BINARY_DIR}/AddOnInfo.plist"
-
-            # Align parameters for Xcode and in Info.plist to avoid warnings
-            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER com.graphisoft.${addOnNameIdentifier}
-            XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET ${lsMinimumSystemVersion}
-
-            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>"
+            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/\$<CONFIG>"
         )
     endif ()
+    generate_add_on_version_info ()
 
     target_include_directories (${target} SYSTEM PUBLIC ${devKitDir}/Inc)
     target_include_directories (${target} PUBLIC ${addOnSourcesFolder})
@@ -252,22 +304,6 @@ function (GenerateAddOnProject target acVersion devKitDir addOnName addOnSources
 
 endfunction ()
 
-function (check_valid_language_code configFile languageCode)
-    file (READ "${configFile}" configsContent)
-    string (JSON configuredLanguagesList GET "${configsContent}" "languages")
-    string (JSON configuredLanguagesListLen LENGTH "${configsContent}" "languages")
-    set (i 0)
-    while (i LESS configuredLanguagesListLen)
-        string (JSON language GET "${configuredLanguagesList}" "${i}")
-        if (language STREQUAL languageCode)
-            return ()
-        endif ()
-        math (EXPR i "${i} + 1")
-    endwhile()
-
-    message (FATAL_ERROR "Language code ${languageCode} is not part of the configured languages in ${configFile}.")
-endfunction ()
-
 function (verify_api_devkit_folder devKitPath)
     if (NOT EXISTS "${devKitPath}")
         message (FATAL_ERROR "The supplied API DevKit path ${devKitPath} does not exist")
@@ -288,5 +324,42 @@ function (verify_api_devkit_folder devKitPath)
 
     if (APPLE AND NOT EXISTS "${devKitPath}/Frameworks")
         message (FATAL_ERROR "${devKitPath}/Frameworks does not exist")
+    endif ()
+endfunction ()
+
+function (ReadConfigJson)
+    file (READ "${CMAKE_SOURCE_DIR}/config.json" json)
+
+    set (requiredMembers addOnName defaultLanguage version copyright\\\;name copyright\\\;year)
+    set (returnAs addOnName addOnDefaultLanguage addOnVersion addOnCompanyName addOnCopyrightYear)
+    foreach (out members IN ZIP_LISTS returnAs requiredMembers)
+        string (JSON "${out}" ERROR_VARIABLE error GET "${json}" ${members})
+        if (error)
+            string (REPLACE \; . members "${members}")
+            message (FATAL_ERROR "Error getting required member (${members}): ${error}")
+        endif ()
+        set ("${out}" "${${out}}" PARENT_SCOPE)
+    endforeach ()
+
+    string (JSON languagesType ERROR_VARIABLE error TYPE "${json}" languages)
+    if (error OR NOT languagesType STREQUAL "ARRAY")
+        message (FATAL_ERROR "'languages' in config.json must be an array: ${error}")
+    endif ()
+
+    string (JSON json GET "${json}" languages)
+    set (addOnLanguages "")
+    set (i 0)
+    while ("ON")
+        string (JSON language ERROR_VARIABLE error GET "${json}" "${i}")
+        if (error)
+            break ()
+        endif ()
+        list (APPEND addOnLanguages "${language}")
+        math (EXPR i "${i} + 1")
+    endwhile ()
+    set (addOnLanguages "${addOnLanguages}" PARENT_SCOPE)
+
+    if (NOT addOnDefaultLanguage IN_LIST addOnLanguages)
+        message (FATAL_ERROR "'defaultLanguage' in config.json does not name a language specified in 'languages'.")
     endif ()
 endfunction ()
