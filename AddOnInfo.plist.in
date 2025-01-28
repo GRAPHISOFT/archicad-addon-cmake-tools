@@ -24,6 +24,8 @@
 		<key>CFBundleIconFile</key>
 		<string>ArchiCADPlugin</string>
 		<key>CFBundleExecutable</key>
-		<string>@addOnName@</string>@privateBuild@
+		<string>@addOnName@</string>
+		<key>GSAddOnDescription</key>
+		<string>@addOnDescription@</string>@privateBuild@
 	</dict>
 </plist>
