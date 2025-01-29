@@ -288,6 +288,8 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
 
     target_include_directories (${target} SYSTEM PUBLIC ${devKitDir}/Inc)
     target_include_directories (${target} PUBLIC ${addOnSourcesFolder})
+    target_include_directories (${target} SYSTEM PUBLIC ${additionalIncludesFolder})
+    target_link_libraries (${target} "${CMAKE_CURRENT_LIST_DIR}/${additionalLibraries}")
 
     # use GSRoot custom allocators consistently in the Add-On
     get_filename_component(new_hpp "${devKitDir}/Modules/GSRoot/GSNew.hpp" REALPATH)
