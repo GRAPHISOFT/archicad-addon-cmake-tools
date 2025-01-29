@@ -338,8 +338,11 @@ function (verify_api_devkit_folder devKitPath)
     endif ()
 endfunction ()
 
+set (GS_CONFIG_JSON_PATH "${CMAKE_SOURCE_DIR}/config.json" CACHE FILEPATH "")
+mark_as_advanced (GS_CONFIG_JSON_PATH)
+
 function (ReadConfigJson)
-    file (READ "${CMAKE_SOURCE_DIR}/config.json" json)
+    file (READ "${GS_CONFIG_JSON_PATH}" json)
 
     set (requiredMembers addOnName defaultLanguage version copyright\\\;name copyright\\\;year description)
     set (returnAs addOnName addOnDefaultLanguage addOnVersion addOnCompanyName addOnCopyrightYear addOnDescription)

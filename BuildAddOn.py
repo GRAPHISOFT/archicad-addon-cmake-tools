@@ -91,12 +91,10 @@ def PrepareParameters (args):
         languageList = [lang.upper () for lang in configData['languages']]
 
     # Get additional CMake parameters
-    additionalParams = None
+    additionalParams = {'GS_CONFIG_JSON_PATH': str (configPath.absolute ())}
     if 'additionalCMakeParams' in configData or args.additionalCMakeParams:
-        additionalParams = {}
-
         if 'additionalCMakeParams' in configData:
-            additionalParams = configData['additionalCMakeParams']
+            additionalParams.update (configData['additionalCMakeParams'])
 
         if args.additionalCMakeParams:
             for param in args.additionalCMakeParams:
