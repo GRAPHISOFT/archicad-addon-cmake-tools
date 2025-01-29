@@ -34,7 +34,7 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "CompanyName", "@addOnCompanyName@"
-            VALUE "FileDescription", "Example Archicad addon"
+            VALUE "FileDescription", "@addOnDescription@"
             VALUE "FileVersion", "@version@"
             VALUE "InternalName", "@addOnName@"
             VALUE "LegalCopyright", "@copyright@"
