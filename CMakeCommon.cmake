@@ -142,7 +142,7 @@ function (parse_version inValue outList)
     endif ()
 endfunction ()
 
-function (generate_add_on_version_info)
+function (generate_add_on_version_info outSemver)
     parse_version ("${addOnVersion}" vers)
     if (NOT DEFINED vers)
         message (FATAL_ERROR "'${addOnVersion}' does not follow the '123' or '1.23' or '1.2.3' version format.")
@@ -150,6 +150,10 @@ function (generate_add_on_version_info)
     if (vers STREQUAL "0;0;0")
         message (WARNING "Addon version is '0.0.0', which is a placeholder version. Please change it in 'config.json'.")
     endif ()
+
+    list (JOIN vers . semver)
+    set ("${outSemver}" "${semver}" PARENT_SCOPE)
+
     string (TIMESTAMP copyright "Copyright © ${addOnCompanyName}, ${addOnCopyrightYear}")
 
     if (WIN32)
@@ -311,7 +315,13 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
             LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/\$<CONFIG>"
         )
     endif ()
-    generate_add_on_version_info ()
+    generate_add_on_version_info (semver)
+    target_compile_definitions (
+        "${target}" PRIVATE
+        "ADDON_VERSION=\"${semver}\""
+        "ADDON_NAME=\"${addOnName}\""
+        "ADDON_LANGUAGE=\"${addOnLanguage}\""
+    )
 
     target_include_directories (${target} SYSTEM PUBLIC ${devKitDir}/Inc)
     target_include_directories (${target} PUBLIC ${addOnSourcesFolder})
@@ -371,8 +381,11 @@ function (verify_api_devkit_folder devKitPath)
     endif ()
 endfunction ()
 
+set (GS_CONFIG_JSON_PATH "${CMAKE_SOURCE_DIR}/config.json" CACHE FILEPATH "")
+mark_as_advanced (GS_CONFIG_JSON_PATH)
+
 function (ReadConfigJson)
-    file (READ "${CMAKE_SOURCE_DIR}/config.json" json)
+    file (READ "${GS_CONFIG_JSON_PATH}" json)
 
     set (requiredMembers addOnName defaultLanguage version copyright\\\;name copyright\\\;year description)
     set (returnAs addOnName addOnDefaultLanguage addOnVersion addOnCompanyName addOnCopyrightYear addOnDescription)
