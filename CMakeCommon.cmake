@@ -53,6 +53,27 @@ function (SetCompilerOptions target acVersion)
         if (${acVersion} LESS_EQUAL "24")
             target_compile_options (${target} PUBLIC -Wno-non-c-typedef-for-linkage)
         endif ()
+        # will be done in a post-step
+        set_target_properties ("${target}" PROPERTIES XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED NO)
+    endif ()
+
+endfunction ()
+
+function (Codesign target)
+    if (NOT ${codesignIdentity} STREQUAL "")
+        # Path to the entitlements file
+        set(ENTITLEMENTS_FILE "${CMAKE_SOURCE_DIR}/Tools/entitlements.plist")
+
+        # Add a custom target for code signing
+        add_custom_target(codesign ALL
+            COMMAND codesign --deep --force -vvv --timestamp --options runtime --preserve-metadata=identifier,entitlements,flag --sign "${codesignIdentity}" --entitlements "${ENTITLEMENTS_FILE}" $<TARGET_BUNDLE_DIR:${target}>
+            COMMENT "Codesigning the add-on"
+        )
+
+        # Ensure the application is signed after building
+        add_dependencies(codesign ${target})
+    else ()
+        message ("!! No codesigning identity is set in config.json. The add-on will not be signed.")
     endif ()
 
 endfunction ()
@@ -185,7 +206,13 @@ function (generate_add_on_version_info)
     endif ()
 endfunction ()
 
-function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder addOnResourcesFolder addOnLanguage additionalIncludesFolder additionalLibraries)
+function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder addOnResourcesFolder addOnLanguage)
+    # Capture optional arguments
+    set(options)
+    set(oneValueArgs additionalIncludesFolder additionalLibrary)
+    set(multiValueArgs)
+    cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
     verify_api_devkit_folder ("${devKitDir}")
     if (NOT addOnLanguage IN_LIST addOnLanguages)
         message (FATAL_ERROR "Language '${addOnLanguage}' is not among the configured languages in config.json.")
@@ -288,8 +315,12 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
 
     target_include_directories (${target} SYSTEM PUBLIC ${devKitDir}/Inc)
     target_include_directories (${target} PUBLIC ${addOnSourcesFolder})
-    target_include_directories (${target} SYSTEM PUBLIC ${additionalIncludesFolder})
-    target_link_libraries (${target} "${CMAKE_CURRENT_LIST_DIR}/${additionalLibraries}")
+    if (NOT ${additionalIncludesFolder} STREQUAL "")
+        target_include_directories (${target} SYSTEM PUBLIC ${additionalIncludesFolder})
+    endif ()
+    if (NOT ${additionalLibrary} STREQUAL "")
+        target_link_libraries (${target} "${CMAKE_CURRENT_LIST_DIR}/${additionalLibrary}")
+    endif ()
 
     # use GSRoot custom allocators consistently in the Add-On
     get_filename_component(new_hpp "${devKitDir}/Modules/GSRoot/GSNew.hpp" REALPATH)
@@ -359,6 +390,13 @@ function (ReadConfigJson)
         message (FATAL_ERROR "'languages' in config.json must be an array: ${error}")
     endif ()
 
+    # macOS codesigning
+    string (JSON codesignIdentityString ERROR_VARIABLE error GET "${json}" codesignIdentity)
+    if (error)
+        set (codesignIdentityString "")
+    endif ()
+    set (codesignIdentity "${codesignIdentityString}" PARENT_SCOPE)
+
     string (JSON json GET "${json}" languages)
     set (addOnLanguages "")
     set (i 0)
@@ -375,4 +413,5 @@ function (ReadConfigJson)
     if (NOT addOnDefaultLanguage IN_LIST addOnLanguages)
         message (FATAL_ERROR "'defaultLanguage' in config.json does not name a language specified in 'languages'.")
     endif ()
+
 endfunction ()
