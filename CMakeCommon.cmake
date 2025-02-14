@@ -72,7 +72,7 @@ function (Codesign target)
         )
 
         # Ensure the application is signed after building
-        add_dependencies(codesign ${target})
+        add_dependencies(codesign "${target}")
     else ()
         message ("!! No codesigning identity is set in config.json. The add-on will not be signed.")
     endif ()
