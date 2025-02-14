@@ -60,7 +60,7 @@ function (SetCompilerOptions target acVersion)
 endfunction ()
 
 function (Codesign target)
-    if (NOT ${codesignIdentity} STREQUAL "")
+    if (NOT codesignIdentity STREQUAL "")
         # Path to the entitlements file
         set(ENTITLEMENTS_FILE "${CMAKE_SOURCE_DIR}/Tools/entitlements.plist")
 
