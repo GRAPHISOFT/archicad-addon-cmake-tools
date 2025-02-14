@@ -68,6 +68,7 @@ function (Codesign target)
         add_custom_target(codesign ALL
             COMMAND codesign --deep --force -vvv --timestamp --options runtime --preserve-metadata=identifier,entitlements,flag --sign "${codesignIdentity}" --entitlements "${ENTITLEMENTS_FILE}" $<TARGET_BUNDLE_DIR:${target}>
             COMMENT "Codesigning the add-on"
+            VERBATIM
         )
 
         # Ensure the application is signed after building
