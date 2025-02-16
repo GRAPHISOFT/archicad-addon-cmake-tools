@@ -54,7 +54,6 @@ function (SetCompilerOptions target acVersion)
             target_compile_options (${target} PUBLIC -Wno-non-c-typedef-for-linkage)
         endif ()
     endif ()
-
 endfunction ()
 
 function (LinkGSLibrariesToProject target acVersion devKitDir)
@@ -287,6 +286,15 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
             BUNDLE TRUE
             LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/\$<CONFIG>"
         )
+        if ((NOT codesignIdentity STREQUAL "") AND (NOT developmentTeamId STREQUAL ""))
+            set_target_properties("${target}" PROPERTIES
+                XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${codesignIdentity}"
+                XCODE_ATTRIBUTE_CODE_SIGN_STYLE "Manual"
+                XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${developmentTeamId}"
+                XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_SOURCE_DIR}/Tools/entitlements.plist"
+                XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "--timestamp --options runtime"
+            )
+        endif ()
     endif ()
     generate_add_on_version_info (semver)
     target_compile_definitions (
@@ -365,6 +373,20 @@ function (ReadConfigJson)
         set ("${out}" "${${out}}" PARENT_SCOPE)
     endforeach ()
 
+    # macOS codesigning (optional)
+    string (JSON codesignIdentityString ERROR_VARIABLE error GET "${json}" codesignIdentity)
+    if (error)
+        set (codesignIdentityString "")
+    endif ()
+    set (codesignIdentity "${codesignIdentityString}" PARENT_SCOPE)
+
+    string (JSON developmentTeamIdString ERROR_VARIABLE error GET "${json}" developmentTeamId)
+    if (error)
+        set (developmentTeamIdString "")
+    endif ()
+    set (developmentTeamId "${developmentTeamIdString}" PARENT_SCOPE)
+
+    # language list
     string (JSON languagesType ERROR_VARIABLE error TYPE "${json}" languages)
     if (error OR NOT languagesType STREQUAL "ARRAY")
         message (FATAL_ERROR "'languages' in config.json must be an array: ${error}")
