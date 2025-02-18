@@ -291,7 +291,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
                 XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${codesignIdentity}"
                 XCODE_ATTRIBUTE_CODE_SIGN_STYLE "Manual"
                 XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${developmentTeamId}"
-                XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_SOURCE_DIR}/Tools/entitlements.plist"
+                XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entitlements.plist"
                 XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "--timestamp --options runtime"
             )
         endif ()
