@@ -190,13 +190,11 @@ function (generate_add_on_version_info outSemver)
     endif ()
 endfunction ()
 
-function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder addOnResourcesFolder addOnLanguage)
+function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder addOnResourcesFolder addOnLanguage addOnDefaultLanguage)
     verify_api_devkit_folder ("${devKitDir}")
     if (NOT addOnLanguage IN_LIST addOnLanguages)
         message (FATAL_ERROR "Language '${addOnLanguage}' is not among the configured languages in config.json.")
     endif ()
-
-    find_package (Python COMPONENTS Interpreter)
 
     set (ResourceObjectsDir ${CMAKE_BINARY_DIR}/ResourceObjects)
     set (ResourceStampFile "${ResourceObjectsDir}/AddOnResources.stamp")
@@ -220,24 +218,67 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
         )
     endif ()
 
+    if (${acVersion} GREATER_EQUAL 30)
+        file (GLOB AddOnJSONResourceFiles CONFIGURE_DEPENDS
+            ${addOnResourcesFolder}/R${addOnDefaultLanguage}/*.json
+            ${addOnResourcesFolder}/RFIX/*.json
+            ${addOnResourcesFolder}/R${addOnDefaultLanguage}/${addOnName}.xlf
+        )
+        file (GLOB AddOnXLIFFFiles CONFIGURE_DEPENDS
+            ${addOnResourcesFolder}/ResourceLibrary/*/XLF/${addOnName}.xlf
+        )
+    endif ()
+
+    set (minimumPython3Version "3.8")
+    if (AddOnJSONResourceFiles)
+        set (minimumPython3Version "3.10")
+    endif ()
+
+    find_package (Python3 ${minimumPython3Version} REQUIRED COMPONENTS Interpreter)
+
+    message (STATUS "Using Python3 interpreter: ${Python3_EXECUTABLE}")
+
+    set (permissiveLocalizationArgument "")
+    if (NOT AC_ADDON_FOR_DISTRIBUTION)
+        set (permissiveLocalizationArgument "--permissiveLocalization")
+    endif ()
+
     get_filename_component (AddOnSourcesFolderAbsolute "${CMAKE_CURRENT_LIST_DIR}/${addOnSourcesFolder}" ABSOLUTE)
     get_filename_component (AddOnResourcesFolderAbsolute "${CMAKE_CURRENT_LIST_DIR}/${addOnResourcesFolder}" ABSOLUTE)
     if (WIN32)
         add_custom_command (
             OUTPUT ${ResourceStampFile}
-            DEPENDS ${AddOnResourceFiles} ${AddOnImageFiles}
+            DEPENDS ${AddOnResourceFiles} ${AddOnImageFiles} ${AddOnJSONResourceFiles} ${AddOnXLIFFFiles}
             COMMENT "Compiling resources..."
             COMMAND ${CMAKE_COMMAND} -E make_directory "${ResourceObjectsDir}"
-            COMMAND ${Python_EXECUTABLE} "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/CompileResources.py" "${addOnLanguage}" "${devKitDir}" "${AddOnSourcesFolderAbsolute}" "${AddOnResourcesFolderAbsolute}" "${ResourceObjectsDir}" "${ResourceObjectsDir}/${addOnName}.res"
+            COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/CompileResources.py"
+                "${addOnName}"
+                "${addOnLanguage}"
+                "${addOnDefaultLanguage}"
+                "${devKitDir}"
+                "${AddOnSourcesFolderAbsolute}"
+                "${AddOnResourcesFolderAbsolute}"
+                "${ResourceObjectsDir}"
+                "${ResourceObjectsDir}/${addOnName}.res"
+                "${permissiveLocalizationArgument}"
             COMMAND ${CMAKE_COMMAND} -E touch ${ResourceStampFile}
         )
     else ()
         add_custom_command (
             OUTPUT ${ResourceStampFile}
-            DEPENDS ${AddOnResourceFiles} ${AddOnImageFiles}
+            DEPENDS ${AddOnResourceFiles} ${AddOnImageFiles} ${AddOnJSONResourceFiles} ${AddOnXLIFFFiles}
             COMMENT "Compiling resources..."
             COMMAND ${CMAKE_COMMAND} -E make_directory "${ResourceObjectsDir}"
-            COMMAND ${Python_EXECUTABLE} "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/CompileResources.py" "${addOnLanguage}" "${devKitDir}" "${AddOnSourcesFolderAbsolute}" "${AddOnResourcesFolderAbsolute}" "${ResourceObjectsDir}" "${CMAKE_BINARY_DIR}/$<CONFIG>/${addOnName}.bundle/Contents/Resources"
+            COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/CompileResources.py"
+                "${addOnName}"
+                "${addOnLanguage}"
+                "${addOnDefaultLanguage}"
+                "${devKitDir}"
+                "${AddOnSourcesFolderAbsolute}"
+                "${AddOnResourcesFolderAbsolute}"
+                "${ResourceObjectsDir}"
+                "${CMAKE_BINARY_DIR}/$<CONFIG>/${addOnName}.bundle/Contents/Resources"
+                "${permissiveLocalizationArgument}"
             COMMAND ${CMAKE_COMMAND} -E copy "${devKitDir}/Inc/PkgInfo" "${CMAKE_BINARY_DIR}/$<CONFIG>/${addOnName}.bundle/Contents/PkgInfo"
             COMMAND ${CMAKE_COMMAND} -E touch ${ResourceStampFile}
         )
@@ -257,12 +298,14 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
         ${AddOnSourceFiles}
         ${AddOnImageFiles}
         ${AddOnResourceFiles}
+        ${AddOnJSONResourceFiles}
+        ${AddOnXLIFFFiles}
         ${ResourceStampFile}
     )
 
     source_group ("Sources" FILES ${AddOnHeaderFiles} ${AddOnSourceFiles})
     source_group ("Images" FILES ${AddOnImageFiles})
-    source_group ("Resources" FILES ${AddOnResourceFiles})
+    source_group ("Resources" FILES ${AddOnResourceFiles} ${AddOnJSONResourceFiles} ${AddOnXLIFFFiles})
     if (WIN32)
         add_library (${target} SHARED ${AddOnFiles})
     else ()
