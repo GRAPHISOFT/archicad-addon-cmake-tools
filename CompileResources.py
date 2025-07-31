@@ -92,13 +92,24 @@ class ResourceCompiler (object):
         else:
             assert False, 'Unsupported platform: ' + platform.system ()
 
-        nativeResCreationResult = subprocess.call ([
+        jsonPartsDir = os.path.join (self.resourceObjectsPath, 'JsonParts')
+
+        if not os.path.exists (jsonPartsDir):
+            os.makedirs (jsonPartsDir, exist_ok=True)
+
+        nativeResCreationCommand = [
             sys.executable,
             os.path.join (jsonResourceProcessorPath, 'GSCreateNativeResourceFromJSON.py'),
             '-i', translatedJsonPath,
-            '-o', os.path.join (self.resourceObjectsPath, os.path.basename (jsonFilePath) + self.nativeResourceFileExtension),
+            '-o', os.path.join (jsonPartsDir, os.path.basename (jsonFilePath) + self.nativeResourceFileExtension),
             '-d', self.GetPlatformDefine (),
-        ], env=envForJson)
+        ]
+        if not localized:
+            imageResourcesFolder = os.path.join (self.resourcesPath, 'RFIX', 'Images')
+            nativeResCreationCommand.extend ([ '-p', imageResourcesFolder ])
+
+        nativeResCreationResult = subprocess.call (nativeResCreationCommand, env=envForJson)
+
         assert nativeResCreationResult == 0, 'Native resource creation command failed: ' + translatedJsonPath
 
         postCheckersCommand = [
