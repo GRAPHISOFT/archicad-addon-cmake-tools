@@ -260,7 +260,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
                 "${AddOnResourcesFolderAbsolute}"
                 "${ResourceObjectsDir}"
                 "${ResourceObjectsDir}/${addOnName}.res"
-                "${permissiveLocalizationArgument}"
+                ${permissiveLocalizationArgument}
             COMMAND ${CMAKE_COMMAND} -E touch ${ResourceStampFile}
         )
     else ()
@@ -278,7 +278,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
                 "${AddOnResourcesFolderAbsolute}"
                 "${ResourceObjectsDir}"
                 "${CMAKE_BINARY_DIR}/$<CONFIG>/${addOnName}.bundle/Contents/Resources"
-                "${permissiveLocalizationArgument}"
+                ${permissiveLocalizationArgument}
             COMMAND ${CMAKE_COMMAND} -E copy "${devKitDir}/Inc/PkgInfo" "${CMAKE_BINARY_DIR}/$<CONFIG>/${addOnName}.bundle/Contents/PkgInfo"
             COMMAND ${CMAKE_COMMAND} -E touch ${ResourceStampFile}
         )
