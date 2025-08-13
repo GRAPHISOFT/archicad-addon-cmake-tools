@@ -218,7 +218,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
         )
     endif ()
 
-    if (${acVersion} GREATER_EQUAL 30)
+    if (acVersion GREATER_EQUAL "30")
         file (GLOB AddOnJSONResourceFiles CONFIGURE_DEPENDS
             ${addOnResourcesFolder}/R${addOnDefaultLanguage}/*.json
             ${addOnResourcesFolder}/RFIX/*.json
@@ -230,7 +230,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
     endif ()
 
     set (minimumPython3Version "3.8")
-    if (AddOnJSONResourceFiles)
+    if (NOT AddOnJSONResourceFiles STREQUAL "")
         set (minimumPython3Version "3.10")
     endif ()
 
