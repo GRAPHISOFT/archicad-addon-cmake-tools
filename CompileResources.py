@@ -5,9 +5,10 @@ import subprocess
 import shutil
 import codecs
 import argparse
+from pathlib import Path
 
 class ResourceCompiler (object):
-    def __init__ (self, devKitPath, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization):
+    def __init__ (self, devKitPath: Path, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path, permissiveLocalization: bool):
         self.devKitPath = devKitPath
         self.addonName = addonName
         self.languageCode = languageCode
@@ -19,25 +20,25 @@ class ResourceCompiler (object):
         self.resConvPath = None
         self.nativeResourceFileExtension = None
         
-    def IsValid (self):
-        if self.resConvPath == None:
+    def IsValid (self) -> bool:
+        if self.resConvPath is None:
             return False
-        if not os.path.exists (self.resConvPath):
+        if not self.resConvPath.exists ():
             return False
         return True
 
-    def GetPrecompiledGRCResourceFilePath (self, grcFilePath):
-        grcFileName = os.path.split (grcFilePath)[1]
-        return os.path.join (self.resourceObjectsPath, grcFileName + '.i')
+    def GetPrecompiledGRCResourceFilePath (self, grcFilePath: Path) -> Path:
+        grcFileName = grcFilePath.name
+        return self.resourceObjectsPath / f'{grcFileName}.i'
 
-    def CompileJSONResourceFile (self, jsonFilePath, localized):
-        jsonResourceProcessorPath = os.path.join (self.devKitPath, 'Tools', 'JSONResourceProcessor')
+    def CompileJSONResourceFile (self, jsonFilePath: Path, localized: bool) -> None:
+        jsonResourceProcessorPath = self.devKitPath / 'Tools' / 'JSONResourceProcessor'
         schemaValidationResult = subprocess.call ([
             sys.executable,
-            os.path.join (jsonResourceProcessorPath, 'SchemaValidator.py'),
+            jsonResourceProcessorPath / 'SchemaValidator.py',
             '-i', jsonFilePath,
-            '-o', os.path.join (self.resourceObjectsPath, os.path.basename (jsonFilePath) + '.valid'),
-            '--schemaFolder', os.path.join (self.devKitPath, 'Tools', 'SchemaFiles'),
+            '-o', self.resourceObjectsPath / f'{jsonFilePath.name}.valid',
+            '--schemaFolder', self.devKitPath / 'Tools' / 'SchemaFiles',
         ])
         assert schemaValidationResult == 0, 'JSON Schema validation command failed: ' + jsonFilePath
 
@@ -46,17 +47,17 @@ class ResourceCompiler (object):
         if localized:
             xliffFileToTranslateWith = None
             if self.languageCode == self.defaultLanguageCode:
-                xliffFileToTranslateWith = os.path.join (self.resourcesPath, 'R' + self.defaultLanguageCode, self.addonName + '.xlf')
+                xliffFileToTranslateWith = self.resourcesPath / f'R{self.defaultLanguageCode}' / f'{self.addonName}.xlf'
             else:
-                childXliffPath = os.path.join (self.resourcesPath, 'ResourceLibrary', self.languageCode, 'XLF', self.addonName + '.xlf')
-                parentTxtPath = os.path.join (self.resourcesPath, 'ResourceLibrary', self.languageCode, 'XLF', '_parent.txt')
-                if os.path.exists (parentTxtPath):
+                childXliffPath = self.resourcesPath / 'ResourceLibrary' / self.languageCode / 'XLF' / f'{self.addonName}.xlf'
+                parentTxtPath = self.resourcesPath / 'ResourceLibrary' / self.languageCode / 'XLF' / '_parent.txt'
+                if parentTxtPath.exists ():
                     parentLanguageCode = codecs.open (parentTxtPath, 'r', 'utf-8').read ().strip ()
-                    parentXliffPath = os.path.join (self.resourcesPath, 'ResourceLibrary', parentLanguageCode, 'XLF', self.addonName + '.xlf')
-                    mergedXliffOutputPath = os.path.join (self.resourceObjectsPath, self.addonName + '.merged.xlf')
+                    parentXliffPath = self.resourcesPath / 'ResourceLibrary' / parentLanguageCode / 'XLF' / f'{self.addonName}.xlf'
+                    mergedXliffOutputPath = self.resourceObjectsPath / f'{self.addonName}.merged.xlf'
                     mergeParentChildXliffResult = subprocess.call ([
                         sys.executable,
-                        os.path.join (jsonResourceProcessorPath, 'MergeParentChildXliff.py'),
+                        jsonResourceProcessorPath / 'MergeParentChildXliff.py',
                         '--childXliff', childXliffPath,
                         '--parentXliff', parentXliffPath,
                         '-o', mergedXliffOutputPath
@@ -66,10 +67,10 @@ class ResourceCompiler (object):
                 else:
                     xliffFileToTranslateWith = childXliffPath
 
-            translatedJsonPath = os.path.join (self.resourceObjectsPath, os.path.basename (jsonFilePath) + '.translated')
+            translatedJsonPath = self.resourceObjectsPath / f'{jsonFilePath.name}.translated'
             xliffTranslationCommand = [
                 sys.executable,
-                os.path.join (jsonResourceProcessorPath, 'XliffJsonTranslator.py'),
+                jsonResourceProcessorPath / 'XliffJsonTranslator.py',
                 '-i', jsonFilePath,
                 '-m', self.addonName,
                 '-d', xliffFileToTranslateWith,
@@ -82,30 +83,30 @@ class ResourceCompiler (object):
 
         envForJson = os.environ.copy ()
         if platform.system () == 'Windows':
-            dllFolder = os.path.join (jsonResourceProcessorPath, 'dlls')
+            dllFolder = jsonResourceProcessorPath / 'dlls'
             envForJson['PATH'] = str (dllFolder) + os.pathsep + envForJson['PATH']
         elif platform.system () == 'Darwin':
             if platform.processor () == 'arm':
-                envForJson['DYLD_FALLBACK_LIBRARY_PATH'] = os.path.join (jsonResourceProcessorPath, 'dylibs_ARM')
+                envForJson['DYLD_FALLBACK_LIBRARY_PATH'] = jsonResourceProcessorPath / 'dylibs_ARM'
             else:
-                envForJson['DYLD_FALLBACK_LIBRARY_PATH'] = os.path.join (jsonResourceProcessorPath, 'dylibs')
+                envForJson['DYLD_FALLBACK_LIBRARY_PATH'] = jsonResourceProcessorPath / 'dylibs'
         else:
             assert False, 'Unsupported platform: ' + platform.system ()
 
-        jsonPartsDir = os.path.join (self.resourceObjectsPath, 'JsonParts')
+        jsonPartsDir = self.resourceObjectsPath / 'JsonParts'
 
-        if not os.path.exists (jsonPartsDir):
-            os.makedirs (jsonPartsDir, exist_ok=True)
+        if not jsonPartsDir.exists ():
+            jsonPartsDir.mkdir (parents=True, exist_ok=True)
 
         nativeResCreationCommand = [
             sys.executable,
-            os.path.join (jsonResourceProcessorPath, 'GSCreateNativeResourceFromJSON.py'),
+            jsonResourceProcessorPath / 'GSCreateNativeResourceFromJSON.py',
             '-i', translatedJsonPath,
-            '-o', os.path.join (jsonPartsDir, os.path.basename (jsonFilePath) + self.nativeResourceFileExtension),
+            '-o', jsonPartsDir / (jsonFilePath.name + self.nativeResourceFileExtension),
             '-d', self.GetPlatformDefine (),
         ]
         if not localized:
-            imageResourcesFolder = os.path.join (self.resourcesPath, 'RFIX', 'Images')
+            imageResourcesFolder = self.resourcesPath / 'RFIX' / 'Images'
             nativeResCreationCommand.extend ([ '-p', imageResourcesFolder ])
 
         nativeResCreationResult = subprocess.call (nativeResCreationCommand, env=envForJson)
@@ -114,40 +115,40 @@ class ResourceCompiler (object):
 
         postCheckersCommand = [
             sys.executable,
-            os.path.join (jsonResourceProcessorPath, 'RunPostCheckers.py'),
+            jsonResourceProcessorPath / 'RunPostCheckers.py',
             '-i', jsonFilePath,
-            '-o', os.path.join (self.resourceObjectsPath, os.path.basename (jsonFilePath) + '.postcheck'),
+            '-o', self.resourceObjectsPath / f'{jsonFilePath.name}.postcheck',
         ]
         if localized:
             postCheckersCommand.append ('--localized')
         postCheckersResult = subprocess.call (postCheckersCommand)
         assert postCheckersResult == 0, 'Post-checkers command failed: ' + jsonFilePath
 
-    def CompileLocalizedResources (self):
-        locResourcesFolder = os.path.join (self.resourcesPath, 'R' + self.languageCode)
-        grcFiles = self.CollectFilesFromFolderWithExtension (locResourcesFolder, '.grc')
+    def CompileLocalizedResources (self) -> None:
+        locResourcesFolder = self.resourcesPath / f'R{self.languageCode}'
+        grcFiles = locResourcesFolder.glob ('*.grc')
         for grcFilePath in grcFiles:
             assert self.CompileGRCResourceFile (grcFilePath), 'Failed to compile resource: ' + grcFilePath
 
-        locResourcesFolderDefault = os.path.join (self.resourcesPath, 'R' + self.defaultLanguageCode)
-        jsonFiles = self.CollectFilesFromFolderWithExtension (locResourcesFolderDefault, '.json')
+        locResourcesFolderDefault = self.resourcesPath / f'R{self.defaultLanguageCode}'
+        jsonFiles = locResourcesFolderDefault.glob ('*.json')
         for jsonFilePath in jsonFiles:
             self.CompileJSONResourceFile (jsonFilePath, localized=True)
 
-    def CompileFixResources (self):
-        fixResourcesFolder = os.path.join (self.resourcesPath, 'RFIX')
-        grcFiles = self.CollectFilesFromFolderWithExtension (fixResourcesFolder, '.grc')
+    def CompileFixResources (self) -> None:
+        fixResourcesFolder = self.resourcesPath / 'RFIX'
+        grcFiles = fixResourcesFolder.glob ('*.grc')
         for grcFilePath in grcFiles:
             assert self.CompileGRCResourceFile (grcFilePath), 'Failed to compile resource: ' + grcFilePath
 
-        jsonFiles = self.CollectFilesFromFolderWithExtension (fixResourcesFolder, '.json')
+        jsonFiles = fixResourcesFolder.glob ('*.json')
         for jsonFilePath in jsonFiles:
             self.CompileJSONResourceFile (jsonFilePath, localized=False)
 
-    def RunResConv (self, platformSign, codepage, inputFilePath):
-        imageResourcesFolder = os.path.join (self.resourcesPath, 'RFIX', 'Images')
-        inputFileBaseName = os.path.splitext (os.path.split (inputFilePath)[1])[0]
-        nativeResourceFilePath = os.path.join (self.resourceObjectsPath, inputFileBaseName + self.nativeResourceFileExtension)
+    def RunResConv (self, platformSign: str, codepage: str, inputFilePath: Path) -> bool:
+        imageResourcesFolder = self.resourcesPath / 'RFIX' / 'Images'
+        inputFileBaseName = inputFilePath.stem
+        nativeResourceFilePath = self.resourceObjectsPath / (inputFileBaseName + self.nativeResourceFileExtension)
         result = subprocess.call ([
             self.resConvPath,
             '-m', 'r',                        # resource compile mode
@@ -162,27 +163,16 @@ class ResourceCompiler (object):
             return False
         return True
 
-    def CollectFilesFromFolderWithExtension (self, folderPath, extension):
-        result = []
-        if not os.path.exists (folderPath):
-            return result
-        for fileName in os.listdir (folderPath):
-            fileExtension = os.path.splitext (fileName)[1]
-            if fileExtension.lower () == extension.lower ():
-                fullPath = os.path.join (folderPath, fileName)
-                result.append (fullPath)
-        return result
-
 class WinResourceCompiler (ResourceCompiler):
-    def __init__ (self, devKitPath, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization):
+    def __init__ (self, devKitPath: Path, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path, permissiveLocalization: bool):
         super (WinResourceCompiler, self).__init__ (devKitPath, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization)
-        self.resConvPath = os.path.join (devKitPath, 'Tools', 'Win', 'ResConv.exe')
+        self.resConvPath = devKitPath / 'Tools' / 'Win' / 'ResConv.exe'
         self.nativeResourceFileExtension = '.rc2'
 
-    def GetPlatformDefine (self):
+    def GetPlatformDefine (self) -> str:
         return 'WINDOWS'
 
-    def PrecompileGRCResourceFile (self, grcFilePath):
+    def PrecompileGRCResourceFile (self, grcFilePath: Path) -> Path:
         precompiledGrcFilePath = self.GetPrecompiledGRCResourceFilePath (grcFilePath)
         result = subprocess.call ([
             'cl',
@@ -190,8 +180,8 @@ class WinResourceCompiler (ResourceCompiler):
             '/X',
             '/EP',
             '/P',
-            '/I', os.path.join (self.devKitPath, 'Inc'),
-            '/I', os.path.join (self.devKitPath, 'Modules', 'DGLib'),
+            '/I', self.devKitPath / 'Inc',
+            '/I', self.devKitPath / 'Modules' / 'DGLib',
             '/I', self.sourcesPath,
             '/I', self.resourceObjectsPath,
             '/D' + self.GetPlatformDefine (),
@@ -203,26 +193,26 @@ class WinResourceCompiler (ResourceCompiler):
         assert result == 0, 'Failed to precompile resource ' + grcFilePath
         return precompiledGrcFilePath
 
-    def CompileGRCResourceFile (self, grcFilePath):
+    def CompileGRCResourceFile (self, grcFilePath: Path) -> bool:
         precompiledGrcFilePath = self.PrecompileGRCResourceFile (grcFilePath)
         return self.RunResConv ('W', '1252', precompiledGrcFilePath)
 
-    def GetNativeResourceFile (self):
-        defaultNativeResourceFile = os.path.join (self.resourcesPath, 'RFIX.win', 'AddOnMain.rc2')
-        if os.path.exists (defaultNativeResourceFile):
+    def GetNativeResourceFile (self) -> Path:
+        defaultNativeResourceFile = self.resourcesPath / 'RFIX.win' / 'AddOnMain.rc2'
+        if defaultNativeResourceFile.exists ():
             return defaultNativeResourceFile
 
-        existingNativeResourceFiles = self.CollectFilesFromFolderWithExtension (os.path.join (self.resourcesPath, 'RFIX.win'), '.rc2')
+        existingNativeResourceFiles = (self.resourcesPath / 'RFIX.win').glob ('*.rc2')
         assert existingNativeResourceFiles, 'Native resource file was not found at RFIX.win folder'
 
         return existingNativeResourceFiles[0]
 
-    def CompileNativeResource (self, resultResourcePath):
+    def CompileNativeResource (self, resultResourcePath: Path) -> None:
         nativeResourceFile = self.GetNativeResourceFile ()
         result = subprocess.call ([
             'rc',
-            '/i', os.path.join (self.devKitPath, 'Inc'),
-            '/i', os.path.join (self.devKitPath, 'Modules', 'DGLib'),
+            '/i', self.devKitPath / 'Inc',
+            '/i', self.devKitPath / 'Modules' / 'DGLib',
             '/i', self.sourcesPath,
             '/i', self.resourceObjectsPath,
             '/fo', resultResourcePath,
@@ -231,15 +221,15 @@ class WinResourceCompiler (ResourceCompiler):
         assert result == 0, 'Failed to compile native resource ' + nativeResourceFile
 
 class MacResourceCompiler (ResourceCompiler):
-    def __init__ (self, devKitPath, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization):
+    def __init__ (self, devKitPath: Path, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path, permissiveLocalization: bool):
         super (MacResourceCompiler, self).__init__ (devKitPath, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization)
-        self.resConvPath = os.path.join (devKitPath, 'Tools', 'OSX', 'ResConv')
+        self.resConvPath = devKitPath / 'Tools' / 'OSX' / 'ResConv'
         self.nativeResourceFileExtension = '.ro'
 
-    def GetPlatformDefine (self):
+    def GetPlatformDefine (self) -> str:
         return 'macintosh'
 
-    def PrecompileGRCResourceFile (self, grcFilePath):
+    def PrecompileGRCResourceFile (self, grcFilePath: Path) -> Path:
         precompiledGrcFilePath = self.GetPrecompiledGRCResourceFilePath (grcFilePath)
         result = subprocess.call ([
             'clang',
@@ -247,8 +237,8 @@ class MacResourceCompiler (ResourceCompiler):
             '-E',
             '-P',
             '-D' + self.GetPlatformDefine (),
-            '-I', os.path.join (self.devKitPath, 'Inc'),
-            '-I', os.path.join (self.devKitPath, 'Modules', 'DGLib'),
+            '-I', self.devKitPath / 'Inc',
+            '-I', self.devKitPath / 'Modules' / 'DGLib',
             '-I', self.sourcesPath,
             '-I', self.resourceObjectsPath,
             '-o', precompiledGrcFilePath,
@@ -257,19 +247,19 @@ class MacResourceCompiler (ResourceCompiler):
         assert result == 0, 'Failed to precompile resource ' + grcFilePath
         return precompiledGrcFilePath
 
-    def CompileGRCResourceFile (self, grcFilePath):
+    def CompileGRCResourceFile (self, grcFilePath: Path) -> bool:
         precompiledGrcFilePath = self.PrecompileGRCResourceFile (grcFilePath)
         return self.RunResConv ('M', 'utf16', precompiledGrcFilePath)
 
-    def CompileNativeResource (self, resultResourcePath):
-        resultLocalizedResourcePath = os.path.join (resultResourcePath, 'English.lproj')
-        if not os.path.exists (resultLocalizedResourcePath):
-            os.makedirs (resultLocalizedResourcePath)
-        resultLocalizableStringsPath = os.path.join (resultLocalizedResourcePath, 'Localizable.strings')
+    def CompileNativeResource (self, resultResourcePath: Path) -> None:
+        resultLocalizedResourcePath = resultResourcePath / 'English.lproj'
+        if not resultLocalizedResourcePath.exists ():
+            resultLocalizedResourcePath.mkdir (parents=True)
+        resultLocalizableStringsPath = resultLocalizedResourcePath / 'Localizable.strings'
         resultLocalizableStringsFile = codecs.open (resultLocalizableStringsPath, 'w', 'utf-16')
-        for fileName in os.listdir (self.resourceObjectsPath):
-            filePath = os.path.join (self.resourceObjectsPath, fileName)
-            extension = os.path.splitext (fileName)[1].lower ()
+        for fileName in self.resourceObjectsPath.iterdir ():
+            filePath = self.resourceObjectsPath / fileName
+            extension = fileName.suffix.lower ()
             if extension == '.tif':
                 shutil.copy (filePath, resultResourcePath)
             elif extension == '.rsrd':
@@ -293,17 +283,17 @@ def Main (argv):
     parser.add_argument ('--permissiveLocalization', action='store_true', help = 'Enable permissive localization mode.', default = False)
     args = parser.parse_args ()
 
-    currentDir = os.path.dirname (os.path.abspath (__file__))
+    currentDir = Path (__file__).parent
     os.chdir (currentDir)
 
     addonName = args.addonName
     languageCode = args.languageCode
     defaultLanguageCode = args.defaultLanguageCode
-    devKitPath = os.path.abspath (args.devKitPath)
-    sourcesPath = os.path.abspath (args.sourcesPath)
-    resourcesPath = os.path.abspath (args.resourcesPath)
-    resourceObjectsPath = os.path.abspath (args.resourceObjectsPath)
-    resultResourcePath = os.path.abspath (args.resultResourcePath)
+    devKitPath = Path (args.devKitPath)
+    sourcesPath = Path (args.sourcesPath)
+    resourcesPath = Path (args.resourcesPath)
+    resourceObjectsPath = Path (args.resourceObjectsPath)
+    resultResourcePath = Path (args.resultResourcePath)
     permissiveLocalization = args.permissiveLocalization
 
     resourceCompiler = None
