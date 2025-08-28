@@ -190,7 +190,7 @@ function (generate_add_on_version_info outSemver)
     endif ()
 endfunction ()
 
-function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder addOnResourcesFolder addOnLanguage addOnDefaultLanguage)
+function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder addOnResourcesFolder addOnLanguage addOnDefaultLanguage addOnPCH)
     verify_api_devkit_folder ("${devKitDir}")
     if (NOT addOnLanguage IN_LIST addOnLanguages)
         message (FATAL_ERROR "Language '${addOnLanguage}' is not among the configured languages in config.json.")
@@ -353,22 +353,27 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
     target_include_directories (${target} PUBLIC ${addOnSourcesFolder})
 
     # use GSRoot custom allocators consistently in the Add-On
-    get_filename_component(new_hpp "${devKitDir}/Modules/GSRoot/GSNew.hpp" REALPATH)
-    get_filename_component(malloc_hpp "${devKitDir}/Modules/GSRoot/GSMalloc.hpp" REALPATH)
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-        target_compile_options(
-            "${target}" PRIVATE
-            "SHELL:/FI \"${new_hpp}\""
-            "SHELL:/FI \"${malloc_hpp}\""
-        )
-    elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang\$")
-        target_compile_options(
-            "${target}" PRIVATE
-            "SHELL:-include \"${new_hpp}\""
-            "SHELL:-include \"${malloc_hpp}\""
-        )
+    # if you specify a precompiled header, make sure <GSNew.hpp> and <GSMalloc.hpp> are the first includes
+    if (addOnPCH)
+        target_precompile_headers("${target}" PRIVATE "${addOnPCH}")
     else()
-        message(FATAL_ERROR "Unknown compiler ID. Please open an issue at https://github.com/GRAPHISOFT/archicad-addon-cmake-tools")
+        get_filename_component(new_hpp "${devKitDir}/Modules/GSRoot/GSNew.hpp" REALPATH)
+        get_filename_component(malloc_hpp "${devKitDir}/Modules/GSRoot/GSMalloc.hpp" REALPATH)
+        if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+            target_compile_options(
+                "${target}" PRIVATE
+                "SHELL:/FI \"${new_hpp}\""
+                "SHELL:/FI \"${malloc_hpp}\""
+            )
+        elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang\$")
+            target_compile_options(
+                "${target}" PRIVATE
+                "SHELL:-include \"${new_hpp}\""
+                "SHELL:-include \"${malloc_hpp}\""
+            )
+        else()
+            message(FATAL_ERROR "Unknown compiler ID. Please open an issue at https://github.com/GRAPHISOFT/archicad-addon-cmake-tools")
+        endif()
     endif()
 
     LinkGSLibrariesToProject (${target} ${acVersion} ${devKitDir})
