@@ -5,6 +5,7 @@ import subprocess
 import shutil
 import codecs
 import argparse
+import re
 from pathlib import Path
 
 class ResourceCompiler (object):
@@ -20,6 +21,26 @@ class ResourceCompiler (object):
         self.resConvPath = None
         self.nativeResourceFileExtension = None
         
+    def GetDevKitVersionAndBuildNumber (self) -> tuple[int, int]:
+        versionFilePath = self.devKitPath.parent / 'VersionAndBuildNumber.txt'
+        assert versionFilePath.exists (), 'VersionAndBuildNumber.txt file was not found in the DevKit folder'
+        with open (versionFilePath, 'r', encoding='utf-8') as versionFile:
+            content: str = versionFile.readlines ()
+            
+        main_version_regex = re.compile(r'API_MAINVERSION\s+"(\d+)"', re.IGNORECASE)
+        build_number_regex = re.compile(r'AC_BUILD_NUMBER\s+"(\d+)"', re.IGNORECASE)
+
+        main_version, build_number = 0, 0
+        for line in content:
+            main_version_match = main_version_regex.search(line)
+            build_number_match = build_number_regex.search(line)
+            if main_version_match:
+                main_version = main_version_match.group(1)
+            if build_number_match:
+                build_number = build_number_match.group(1)
+
+        return (int (main_version), int (build_number))
+
     def IsValid (self) -> bool:
         if self.resConvPath is None:
             return False
@@ -160,7 +181,10 @@ class ResourceCompiler (object):
             '-i', inputFilePath,            # input path
             '-o', nativeResourceFilePath    # output path
         ]
-        if colorChangeScriptPath.exists (): # Exists since APIDevKit of Archicad 29
+
+        devkit_main_version, devkit_build_number= self.GetDevKitVersionAndBuildNumber ()
+        if (devkit_main_version > 29 or
+            (devkit_main_version == 29 and devkit_build_number >= 3000)):
             call_params.extend (['-py', sys.executable])        # python executable
             call_params.extend (['-sc', colorChangeScriptPath]) # SVG color change script path for generating Dark Mode icons
         result = subprocess.call (call_params)
