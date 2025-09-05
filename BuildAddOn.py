@@ -199,7 +199,7 @@ def GetToolset (version):
     return 'v143'
 
 
-def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, release, additionalParams):
+def GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, release, additionalParams):
     # Add params to configure cmake
     projGenParams = [
         'cmake',
@@ -221,6 +221,10 @@ def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, de
     if release:
         projGenParams.append ('-DAC_ADDON_FOR_DISTRIBUTION=ON')
 
+    if args.devKitPath is not None:
+        projGenParams.append ('-DAC_USE_LOCAL_DEVKIT=ON')
+        projGenParams.append (f'-DDEVKIT_BUILDNUM={args.buildNum}')
+
     if additionalParams is not None:
         for key in additionalParams:
             projGenParams.append (f'-D{key}={additionalParams[key]}')
@@ -230,11 +234,11 @@ def GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, de
     return projGenParams
 
 
-def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, configuration, languageCode, release, quiet):
+def BuildAddOn (args, addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, configuration, languageCode, release, quiet):
     buildPath = buildFolder / addOnName / version / languageCode
 
     # Add params to configure cmake
-    projGenParams = GetProjectGenerationParams (workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, release, additionalParams)
+    projGenParams = GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, release, additionalParams)
     projGenResult = CallCommand (projGenParams, quiet)
 
     if projGenResult != 0:
@@ -253,7 +257,7 @@ def BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, 
         raise Exception ('Failed to build project!')
 
 
-def BuildAddOns (addOnName, buildConfigList, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, release, quiet):
+def BuildAddOns (args, addOnName, buildConfigList, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, release, quiet):
     platformName = GetPlatformName ()
 
     try:
@@ -262,7 +266,7 @@ def BuildAddOns (addOnName, buildConfigList, languageList, additionalParams, wor
 
             for languageCode in languageList:
                 for config in buildConfigList:
-                    BuildAddOn (addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, config, languageCode, release, quiet)
+                    BuildAddOn (args, addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, config, languageCode, release, quiet)
 
     except Exception as e:
         raise e
@@ -339,7 +343,7 @@ def Main ():
 
         os.chdir (workspaceRootFolder)
 
-        BuildAddOns (addOnName, buildConfigList, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, args.release, args.quiet)
+        BuildAddOns (args, addOnName, buildConfigList, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, args.release, args.quiet)
 
         if args.package:
             PackageAddOns (args, devKitData, addOnName, buildConfigList, acVersionList, languageList, buildFolder, packageRootFolder)
