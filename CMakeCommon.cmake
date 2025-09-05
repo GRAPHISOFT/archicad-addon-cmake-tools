@@ -245,6 +245,11 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
 
     get_filename_component (AddOnSourcesFolderAbsolute "${CMAKE_CURRENT_LIST_DIR}/${addOnSourcesFolder}" ABSOLUTE)
     get_filename_component (AddOnResourcesFolderAbsolute "${CMAKE_CURRENT_LIST_DIR}/${addOnResourcesFolder}" ABSOLUTE)
+    if(AC_USE_LOCAL_DEVKIT)
+        set(DEVKIT_BUILDNUM_VALUE "${DEVKIT_BUILDNUM}")
+    else()
+        set(DEVKIT_BUILDNUM_VALUE "default")
+    endif()
     if (WIN32)
         add_custom_command (
             OUTPUT ${ResourceStampFile}
@@ -255,6 +260,8 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
                 "${addOnName}"
                 "${addOnLanguage}"
                 "${addOnDefaultLanguage}"
+                "${acVersion}"
+                "${DEVKIT_BUILDNUM_VALUE}"
                 "${devKitDir}"
                 "${AddOnSourcesFolderAbsolute}"
                 "${AddOnResourcesFolderAbsolute}"
@@ -273,6 +280,8 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
                 "${addOnName}"
                 "${addOnLanguage}"
                 "${addOnDefaultLanguage}"
+                "${acVersion}"
+                "${DEVKIT_BUILDNUM_VALUE}"
                 "${devKitDir}"
                 "${AddOnSourcesFolderAbsolute}"
                 "${AddOnResourcesFolderAbsolute}"
