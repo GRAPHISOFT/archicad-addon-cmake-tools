@@ -149,16 +149,21 @@ class ResourceCompiler (object):
         imageResourcesFolder = self.resourcesPath / 'RFIX' / 'Images'
         inputFileBaseName = inputFilePath.stem
         nativeResourceFilePath = self.resourceObjectsPath / (inputFileBaseName + self.nativeResourceFileExtension)
-        result = subprocess.call ([
+        colorChangeScriptPath = self.resConvPath.parent / 'SVGColorChange.py'
+        call_params = [
             self.resConvPath,
-            '-m', 'r',                        # resource compile mode
-            '-T', platformSign,                # target platform
-            '-q', 'utf8', codepage,            # code page conversion
-            '-w', '2',                        # HiDPI image size list
-            '-p', imageResourcesFolder,        # image search path
+            '-m', 'r',                      # resource compile mode
+            '-T', platformSign,             # target platform
+            '-q', 'utf8', codepage,         # code page conversion
+            '-w', '2',                      # HiDPI image size list
+            '-p', imageResourcesFolder,     # image search path
             '-i', inputFilePath,            # input path
             '-o', nativeResourceFilePath    # output path
-        ])
+        ]
+        if colorChangeScriptPath.exists (): # Exists since APIDevKit of Archicad 29
+            call_params.extend (['-py', sys.executable])        # python executable
+            call_params.extend (['-sc', colorChangeScriptPath]) # SVG color change script path for generating Dark Mode icons
+        result = subprocess.call (call_params)
         if result != 0:
             return False
         return True
