@@ -237,10 +237,10 @@ class WinResourceCompiler (ResourceCompiler):
         if defaultNativeResourceFile.exists ():
             return defaultNativeResourceFile
 
-        existingNativeResourceFiles = (self.resourcesPath / 'RFIX.win').glob ('*.rc2')
-        assert existingNativeResourceFiles, 'Native resource file was not found at RFIX.win folder'
+        existingNativeResourceFile = next ((self.resourcesPath / 'RFIX.win').glob ('*.rc2'), None)
+        assert existingNativeResourceFile is not None, 'Native resource file was not found at RFIX.win folder'
 
-        return existingNativeResourceFiles[0]
+        return existingNativeResourceFile
 
     def CompileNativeResource (self, resultResourcePath: Path) -> None:
         nativeResourceFile = self.GetNativeResourceFile ()
