@@ -64,7 +64,7 @@ class ResourceCompiler (object):
             '-o', self.resourceObjectsPath / f'{jsonFilePath.name}.valid',
             '--schemaFolder', self.devKitPath / 'Tools' / 'SchemaFiles',
         ])
-        assert schemaValidationResult == 0, 'JSON Schema validation command failed: ' + jsonFilePath
+        assert schemaValidationResult == 0, 'JSON Schema validation command failed: ' + str(jsonFilePath)
 
         translatedJsonPath = jsonFilePath
 
@@ -86,7 +86,7 @@ class ResourceCompiler (object):
                         '--parentXliff', parentXliffPath,
                         '-o', mergedXliffOutputPath
                     ])
-                    assert mergeParentChildXliffResult == 0, 'Merge parent child XLIFF command failed: ' +  jsonFilePath
+                    assert mergeParentChildXliffResult == 0, 'Merge parent child XLIFF command failed: ' +  str(jsonFilePath)
                     xliffFileToTranslateWith = mergedXliffOutputPath
                 else:
                     xliffFileToTranslateWith = childXliffPath
@@ -103,7 +103,7 @@ class ResourceCompiler (object):
             if self.permissiveLocalization:
                 xliffTranslationCommand.append ('--permissive')
             xliffTranslationResult = subprocess.call (xliffTranslationCommand)
-            assert xliffTranslationResult == 0, 'XLIFF translation command failed: ' +  jsonFilePath
+            assert xliffTranslationResult == 0, 'XLIFF translation command failed: ' +  str(jsonFilePath)
 
         envForJson = os.environ.copy ()
         if platform.system () == 'Windows':
@@ -135,7 +135,7 @@ class ResourceCompiler (object):
 
         nativeResCreationResult = subprocess.call (nativeResCreationCommand, env=envForJson)
 
-        assert nativeResCreationResult == 0, 'Native resource creation command failed: ' + translatedJsonPath
+        assert nativeResCreationResult == 0, 'Native resource creation command failed: ' + str(translatedJsonPath)
 
         postCheckersCommand = [
             sys.executable,
@@ -152,7 +152,7 @@ class ResourceCompiler (object):
         locResourcesFolder = self.resourcesPath / f'R{self.languageCode}'
         grcFiles = locResourcesFolder.glob ('*.grc')
         for grcFilePath in grcFiles:
-            assert self.CompileGRCResourceFile (grcFilePath), 'Failed to compile resource: ' + grcFilePath
+            assert self.CompileGRCResourceFile (grcFilePath), 'Failed to compile resource: ' + str(grcFilePath)
 
         locResourcesFolderDefault = self.resourcesPath / f'R{self.defaultLanguageCode}'
         jsonFiles = locResourcesFolderDefault.glob ('*.json')
@@ -163,7 +163,7 @@ class ResourceCompiler (object):
         fixResourcesFolder = self.resourcesPath / 'RFIX'
         grcFiles = fixResourcesFolder.glob ('*.grc')
         for grcFilePath in grcFiles:
-            assert self.CompileGRCResourceFile (grcFilePath), 'Failed to compile resource: ' + grcFilePath
+            assert self.CompileGRCResourceFile (grcFilePath), 'Failed to compile resource: ' + str(grcFilePath)
 
         jsonFiles = fixResourcesFolder.glob ('*.json')
         for jsonFilePath in jsonFiles:
