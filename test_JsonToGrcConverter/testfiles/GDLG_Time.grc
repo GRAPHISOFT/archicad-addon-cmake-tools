@@ -1,0 +1,24 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ TimeControl                 1    2    3    4
+/* [  2] */ TimeControl                 1    2    3    4 /* TimeControl comment */
+#if defined (WINDOWS)
+/* [  3] */ TimeControl                 1    2    3    4
+#endif
+#if !defined (WINDOWS)
+/* [  3] */ TimeControl                 1    2    3    4
+#endif
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               TimeControl_0
+2  ""                                               TimeControlAnchor_2
+#if defined (WINDOWS)
+3  ""                                               TimeControl_1
+#endif
+#if !defined (WINDOWS)
+4  ""                                               TimeControl_2
+#endif
+}
+

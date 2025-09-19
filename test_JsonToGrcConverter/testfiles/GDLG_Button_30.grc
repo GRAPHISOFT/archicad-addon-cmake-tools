@@ -1,0 +1,32 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ Button                      1    2    3    4 LargePlain frame RoundedEdge "Button1"
+/* [  2] */ Button                      1    2    3    4 LargePlain frame RoundedEdge "Button2" /* Button comment */
+/* [  3] */ Button                      1    2    3    4 ExtraSmall frame RoundedEdge "Button3"
+/* [  3] */ Button                      1    2    3    4 SmallPlain frame SquaredEdge "Button3"
+#if defined (WINDOWS)
+/* [  4] */ Button                      1    2    3    4 SmallItalic noFrame RoundedEdge "Button4_WIN"
+#endif
+#if !defined (WINDOWS)
+/* [  4] */ Button                      1    2    3    4 SmallItalic frame RoundedEdge "Button4_MAC"
+#endif
+/* [  5] */ Button                      1    2    3    4 SmallUnderline frame RoundedEdge "Button5"
+/* [  6] */ Button                      1    2    3    4 LargeOutline frame RoundedEdge "Button6"
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               Button_0
+2  ""                                               ButtonAnchor_2
+3  ""                                               Button_1
+4  ""                                               Button_2
+#if defined (WINDOWS)
+5  ""                                               Button_3
+#endif
+#if !defined (WINDOWS)
+6  ""                                               Button_4
+#endif
+7  ""                                               Button_5
+8  ""                                               Button_6
+}
+

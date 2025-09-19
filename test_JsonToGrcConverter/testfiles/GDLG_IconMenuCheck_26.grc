@@ -1,0 +1,28 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ IconMenuCheck               1    2    3    4  BevelEdge 
+/* [  2] */ IconMenuCheck               1    2    3    4 NoIcon DG_ERROR_ICON NoIcon BevelEdge  /* Icon comment */
+#if defined (WINDOWS)
+/* [  3] */ IconMenuCheck               1    2    3    4  BevelEdge 
+#endif
+#if defined (macintosh)
+/* [  3] */ IconMenuCheck               1    2    3    4  BevelEdge 
+#endif
+/* [  4] */ IconMenuCheck               1    2    3    4 NoIcon BevelEdge 
+/* [  5] */ IconMenuCheck               1    2    3    4  RoundedBevelEdge 
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               IconMenuCheck_0
+2  ""                                               IconAnchor_2
+#if defined (WINDOWS)
+3  ""                                               IconMenuCheck_1
+#endif
+#if defined (macintosh)
+4  ""                                               IconMenuCheck_2
+#endif
+5  ""                                               IconMenuCheck_3
+6  ""                                               IconMenuCheck_4
+}
+

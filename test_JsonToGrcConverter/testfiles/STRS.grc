@@ -1,0 +1,19 @@
+#include "DGDefs.h"
+
+'STR#' 1 "Test Strings" {
+/* [  1] */ "Test String 1"
+/* [  2] */ "Test String 2"
+/* [  3] */ "Test String 3" /* Test Comment */
+/* [  4] */ "Test String 4"
+}
+
+'STR#' 2 "Test Strings" { /* Strs comment */
+/* [  1] */ "Test String 1"
+}
+
+#if defined (WINDOWS)
+'STR#' 3 "Test Strings" {
+/* [  1] */ "Test String 1"
+}
+#endif
+

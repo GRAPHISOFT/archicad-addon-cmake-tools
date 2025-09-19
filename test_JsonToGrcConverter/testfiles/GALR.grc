@@ -1,0 +1,28 @@
+#include "DGDefs.h"
+
+'GALR' 1 DG_WARNING_ICON "Alert Name" { /* Alert Comment */
+    /* largeText   */ "Large Text"
+    /* smallText   */ "Small Text"
+    /* button1     */ "OK"
+    /* button2     */ ""
+    /* button3     */ ""
+}
+
+'GALR' 2 DG_WARNING_ICON "Alert Name" {
+    /* largeText   */ "Large Text"
+    /* smallText   */ "Small Text"
+    /* button1     */ "OK"
+    /* button2     */ ""
+    /* button3     */ ""
+}
+
+#if defined (WINDOWS)
+'GALR' 3 DG_WARNING_ICON "Alert Name" {
+    /* largeText   */ "Large Text"
+    /* smallText   */ "Small Text"
+    /* button1     */ "OK"
+    /* button2     */ ""
+    /* button3     */ ""
+}
+#endif
+

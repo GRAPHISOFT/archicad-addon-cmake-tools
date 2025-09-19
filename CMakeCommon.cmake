@@ -218,16 +218,14 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
         )
     endif ()
 
-    if (acVersion GREATER_EQUAL "30")
-        file (GLOB AddOnJSONResourceFiles CONFIGURE_DEPENDS
-            ${addOnResourcesFolder}/R${addOnDefaultLanguage}/*.json
-            ${addOnResourcesFolder}/RFIX/*.json
-            ${addOnResourcesFolder}/R${addOnDefaultLanguage}/${addOnName}.xlf
-        )
-        file (GLOB AddOnXLIFFFiles CONFIGURE_DEPENDS
-            ${addOnResourcesFolder}/ResourceLibrary/*/XLF/${addOnName}.xlf
-        )
-    endif ()
+    file (GLOB AddOnJSONResourceFiles CONFIGURE_DEPENDS
+        ${addOnResourcesFolder}/R${addOnDefaultLanguage}/*.json
+        ${addOnResourcesFolder}/RFIX/*.json
+        ${addOnResourcesFolder}/R${addOnDefaultLanguage}/${addOnName}.xlf
+    )
+    file (GLOB AddOnXLIFFFiles CONFIGURE_DEPENDS
+        ${addOnResourcesFolder}/ResourceLibrary/*/XLF/${addOnName}.xlf
+    )
 
     set (minimumPython3Version "3.8")
     if (NOT AddOnJSONResourceFiles STREQUAL "")

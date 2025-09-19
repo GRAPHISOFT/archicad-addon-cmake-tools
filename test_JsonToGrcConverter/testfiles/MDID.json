@@ -1,0 +1,24 @@
+{
+	"MDID": [
+		{
+			"#id": "1",
+			"name": "MDID Name",
+			"value1": "1",
+			"value2": "2"
+		},
+		{
+			"#id": "2",
+			"name": "MDID Name",
+			"#comment": "MDID Comment",
+			"value1": "1",
+			"value2": "2"
+		},
+		{
+			"#id": "3",
+			"name": "MDID Name",
+			"#condition": "+WINDOWS",
+			"value1": "1",
+			"value2": "2"
+		}
+	]
+}

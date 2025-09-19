@@ -1,0 +1,26 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ Ruler                       1    2    3    4 window 
+/* [  2] */ Ruler                       1    2    3    4 table 8 /* Ruler comment */
+#if defined (WINDOWS)
+/* [  3] */ Ruler                       1    2    3    4 window 
+#endif
+#if !defined (WINDOWS)
+/* [  3] */ Ruler                       1    2    3    4 window 
+#endif
+/* [  4] */ Ruler                       1    2    3    4 editor 8
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               Ruler_0
+2  ""                                               RulerAnchor_2
+#if defined (WINDOWS)
+3  ""                                               Ruler_1
+#endif
+#if !defined (WINDOWS)
+4  ""                                               Ruler_2
+#endif
+5  ""                                               Ruler_3
+}
+

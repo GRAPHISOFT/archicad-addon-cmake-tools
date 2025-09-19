@@ -1,0 +1,76 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"ProgressBar": {
+						"#id": "1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"minValue": 0,
+						"maxValue": 100
+					}
+				},
+				{
+					"ProgressBar": {
+						"#comment": "ProgressBar comment",
+						"#id": "2",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"minValue": 0,
+						"maxValue": 100,
+						"helpInfo": { "anchor": "ProgressBarAnchor_2" }
+					}
+				},
+				{
+					"ProgressBar": {
+						"#condition": "+WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"minValue": 0,
+						"maxValue": 100
+					}
+				},
+				{
+					"ProgressBar": {
+						"#condition": "+macintosh",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"minValue": 0,
+						"maxValue": 100
+					}
+				},
+				{
+					"ProgressBar": {
+						"#id": "4",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"minValue": 0,
+						"maxValue": 100,
+						"frameType": "staticEdge"
+					}
+				},
+				{
+					"ProgressBar": {
+						"#id": "5",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"minValue": 0,
+						"maxValue": 100,
+						"frameType": "clientEdge"
+					}
+				},
+				{
+					"ProgressBar": {
+						"#id": "6",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"minValue": 0,
+						"maxValue": 100,
+						"frameType": "modalFrame"
+					}
+				}
+			]
+		}
+	]
+}

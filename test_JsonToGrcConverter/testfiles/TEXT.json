@@ -1,0 +1,26 @@
+{
+	"TEXT": [
+		{
+			"#id": "1",
+			"name": "testDataFile.txt",
+			"fileName": {
+				"#value": "testDataFile.txt",
+				"#comment": "data comment"
+			}
+		},
+		{
+			"#id": "2",
+			"name": {
+				"str": "testDataFile.txt",
+				"dictId": "4b6a40f7-2fcf-41fa-8fb4-b470a8951d81"
+			},
+			"fileName": "testDataFile.txt"
+		},
+		{
+			"#id": "2",
+			"name": "testDataFile.txt",
+			"fileName": "testDataFile.txt",
+			"#condition": "+WINDOWS"
+		}
+	]
+}

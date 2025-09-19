@@ -1,0 +1,17 @@
+#include "DGDefs.h"
+
+'STR#' 1 "Test Strings" {
+#if !defined (GS_SOLO_VERSION) && !defined (GS_BTC_VERSION) && !defined (GS_START_VERSION)
+/* [  1] */ "Test String 1"
+#endif
+#if ( !defined (RUS__APP) && !defined (TUR__APP) ) && ( defined (GER__APP) || defined (CHE__APP) )
+/* [  2] */ "Test String 2"
+#endif
+#if defined (COMPILE_LOCALIZED_DLL) && ( defined (macintosh) )
+/* [  3] */ "Test String 3"
+#endif
+#if !defined (WINDOWS) && !defined (GS_ARM64)
+/* [  4] */ "Test String 4"
+#endif
+}
+

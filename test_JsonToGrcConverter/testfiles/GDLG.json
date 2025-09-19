@@ -1,0 +1,185 @@
+{
+	"GDLG": [
+		{
+			"#id": "6",
+			"type": "Modal",
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor6",
+			"controls": [
+				{
+					"LeftText": {
+						"#id": "1",
+						"text": "LeftText1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				}
+			]
+		},
+		{
+			"#id": "7",
+			"type": "Modal",
+			"name": "Dialog name",
+			"localized": "no",
+			"size": { "w": 100, "h": 200 },
+			"grow": "no",
+			"frame": "thick",
+			"anchor": "Dialog_anchor7",
+			"controls": [
+				{
+					"LeftText": {
+						"#id": "1",
+						"text": "LeftText1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				}
+			]
+		},
+		{
+			"#id": "8",
+			"type": "Modal",
+			"name": "Dialog name",
+			"size": { "w": 100, "h": 200 },
+			"grow": "h",
+			"frame": "normal",
+			"anchor": "Dialog_anchor8",
+			"controls": [
+				{
+					"LeftText": {
+						"#id": "1",
+						"text": "LeftText1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				}
+			]
+		},
+		{
+			"#id": "9",
+			"type": "Modal",
+			"name": "Dialog name",
+			"size": { "w": 100, "h": 200 },
+			"caption": "no",
+			"grow": "v",
+			"frame": "normal",
+			"anchor": "Dialog_anchor9",
+			"controls": [
+				{
+					"LeftText": {
+						"#id": "1",
+						"text": "LeftText1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				}
+			]
+		},
+		{
+			"#id": "10",
+			"type": "Modal",
+			"name": "Dialog name",
+			"size": { "w": 100, "h": 200 },
+			"grow": "hv",
+			"frame": "normal",
+			"anchor": "Dialog_anchor10",
+			"controls": [
+				{
+					"LeftText": {
+						"#id": "1",
+						"text": "LeftText1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				}
+			]
+		},
+		{
+			"#id": "11",
+			"type": "Palette",
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor11",
+			"controls": [
+				{
+					"LeftText": {
+						"#id": "1",
+						"text": "LeftText1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				}
+			]
+		},
+		{
+			"#id": "12",
+			"type": "Palette",
+			"name": "Dialog name",
+			"localized": "no",
+			"size": { "w": 100, "h": 200 },
+			"caption": "top",
+			"grow": "no",
+			"close": "yes",
+			"frame": "thick",
+			"anchor": "Dialog_anchor12",
+			"controls": [
+				{
+					"LeftText": {
+						"#id": "1",
+						"text": "LeftText1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				}
+			]
+		},
+		{
+			"#id": "13",
+			"type": "Palette",
+			"name": "Dialog name",
+			"size": { "w": 100, "h": 200 },
+			"caption": "left",
+			"grow": "h",
+			"close": "no",
+			"frame": "normal",
+			"anchor": "Dialog_anchor13",
+			"controls": [
+				{
+					"LeftText": {
+						"#id": "1",
+						"text": "LeftText1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				}
+			]
+		},
+		{
+			"#id": "14",
+			"type": "Palette",
+			"name": "Dialog name",
+			"size": { "w": 100, "h": 200 },
+			"caption": "no",
+			"grow": "v",
+			"frame": "normal",
+			"anchor": "Dialog_anchor14",
+			"controls": [
+				{
+					"LeftText": {
+						"#id": "1",
+						"text": "LeftText1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				}
+			]
+		},
+		{
+			"#id": "15",
+			"type": "Palette",
+			"name": "Dialog name",
+			"size": { "w": 100, "h": 200 },
+			"grow": "hv",
+			"anchor": "Dialog_anchor15",
+			"controls": [
+				{
+					"LeftText": {
+						"#id": "1",
+						"text": "LeftText1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				}
+			]
+		}
+	]
+}

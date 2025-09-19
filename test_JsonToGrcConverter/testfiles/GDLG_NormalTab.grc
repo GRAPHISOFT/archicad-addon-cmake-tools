@@ -1,0 +1,33 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ NormalTab                   1    2    3    4
+            1 NoIcon "Tab 1"
+/* [  2] */ NormalTab                   1    2    3    4 /* NormalTab comment */
+            1 NoIcon "Tab 1"
+#if defined (WINDOWS)
+/* [  3] */ NormalTab                   1    2    3    4
+            1 NoIcon "Tab 1"
+#endif
+#if !defined (WINDOWS)
+/* [  3] */ NormalTab                   1    2    3    4
+            1 NoIcon "Tab 1"
+#endif
+/* [  4] */ NormalTab                   1    2    3    4
+            1 NoIcon "Tab 1"
+            2 NoIcon "Tab 2"
+            3 NoIcon "Tab 2" /* item comment */
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               NormalTab_0
+2  ""                                               NormalTabAnchor_2
+#if defined (WINDOWS)
+3  ""                                               NormalTab_1
+#endif
+#if !defined (WINDOWS)
+4  ""                                               NormalTab_2
+#endif
+5  ""                                               NormalTab_3
+}
+

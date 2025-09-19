@@ -1,0 +1,18 @@
+#include "DGDefs.h"
+
+#define DIALOG_ID                                               1
+#define DIALOG_ANCHOR                                    Anchor_2
+#define STR_ID                                                  1
+
+'GDLG' DIALOG_ID Modeless |noGrow 0 0 100 200 "" {
+/* [  1] */ LeftText                    1    2    3    4 LargePlain vTop | noTrunc Default "LeftText1"
+}
+
+'DLGH' DIALOG_ID DIALOG_ANCHOR {
+1  ""                                               LeftText_0
+}
+
+'STR#' STR_ID "Test Strings" {
+/* [  1] */ "Test String 1"
+}
+

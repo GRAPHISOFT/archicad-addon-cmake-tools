@@ -1,0 +1,80 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"UniRichEdit": {
+						"#id": "1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"scroll": "no"
+					}
+				},
+				{
+					"UniRichEdit": {
+						"#comment": "UniRichEdit comment",
+						"#id": "2",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"scroll": "no",
+						"helpInfo": { "anchor": "UniRichEditAnchor_2" }
+					}
+				},
+				{
+					"UniRichEdit": {
+						"#condition": "+WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"scroll": "no"
+					}
+				},
+				{
+					"UniRichEdit": {
+						"#condition": "+macintosh",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"scroll": "v",
+						"resize": "noAuto"
+					}
+				},
+				{
+					"UniRichEdit": {
+						"#id": "4",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "largeItalic",
+						"frame": "yes",
+						"readOnly": "yes",
+						"scroll": "no",
+						"resize": "auto",
+						"wrap": "word"
+					}
+				},
+				{
+					"UniRichEdit": {
+						"#id": "5",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"frame": "no",
+						"readOnly": "no",
+						"scroll": "hv",
+						"resize": "noAuto",
+						"wrap": "eof"
+					}
+				},
+				{
+					"UniRichEdit": {
+						"#id": "6",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"frame": "no",
+						"readOnly": "no",
+						"scroll": "v",
+						"resize": "noAuto",
+						"wrap": "word"
+					}
+				}
+			]
+		}
+	]
+}

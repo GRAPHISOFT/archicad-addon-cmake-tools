@@ -1,0 +1,28 @@
+{
+	"DHLP": [
+		{
+			"#id": "1",
+			"items": [
+				{ "tooltipStr": "Tooltip 1", "anchorStr": "Anchor_1" },
+				{ "tooltipStr": "Tooltip 2", "anchorStr": "Anchor_2" }
+			]
+		},
+		{
+			"#id": "2",
+			"localized": "no",
+			"#comment": "DHLP comment",
+			"items": [
+				{ "tooltipStr": "Tooltip 1", "anchorStr": "Anchor_3" },
+				{ "tooltipStr": "Tooltip 2", "anchorStr": "Anchor_4", "#comment": "Item comment" }
+			]
+		},
+		{
+			"#id": "3",
+			"#condition": "+WINDOWS",
+			"items": [
+				{ "tooltipStr": "Tooltip 1", "anchorStr": "Anchor_5" },
+				{ "tooltipStr": "Tooltip 2", "anchorStr": "Anchor_6" }
+			]
+		}
+	]
+}

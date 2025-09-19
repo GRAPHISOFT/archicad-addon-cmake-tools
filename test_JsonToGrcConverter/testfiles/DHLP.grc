@@ -1,0 +1,19 @@
+#include "DGDefs.h"
+
+'DHLP' 1 {
+/* [  0] */ "Tooltip 1"                                      Anchor_1
+/* [  1] */ "Tooltip 2"                                      Anchor_2
+}
+
+'DHLP' 2 { /* DHLP comment */
+/* [  0] */ "Tooltip 1"                                      Anchor_3
+/* [  1] */ "Tooltip 2"                                      Anchor_4 /* Item comment */
+}
+
+#if defined (WINDOWS)
+'DHLP' 3 {
+/* [  0] */ "Tooltip 1"                                      Anchor_5
+/* [  1] */ "Tooltip 2"                                      Anchor_6
+}
+#endif
+

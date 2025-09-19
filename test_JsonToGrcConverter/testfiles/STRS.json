@@ -1,0 +1,30 @@
+{
+	"STRS": [
+		{
+			"#id": "1",
+			"name": "Test Strings",
+			"items": [
+				{ "#id": "1", "text": "Test String 1" },
+				{ "#id": "2", "text": { "str": "Test String 2", "dictId": "358657a6-c08f-449b-a53e-2f833602d285" } },
+				{ "#id": "3", "text": "Test String 3", "#comment": "Test Comment" },
+				{ "#id": "4", "text": "Test String 4" }
+			]
+		},
+		{
+			"#comment": "Strs comment",
+			"#id": "2",
+			"name": "Test Strings",
+			"items": [
+				{ "#id": "1", "text": "Test String 1" }
+			]
+		},
+		{
+			"#id": "3",
+			"name": "Test Strings",
+			"#condition": "+WINDOWS",
+			"items": [
+				{ "#id": "1", "text": "Test String 1" }
+			]
+		}
+	]
+}

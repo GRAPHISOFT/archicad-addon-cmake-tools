@@ -1,0 +1,73 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"IconRadioButton": {
+						"#id": "1",
+						"iconId": "-1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"groupId": 8
+					}
+				},
+				{
+					"IconRadioButton": {
+						"#comment": "Icon comment",
+						"#id": "2",
+						"iconId": "DGInfoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"groupId": 8,
+						"helpInfo": { "anchor": "IconAnchor_2" }
+					}
+				},
+				{
+					"IconRadioButton": {
+						"#condition": "+WINDOWS",
+						"#id": "3",
+						"iconId": "DGInfoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"groupId": 8
+					}
+				},
+				{
+					"IconRadioButton": {
+						"#condition": "+macintosh",
+						"#id": "3",
+						"iconId": "DGNoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"groupId": 8
+					}
+				},
+				{
+					"IconRadioButton": {
+						"#id": "4",
+						"iconId": "DGErrorIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"groupId": 8
+					}
+				},
+				{
+					"IconRadioButton": {
+						"#id": "5",
+						"iconId": "DGInfoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"groupId": 8
+					}
+				},
+				{
+					"IconRadioButton": {
+						"#id": "6",
+						"iconId": "DGInfoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"groupId": 8
+					}
+				}
+			]
+		}
+	]
+}

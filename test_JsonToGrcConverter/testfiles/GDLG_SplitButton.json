@@ -1,0 +1,89 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"SplitButton": {
+						"#id": "1",
+						"text": "SplitButton1",
+						"iconId": "DGNoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				},
+				{
+					"SplitButton": {
+						"#comment": "SplitButton comment",
+						"#id": "2",
+						"text": "SplitButton2",
+						"iconId": "DGNoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"helpInfo": { "anchor": "SplitButtonAnchor_2" }
+					}
+				},
+				{
+					"SplitButton": {
+						"#id": "3",
+						"text": { "str": "SplitButton3", "dictId": "0a6ed30c-f595-4161-bd9a-3f1809ab1142" },
+						"iconId": "DGNoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "extraSmall",
+						"appearance": "roundedEdge"
+					}
+				},
+				{
+					"SplitButton": {
+						"#id": "3",
+						"text": "SplitButton3",
+						"iconId": "DGNoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "smallPlain",
+						"appearance": "squaredEdge"
+					}
+				},
+				{
+					"SplitButton": {
+						"#condition": "+WINDOWS",
+						"#id": "4",
+						"text": "SplitButton4_WIN",
+						"iconId": "DGNoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "smallItalic"
+					}
+				},
+				{
+					"SplitButton": {
+						"#condition": "-WINDOWS",
+						"#id": "4",
+						"text": "SplitButton4_MAC",
+						"iconId": "DGNoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "smallItalic"
+					}
+				},
+				{
+					"SplitButton": {
+						"#id": "5",
+						"text": "SplitButton5",
+						"iconId": "DGNoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "smallUnderline"
+					}
+				},
+				{
+					"SplitButton": {
+						"#id": "6",
+						"text": "SplitButton6",
+						"iconId": "DGNoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "largeOutline"
+					}
+				}
+			]
+		}
+	]
+}

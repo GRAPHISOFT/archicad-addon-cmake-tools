@@ -1,0 +1,64 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"SimpleTab": {
+						"#id": "1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"items": [
+							{ "pageId": "1" }
+						]
+					}
+				},
+				{
+					"SimpleTab": {
+						"#comment": "SimpleTab comment",
+						"#id": "2",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"items": [
+							{ "pageId": "1" }
+						],
+						"helpInfo": { "anchor": "SimpleTabAnchor_2" }
+					}
+				},
+				{
+					"SimpleTab": {
+						"#condition": "+WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"items": [
+							{ "pageId": "1" }
+						]
+					}
+				},
+				{
+					"SimpleTab": {
+						"#condition": "-WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"items": [
+							{ "pageId": "1" }
+						]
+					}
+				},
+				{
+					"SimpleTab": {
+						"#id": "4",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"items": [
+							{ "pageId": "1" },
+							{ "pageId": "2" },
+							{ "#comment": "item comment", "pageId": "3" }
+						]
+					}
+				}
+			]
+		}
+	]
+}

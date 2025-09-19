@@ -1,0 +1,16 @@
+#include "DGDefs.h"
+
+'FILE' 1 "testDataFile.txt" {
+    "testDataFile.txt"
+}
+
+'FILE' 2 "testDataFile.txt" {
+    "testDataFile.txt"
+}
+
+#if !defined (macintosh)
+'FILE' 2 "testDataFile.txt" {
+    "testDataFile.txt"
+}
+#endif
+

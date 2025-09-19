@@ -1,0 +1,92 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"SingleSelList": {
+						"#id": "1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"partialItems": "yes",
+						"itemHeight": 80
+					}
+				},
+				{
+					"SingleSelList": {
+						"#comment": "SingleSelList comment",
+						"#id": "2",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"partialItems": "yes",
+						"itemHeight": 80,
+						"helpInfo": { "anchor": "SingleSelListAnchor_2" }
+					}
+				},
+				{
+					"SingleSelList": {
+						"#condition": "+WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"partialItems": "yes",
+						"itemHeight": 80
+					}
+				},
+				{
+					"SingleSelList": {
+						"#condition": "-WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"partialItems": "yes",
+						"itemHeight": 80
+					}
+				},
+				{
+					"SingleSelList": {
+						"#comment": "SingleSelList comment",
+						"#id": "4",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "largeBold",
+						"partialItems": "yes",
+						"scroll": "h",
+						"itemHeight": 80,
+						"header": "yes",
+						"headerHeight": 30,
+						"frame": "yes",
+						"helpInfo": { "anchor": "SingleSelListAnchor_4" }
+					}
+				},
+				{
+					"SingleSelList": {
+						"#id": "5",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "largeUnderline",
+						"partialItems": "no",
+						"scroll": "v",
+						"itemHeight": 80
+					}
+				},
+				{
+					"SingleSelList": {
+						"#id": "6",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"partialItems": "no",
+						"scroll": "hv",
+						"itemHeight": 80
+					}
+				},
+				{
+					"SingleSelList": {
+						"#id": "7",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"partialItems": "no",
+						"scroll": "no",
+						"itemHeight": 80
+					}
+				}
+			]
+		}
+	]
+}

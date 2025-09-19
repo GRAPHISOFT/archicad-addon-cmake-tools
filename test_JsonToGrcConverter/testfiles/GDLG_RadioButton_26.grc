@@ -1,0 +1,28 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ RadioButton                 1    2    3    4 LargePlain 8 "RadioButton Text1"
+/* [  2] */ RadioButton                 1    2    3    4 LargePlain 8 "RadioButton Text" /* RadioButton comment */
+#if defined (WINDOWS)
+/* [  3] */ RadioButton                 1    2    3    4 LargePlain 8 "RadioButton Text"
+#endif
+#if defined (macintosh)
+/* [  3] */ RadioButton                 1    2    3    4 LargePlain 8 "RadioButton Text"
+#endif
+/* [  4] */ RadioButton                 1    2    3    4 LargePlain 8 "RadioButton Text"
+/* [  4] */ RadioButton                 1    2    3    4 LargePlain 8 "RadioButton Text"
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               RadioButton_0
+2  ""                                               RadioButtonAnchor_2
+#if defined (WINDOWS)
+3  ""                                               RadioButton_1
+#endif
+#if defined (macintosh)
+4  ""                                               RadioButton_2
+#endif
+5  ""                                               RadioButton_3
+6  ""                                               RadioButton_4
+}
+
