@@ -362,7 +362,7 @@ class MacResourceCompiler (ResourceCompiler):
             resultLocalizedResourcePath.mkdir (parents=True)
         resultLocalizableStringsPath = resultLocalizedResourcePath / 'Localizable.strings'
         resultLocalizableStringsFile = codecs.open (resultLocalizableStringsPath, 'w', 'utf-16')
-        for fileName in self.resourceObjectsPath.iterdir ():
+        for fileName in self.resourceObjectsPath.rglob ('*'):
             filePath = self.resourceObjectsPath / fileName
             extension = fileName.suffix.lower ()
             if extension == '.tif':
