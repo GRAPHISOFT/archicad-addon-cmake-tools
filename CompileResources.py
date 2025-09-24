@@ -64,7 +64,7 @@ class ResourceCompiler (object):
             '-o', self.resourceObjectsPath / f'{jsonFilePath.name}.valid',
             '--schemaFolder', self.devKitPath / 'Tools' / 'SchemaFiles',
         ])
-        assert schemaValidationResult == 0, 'JSON Schema validation command failed: ' + jsonFilePath
+        assert schemaValidationResult == 0, f'JSON Schema validation command failed: {jsonFilePath}'
 
         translatedJsonPath = jsonFilePath
 
@@ -86,7 +86,7 @@ class ResourceCompiler (object):
                         '--parentXliff', parentXliffPath,
                         '-o', mergedXliffOutputPath
                     ])
-                    assert mergeParentChildXliffResult == 0, 'Merge parent child XLIFF command failed: ' +  jsonFilePath
+                    assert mergeParentChildXliffResult == 0, f'Merge parent child XLIFF command failed: {jsonFilePath}'
                     xliffFileToTranslateWith = mergedXliffOutputPath
                 else:
                     xliffFileToTranslateWith = childXliffPath
@@ -103,7 +103,7 @@ class ResourceCompiler (object):
             if self.permissiveLocalization:
                 xliffTranslationCommand.append ('--permissive')
             xliffTranslationResult = subprocess.call (xliffTranslationCommand)
-            assert xliffTranslationResult == 0, 'XLIFF translation command failed: ' +  jsonFilePath
+            assert xliffTranslationResult == 0, f'XLIFF translation command failed: {jsonFilePath}'
 
         envForJson = os.environ.copy ()
         if platform.system () == 'Windows':
@@ -135,7 +135,7 @@ class ResourceCompiler (object):
 
         nativeResCreationResult = subprocess.call (nativeResCreationCommand, env=envForJson)
 
-        assert nativeResCreationResult == 0, 'Native resource creation command failed: ' + translatedJsonPath
+        assert nativeResCreationResult == 0, f'Native resource creation command failed: {translatedJsonPath}'
 
         postCheckersCommand = [
             sys.executable,
@@ -146,13 +146,13 @@ class ResourceCompiler (object):
         if localized:
             postCheckersCommand.append ('--localized')
         postCheckersResult = subprocess.call (postCheckersCommand)
-        assert postCheckersResult == 0, 'Post-checkers command failed: ' + jsonFilePath
+        assert postCheckersResult == 0, f'Post-checkers command failed: {jsonFilePath}'
 
     def CompileLocalizedResources (self) -> None:
         locResourcesFolder = self.resourcesPath / f'R{self.languageCode}'
         grcFiles = locResourcesFolder.glob ('*.grc')
         for grcFilePath in grcFiles:
-            assert self.CompileGRCResourceFile (grcFilePath), 'Failed to compile resource: ' + grcFilePath
+            assert self.CompileGRCResourceFile (grcFilePath), f'Failed to compile resource: {grcFilePath}'
 
         locResourcesFolderDefault = self.resourcesPath / f'R{self.defaultLanguageCode}'
         jsonFiles = locResourcesFolderDefault.glob ('*.json')
@@ -163,7 +163,7 @@ class ResourceCompiler (object):
         fixResourcesFolder = self.resourcesPath / 'RFIX'
         grcFiles = fixResourcesFolder.glob ('*.grc')
         for grcFilePath in grcFiles:
-            assert self.CompileGRCResourceFile (grcFilePath), 'Failed to compile resource: ' + grcFilePath
+            assert self.CompileGRCResourceFile (grcFilePath), f'Failed to compile resource: {grcFilePath}'
 
         jsonFiles = fixResourcesFolder.glob ('*.json')
         for jsonFilePath in jsonFiles:
@@ -225,7 +225,7 @@ class WinResourceCompiler (ResourceCompiler):
             '/Fi{}'.format (precompiledGrcFilePath),
             grcFilePath,
         ])
-        assert result == 0, 'Failed to precompile resource ' + grcFilePath
+        assert result == 0, f'Failed to precompile resource {grcFilePath}'
         return precompiledGrcFilePath
 
     def CompileGRCResourceFile (self, grcFilePath: Path) -> bool:
@@ -253,7 +253,7 @@ class WinResourceCompiler (ResourceCompiler):
             '/fo', resultResourcePath,
             nativeResourceFile
         ])
-        assert result == 0, 'Failed to compile native resource ' + nativeResourceFile
+        assert result == 0, f'Failed to compile native resource {nativeResourceFile}'
 
 class MacResourceCompiler (ResourceCompiler):
     def __init__ (self, devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path, permissiveLocalization: bool):
@@ -282,7 +282,7 @@ class MacResourceCompiler (ResourceCompiler):
             '-o', precompiledGrcFilePath,
             grcFilePath,
         ])
-        assert result == 0, 'Failed to precompile resource ' + grcFilePath
+        assert result == 0, f'Failed to precompile resource {grcFilePath}'
         return precompiledGrcFilePath
 
     def CompileGRCResourceFile (self, grcFilePath: Path) -> bool:
