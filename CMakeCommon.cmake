@@ -196,7 +196,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
         message (FATAL_ERROR "Language '${addOnLanguage}' is not among the configured languages in config.json.")
     endif ()
 
-    set (ResourceObjectsDir ${CMAKE_BINARY_DIR}/ResourceObjects)
+    set (ResourceObjectsDir "${CMAKE_CURRENT_BINARY_DIR}/ResourceObjects")
     set (ResourceStampFile "${ResourceObjectsDir}/AddOnResources.stamp")
 
     file (GLOB AddOnImageFiles CONFIGURE_DEPENDS
