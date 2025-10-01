@@ -10,8 +10,8 @@ import json
 import pathlib
 from pathlib import Path
 
-class ResourceCompiler (object):
-    def __init__ (self, devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path, permissiveLocalization: bool):
+class Compiler (object):
+    def __init__ (self, devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path):
         self.devKitPath = devKitPath
         self.acVersion = acVersion
         self.buildNum = buildNum
@@ -21,10 +21,7 @@ class ResourceCompiler (object):
         self.sourcesPath = sourcesPath
         self.resourcesPath = resourcesPath
         self.resourceObjectsPath = resourceObjectsPath
-        self.permissiveLocalization = permissiveLocalization
-        self.resConvPath = None
-        self.nativeResourceFileExtension = None
-    
+
     def GetPlatformDevKitLinkKey (self) -> str:
         return ""
 
@@ -43,6 +40,13 @@ class ResourceCompiler (object):
             build_number = devkit_verison_regex.group(2)
 
         return (int (main_version), int (build_number))
+
+class ResourceCompiler (Compiler):
+    def __init__ (self, devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path, permissiveLocalization: bool):
+        super (ResourceCompiler, self).__init__ (devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath)
+        self.permissiveLocalization = permissiveLocalization
+        self.resConvPath = None
+        self.nativeResourceFileExtension = None
 
     def IsValid (self) -> bool:
         if self.resConvPath is None:
@@ -170,7 +174,12 @@ class ResourceCompiler (object):
             self.CompileJSONResourceFile (jsonFilePath, localized=False)
 
     def RunResConv (self, platformSign: str, codepage: str, inputFilePath: Path) -> bool:
-        imageResourcesFolder = self.resourcesPath / 'RFIX' / 'Images'
+        with open(inputFilePath, 'r', encoding='utf-8', errors='ignore') as f:
+            file_content = f.read()
+        if 'FILE' in file_content and '.gsm' in file_content:
+            imageResourcesFolder = self.resourceObjectsPath
+        else:
+            imageResourcesFolder = self.resourcesPath / 'RFIX' / 'Images'
         inputFileBaseName = inputFilePath.stem
         nativeResourceFilePath = self.resourceObjectsPath / (inputFileBaseName + self.nativeResourceFileExtension)
         colorChangeScriptPath = self.resConvPath.parent / 'SVGColorChange.py'
@@ -308,6 +317,84 @@ class MacResourceCompiler (ResourceCompiler):
                 stringsFile.close ()
         resultLocalizableStringsFile.close ()
 
+
+def CreateResourceCompiler(devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path, permissiveLocalization: bool) -> ResourceCompiler:
+    """Create and return the appropriate resource compiler based on the current platform."""
+    system = platform.system()
+
+    if system == 'Windows':
+        return WinResourceCompiler(devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization)
+    elif system == 'Darwin':
+        return MacResourceCompiler(devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization)
+    else:
+        raise RuntimeError('Platform is not supported')
+
+
+class LibraryCompiler (Compiler):
+    def __init__ (self, devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path):
+        super (LibraryCompiler, self).__init__ (devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath)
+        self.libToolPath = None
+        self.libSourcePath = resourcesPath / f'R{self.defaultLanguageCode}' / 'ACLib' / 'Src'
+
+    def IsValid (self) -> bool:
+        if self.libToolPath is None:
+            return False
+        if not self.libToolPath.exists ():
+            return False
+        return True
+
+    def GetPlatformDevKitLinkKey (self) -> str:
+        return ""
+
+    def GetPlatformDefine (self) -> str:
+        return ""
+
+    def CompileLibrary (self) -> None:
+        if self.libSourcePath.is_dir():
+            command = [
+                self.libToolPath,
+                'hsf2l',
+                str(self.libSourcePath),
+                str(self.resourceObjectsPath)
+            ]
+
+            result = subprocess.call(command)
+            assert result == 0, 'Failed to create library ' + str(subfolder)
+
+class MacLibraryCompiler (LibraryCompiler):
+    def __init__ (self, devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path):
+        super (MacLibraryCompiler, self).__init__ (devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath)
+        self.libToolPath = devKitPath / 'Tools' / 'OSX' / 'MakeGDLLib' / 'LP_XMLConverter.app' / 'Contents' / 'MacOS' / 'LP_XMLConverter'
+
+    def GetPlatformDevKitLinkKey(self) -> str:
+        return "MAC"
+
+    def GetPlatformDefine (self) -> str:
+        return 'macintosh'
+
+class WinLibraryCompiler (LibraryCompiler):
+    def __init__ (self, devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path):
+        super (WinLibraryCompiler, self).__init__ (devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath)
+        self.libToolPath = devKitPath / 'Tools' / 'Win' / 'LP_XMLConverter.exe'
+
+    def GetPlatformDevKitLinkKey(self) -> str:
+        return "WIN"
+
+    def GetPlatformDefine (self) -> str:
+        return 'WINDOWS'
+
+def CreateLibraryCompiler(devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path) -> LibraryCompiler:
+    """Create and return the appropriate library compiler based on the current platform."""
+    system = platform.system()
+
+    if system == 'Windows':
+        return WinLibraryCompiler(devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath)
+    elif system == 'Darwin':
+        return MacLibraryCompiler(devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath)
+    else:
+        raise RuntimeError('Platform is not supported')
+
+
 def Main (argv):
     parser = argparse.ArgumentParser (description = 'Archicad Add-On Resource Compiler.')
     parser.add_argument ('addonName', help = 'Name of the Add-On.')
@@ -338,14 +425,11 @@ def Main (argv):
     resultResourcePath = Path (args.resultResourcePath)
     permissiveLocalization = args.permissiveLocalization
 
-    resourceCompiler = None
-    system = platform.system ()
-    if system == 'Windows':
-        resourceCompiler = WinResourceCompiler (devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization)
-    elif system == 'Darwin':
-        resourceCompiler = MacResourceCompiler (devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization)
+    objectCompiler = CreateLibraryCompiler(devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath)
+    if objectCompiler.IsValid ():           # older devkits may not have the library compiler
+        objectCompiler.CompileLibrary()
 
-    assert resourceCompiler, 'Platform is not supported'
+    resourceCompiler = CreateResourceCompiler(devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization)
     assert resourceCompiler.IsValid (), 'Invalid resource compiler'
 
     resourceCompiler.CompileLocalizedResources ()

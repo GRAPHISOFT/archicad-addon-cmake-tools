@@ -217,6 +217,12 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
             ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/*.py
         )
     endif ()
+    # Find all GDL objects and iterate through their folders to properly include images, scripts and XML files
+    file (GLOB_RECURSE AddOnLibFiles CONFIGURE_DEPENDS
+        ${addOnResourcesFolder}/R${addOnLanguage}/ACLib/Src/*/images/*.svg
+        ${addOnResourcesFolder}/R${addOnLanguage}/ACLib/Src/*/scripts/*.gdl
+        ${addOnResourcesFolder}/R${addOnLanguage}/ACLib/Src/*/*.xml
+    )
 
     if (acVersion GREATER_EQUAL "30")
         file (GLOB AddOnJSONResourceFiles CONFIGURE_DEPENDS
@@ -253,7 +259,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
     if (WIN32)
         add_custom_command (
             OUTPUT ${ResourceStampFile}
-            DEPENDS ${AddOnResourceFiles} ${AddOnImageFiles} ${AddOnJSONResourceFiles} ${AddOnXLIFFFiles}
+            DEPENDS ${AddOnResourceFiles} ${AddOnImageFiles} ${AddOnJSONResourceFiles} ${AddOnXLIFFFiles} ${AddOnLibFiles}
             COMMENT "Compiling resources..."
             COMMAND ${CMAKE_COMMAND} -E make_directory "${ResourceObjectsDir}"
             COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/CompileResources.py"
@@ -273,7 +279,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
     else ()
         add_custom_command (
             OUTPUT ${ResourceStampFile}
-            DEPENDS ${AddOnResourceFiles} ${AddOnImageFiles} ${AddOnJSONResourceFiles} ${AddOnXLIFFFiles}
+            DEPENDS ${AddOnResourceFiles} ${AddOnImageFiles} ${AddOnJSONResourceFiles} ${AddOnXLIFFFiles} ${AddOnLibFiles}
             COMMENT "Compiling resources..."
             COMMAND ${CMAKE_COMMAND} -E make_directory "${ResourceObjectsDir}"
             COMMAND ${Python3_EXECUTABLE} "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/CompileResources.py"
