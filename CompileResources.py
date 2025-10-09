@@ -242,7 +242,7 @@ class ResourceCompiler (object):
         ]
 
         devkit_main_version, devkit_build_number= self.GetDevKitVersionAndBuildNumber ()
-        if (devkit_main_version == 29 and devkit_build_number >= 3000) or (devkit_main_version == 30 and devkit_build_number >= 100):
+        if (devkit_main_version == 29 and devkit_build_number >= 3000) or (devkit_main_version == 30 and devkit_build_number >= 82) or (devkit_main_version > 30):
             call_params.extend (['-py', sys.executable])        # python executable
             call_params.extend (['-sc', colorChangeScriptPath]) # SVG color change script path for generating Dark Mode icons
         result = subprocess.call (call_params)
