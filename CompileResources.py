@@ -58,11 +58,14 @@ class ResourceCompiler (object):
         grcFileName = grcFilePath.name
         return self.resourceObjectsPath / f'{grcFileName}.i'
 
+    def GetNormalizedAddonName (self, addonName: str) -> str:
+        return addonName.replace (' ', '_')
+
     def GetXliffPathForLanguage (self, languageCode: str) -> Path:
         if languageCode == self.defaultLanguageCode:
-            return self.resourcesPath / f'R{self.defaultLanguageCode}' / f'{self.addonName}.xlf'
+            return self.resourcesPath / f'R{self.defaultLanguageCode}' / f'{self.GetNormalizedAddonName (self.addonName)}.xlf'
         else:
-            return self.resourcesPath / 'ResourceLibrary' / languageCode / 'XLF' / f'{self.addonName}.xlf'
+            return self.resourcesPath / 'ResourceLibrary' / languageCode / 'XLF' / f'{self.GetNormalizedAddonName (self.addonName)}.xlf'
 
     def GetParentXliffPath (self) -> Path | None:
         parentTxtPath = self.resourcesPath / 'ResourceLibrary' / self.languageCode / 'XLF' / '_parent.txt'
@@ -110,7 +113,7 @@ class ResourceCompiler (object):
             childXliffPath = self.GetXliffPathForLanguage (self.languageCode)
             parentXliffPath = self.GetParentXliffPath ()
             if parentXliffPath:
-                mergedXliffOutputPath = self.resourceObjectsPath / f'{self.addonName}.merged.xlf'
+                mergedXliffOutputPath = self.resourceObjectsPath / f'{self.GetNormalizedAddonName (self.addonName)}.merged.xlf'
                 mergeParentChildXliffResult = subprocess.call ([
                     sys.executable,
                     jsonResourceProcessorPath / 'MergeParentChildXliff.py',
@@ -128,7 +131,7 @@ class ResourceCompiler (object):
                 sys.executable,
                 jsonResourceProcessorPath / 'XliffJsonTranslator.py',
                 '-i', jsonFilePath,
-                '-m', self.addonName,
+                '-m', self.GetNormalizedAddonName (self.addonName),
                 '-d', xliffFileToTranslateWith,
                 '-o', translatedJsonPath,
             ]
