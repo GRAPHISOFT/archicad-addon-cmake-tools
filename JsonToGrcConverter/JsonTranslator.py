@@ -54,7 +54,8 @@ def TranslateJson (data, translations: dict[str, str]) -> None:
     if isinstance (data, dict):
         if 'dictId' in data:
             (leading, trailing) = GetTrailingAndLeadingWhitespaces (data['str'])
-            data['str'] = leading + translations[data['dictId']] + trailing
+            result = translations[data['dictId']].replace ('\\n', '\n')
+            data['str'] = leading + result + trailing
 
         for value in data.values ():
             TranslateJson (value, translations)
