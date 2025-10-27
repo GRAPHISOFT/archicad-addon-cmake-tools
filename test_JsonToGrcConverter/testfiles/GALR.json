@@ -2,7 +2,7 @@
 	"GALR": [
 		{
 			"#id": "1",
-			"iconId": "DGWarningIcon",
+			"iconId": "DGInfoIcon",
 			"name": { "str": "Alert Name", "dictId": "84a8c044-d64f-4dfd-b656-cdc24d7100ee" },
 			"largeText": { "str": "Large Text", "localized": "no" },
 			"smallText": "Small Text",
@@ -23,7 +23,7 @@
 		},
 		{
 			"#id": "3",
-			"iconId": "DGWarningIcon",
+			"iconId": "DGErrorIcon",
 			"name": { "str": "Alert Name", "dictId": "4f9994f7-6733-4ef4-99b5-0e4969f649f2" },
 			"largeText": { "str": "Large Text", "dictId": "9b74faa0-e4a8-4b1b-9139-1514cc0a0024" },
 			"smallText": "Small Text",

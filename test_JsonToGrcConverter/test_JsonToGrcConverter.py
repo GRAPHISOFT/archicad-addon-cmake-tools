@@ -6,6 +6,7 @@ import subprocess
 import shutil
 import platform
 import os
+import sys
 
 """
 By default this test only compares the converted GRC file to a reference GRC file.
@@ -13,8 +14,8 @@ If the APIDEVKIT_DIR and APIDEVKIT_VERSION environment variables are set, the te
 On Windows this requires the Developer Command Prompt (or Powershell) for VS to be used to run the tests (to find cl.exe).
 
 Using Developer Powershell for VS:
-$env:APIDEVKIT_DIR="C:/Dev/DevMain/Bin.Win/Programs_VS_64.dev/APIDevKit"
-$env:APIDEVKIT_VERSION="30"
+$env:APIDEVKIT_DIR="C:/Dev/API.Development.Kit.WIN.29.3000"
+$env:APIDEVKIT_VERSION="29"
 py -3 -m unittest
 """
 APIDEVKIT_DIR: str | None = None
@@ -60,7 +61,7 @@ def PreprocessGrc (inputFile: str, outputFile: str) -> None:
     subprocess.run (args, check=True)
 
 
-def RunResConv (inputFile: str, outputFile: str, includePath: str) -> None:
+def RunResConv (inputFile: str, outputFile: str, includePath: str, targetAcVersion: int) -> None:
     if platform.system () == 'Windows':
         resConvPath = Path (APIDEVKIT_DIR) / 'Support' / 'Tools' / 'Win' / 'ResConv.exe'
         platformSign = 'W'
@@ -80,6 +81,11 @@ def RunResConv (inputFile: str, outputFile: str, includePath: str) -> None:
         '-i', inputFile,
         '-o', outputFile,
     ]
+
+    if targetAcVersion >= 29:
+        args.extend (['-py', sys.executable])
+        args.extend (['-sc', resConvPath.parent / 'SVGColorChange.py'])
+
     subprocess.run (args, check=True)
 
 
@@ -91,6 +97,7 @@ class TestJsonToGrcConverter (unittest.TestCase):
             APIDEVKIT_DIR = os.environ['APIDEVKIT_DIR']
             global APIDEVKIT_VERSION
             APIDEVKIT_VERSION = os.environ['APIDEVKIT_VERSION']
+            assert Path (APIDEVKIT_DIR).is_dir (), f'APIDEVKIT_DIR environment variable is not set to a valid directory: "{APIDEVKIT_DIR}"'
         
         self.tempDirectory = Path (__file__).parent / 'TEMP_TEST_OUTPUT'
         self.tempDirectory.mkdir (parents=True, exist_ok=True)
@@ -124,7 +131,7 @@ class TestJsonToGrcConverter (unittest.TestCase):
 
             nativeResource = actualGrcOutputPath.with_suffix ('.rc2')
             includePath = Path (referenceGrcPath).parent
-            RunResConv (str (preprocessedGrc), str (nativeResource), str (includePath))
+            RunResConv (str (preprocessedGrc), str (nativeResource), str (includePath), targetAcVersion)
 
     def RunTestCase (self, inputJson: Path, referenceGrc: Path) -> None:
         for targetAcVersion in TARGET_AC_VERSIONS:

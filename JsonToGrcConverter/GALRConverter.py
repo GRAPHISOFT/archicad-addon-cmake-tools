@@ -8,9 +8,23 @@ from .Common import (
     GrcOutputBuilder,
 )
 
+
+def ConvertGALRIconId (iconIdStr: str) -> str:
+    mapping = {
+        'DGErrorIcon': 'DG_ERROR',
+        'DGInfoIcon': 'DG_INFORMATION',
+        'DGWarningIcon': 'DG_WARNING',
+    }
+
+    if iconIdStr in mapping:
+        return mapping[iconIdStr]
+    else:
+        return ConvertIconId (iconIdStr)
+
+
 def ConvertGALR (outputBuilder: GrcOutputBuilder, resource: dict, targetAcVersion: int) -> None:
     resId = resource.pop ('#id')
-    iconId = ConvertIconId (resource.pop ('iconId'))
+    iconId = ConvertGALRIconId (resource.pop ('iconId'))
     name = ConvertToEscapedString (resource.pop ('name', None))
     largeText = ConvertToEscapedString (resource.pop ('largeText'))
     smallText = ConvertToEscapedString (resource.pop ('smallText'))
