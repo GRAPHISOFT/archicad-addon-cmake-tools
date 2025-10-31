@@ -4,6 +4,7 @@ import requests
 import zipfile
 import subprocess
 import sys
+import stat
 import tempfile
 import platform
 from pathlib import Path
@@ -38,6 +39,11 @@ def Main () -> None:
             extractDir.mkdir (exist_ok=True, parents=True)
             with zipfile.ZipFile (zipPath, 'r') as f:
                 f.extractall (extractDir)
+
+            # Mark ResConv as executable on mac
+            if platform.system () == 'Darwin':
+                resConvPath = extractDir / 'Support' / 'Tools' / 'OSX' / 'ResConv'
+                resConvPath.chmod (resConvPath.stat ().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
             testEnv = os.environ.copy ()
             testEnv['APIDEVKIT_DIR'] = str (extractDir)
