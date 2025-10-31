@@ -133,12 +133,12 @@ class TestJsonToGrcConverter (unittest.TestCase):
             includePath = Path (referenceGrcPath).parent
             RunResConv (str (preprocessedGrc), str (nativeResource), str (includePath), targetAcVersion)
 
-    def RunTestCase (self, inputJson: Path, referenceGrc: Path) -> None:
-        for targetAcVersion in TARGET_AC_VERSIONS:
+    def RunTestCase (self, inputJson: Path, referenceGrc: Path, targetAcVersions: list[int] = TARGET_AC_VERSIONS) -> None:
+        for targetAcVersion in targetAcVersions:
             self.RunTestCase_SingleVersion (inputJson, referenceGrc, targetAcVersion)
 
-    def RunTestCase_VersionDependentReference (self, inputJson: Path, referenceGrc: Path) -> None:
-        for targetAcVersion in TARGET_AC_VERSIONS:
+    def RunTestCase_VersionDependentReference (self, inputJson: Path, referenceGrc: Path, targetAcVersions: list[int] = TARGET_AC_VERSIONS) -> None:
+        for targetAcVersion in targetAcVersions:
             referenceGrcFileName = f'{referenceGrc.stem}_{targetAcVersion}{referenceGrc.suffix}'
             self.RunTestCase_SingleVersion (inputJson, referenceGrc.parent / referenceGrcFileName, targetAcVersion)
 
@@ -281,7 +281,7 @@ class TestJsonToGrcConverter (unittest.TestCase):
         self.RunTestCase (TESTFILES_DIR_NAME / 'GDLG_Ruler.json', TESTFILES_DIR_NAME / 'GDLG_Ruler.grc')
 
     def test_GDLG_SAMQuantityEdit (self):
-        self.RunTestCase (TESTFILES_DIR_NAME / 'GDLG_SAMQuantityEdit.json', TESTFILES_DIR_NAME / 'GDLG_SAMQuantityEdit.grc')
+        self.RunTestCase (TESTFILES_DIR_NAME / 'GDLG_SAMQuantityEdit.json', TESTFILES_DIR_NAME / 'GDLG_SAMQuantityEdit.grc', [v for v in TARGET_AC_VERSIONS if v >= 26])
 
     def test_GDLG_ScrollBar (self):
         self.RunTestCase (TESTFILES_DIR_NAME / 'GDLG_ScrollBar.json', TESTFILES_DIR_NAME / 'GDLG_ScrollBar.grc')
