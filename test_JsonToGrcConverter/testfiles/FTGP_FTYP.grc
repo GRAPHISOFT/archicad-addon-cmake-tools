@@ -1,0 +1,30 @@
+#include "DGDefs.h"
+
+'FTYP' 1 "image/jpeg;image/x-jpeg" {
+    /* description */ "JPEG Image Files"
+    /* fileExt     */ "jpg;jpeg"
+    /* creator     */ "JPEG"
+    /* type        */ "JPEG"
+    /* iconId      */ -1
+}
+
+'FTGP' 1 "gs/test" {
+    /* description */ "Test description"
+    {
+    }
+    {
+        1 /* "jpeg/jpeg" */ /* FTGP comment */
+    }
+}
+
+#if defined (WINDOWS)
+'FTGP' 2 "gs/test" {
+    /* description */ "Test description"
+    {
+    }
+    {
+        1 /* "jpeg/jpeg" */ /* FTGP comment */
+    }
+}
+#endif
+

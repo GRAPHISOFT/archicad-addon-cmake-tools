@@ -1,0 +1,25 @@
+from .Common import (
+    GetConditionAsIfDef,
+    GetConditionEnd,
+    ConvertComment,
+    ConvertToEscapedString,
+    GrcOutputBuilder,
+)
+
+
+def ConvertTEXT (outputBuilder: GrcOutputBuilder, resource: dict, targetAcVersion: int) -> None:
+    resId = resource.pop ('#id')
+    name = ConvertToEscapedString (resource.pop ('name'))
+    fileName = ConvertToEscapedString (resource.pop ('fileName'))
+    comment = ConvertComment (resource)
+
+    condition = resource.pop ('#condition', None)
+    if condition:
+        outputBuilder.AddLine (GetConditionAsIfDef (condition))
+    
+    outputBuilder.AddLine (f"'TEXT' {resId} {name} {{{comment}")
+    outputBuilder.AddLine (f"    {fileName}")
+    outputBuilder.AddLine ('}')
+
+    if condition:
+        outputBuilder.AddLine (GetConditionEnd ())

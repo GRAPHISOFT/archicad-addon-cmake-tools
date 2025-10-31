@@ -1,0 +1,32 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ GroupBox                    1    2    3    4 LargePlain Primary "GroupBox1"
+/* [  2] */ GroupBox                    1    2    3    4 LargePlain Primary "GroupBox2" /* GroupBox comment */
+/* [  3] */ GroupBox                    1    2    3    4 ExtraSmall Primary "GroupBox3"
+/* [  3] */ GroupBox                    1    2    3    4 SmallPlain Secondary "GroupBox3"
+#if defined (WINDOWS)
+/* [  4] */ GroupBox                    1    2    3    4 SmallItalic Primary "GroupBox4_WIN"
+#endif
+#if !defined (WINDOWS)
+/* [  4] */ GroupBox                    1    2    3    4 SmallItalic Primary "GroupBox4_MAC"
+#endif
+/* [  5] */ GroupBox                    1    2    3    4 SmallUnderline Primary "GroupBox5"
+/* [  6] */ GroupBox                    1    2    3    4 LargeOutline Primary "GroupBox6"
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               GroupBox_0
+2  ""                                               GroupBoxAnchor_2
+3  ""                                               GroupBox_1
+4  ""                                               GroupBox_2
+#if defined (WINDOWS)
+5  ""                                               GroupBox_3
+#endif
+#if !defined (WINDOWS)
+6  ""                                               GroupBox_4
+#endif
+7  ""                                               GroupBox_5
+8  ""                                               GroupBox_6
+}
+

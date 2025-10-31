@@ -1,0 +1,30 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ SAMQuantityEdit             1    2    3    4 LargePlain PointTranslationStiffness frame | update | absolute | editable "" ""
+/* [  2] */ SAMQuantityEdit             1    2    3    4 LargePlain PointTranslationStiffness frame | update | absolute | editable "" "" /* SAMQuantityEdit comment */
+#if defined (WINDOWS)
+/* [  3] */ SAMQuantityEdit             1    2    3    4 LargePlain PointTranslationStiffness frame | update | absolute | editable "" ""
+#endif
+#if defined (macintosh)
+/* [  3] */ SAMQuantityEdit             1    2    3    4 LargePlain PointTranslationStiffness frame | update | absolute | editable "" ""
+#endif
+/* [  4] */ SAMQuantityEdit             1    2    3    4 LargeItalic PointTranslationStiffness frame | noDelay | relative | readOnly "0" "100"
+/* [  5] */ SAMQuantityEdit             1    2    3    4 LargePlain SurfaceTranslationStiffness noFrame | update | absolute | editable "" ""
+/* [  6] */ SAMQuantityEdit             1    2    3    4 LargePlain SurfaceLoadForce frame | noUpdate | absolute | editable "" ""
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               SAMQuantityEdit_0
+2  ""                                               SAMQuantityEditAnchor_2
+#if defined (WINDOWS)
+3  ""                                               SAMQuantityEdit_1
+#endif
+#if defined (macintosh)
+4  ""                                               SAMQuantityEdit_2
+#endif
+5  ""                                               SAMQuantityEdit_3
+6  ""                                               SAMQuantityEdit_4
+7  ""                                               SAMQuantityEdit_5
+}
+

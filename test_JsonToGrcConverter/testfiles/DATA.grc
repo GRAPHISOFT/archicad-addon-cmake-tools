@@ -1,0 +1,16 @@
+#include "DGDefs.h"
+
+'DATA' 1 "testDataFile.txt" {
+    "testDataFile.txt"
+}
+
+'DATA' 2 "testDataFile.txt" { /* data comment */
+    "testDataFile.txt"
+}
+
+#if defined (macintosh)
+'DATA' 3 "bytes" {
+    0x2
+}
+#endif
+

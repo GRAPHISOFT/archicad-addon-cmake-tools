@@ -1,0 +1,24 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ Separator                   1    2    3    4
+/* [  2] */ Separator                   1    2    3    4 /* Separator comment */
+#if defined (WINDOWS)
+/* [  3] */ Separator                   1    2    3    4
+#endif
+#if !defined (WINDOWS)
+/* [  3] */ Separator                   1    2    3    4
+#endif
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               Separator_0
+2  ""                                               SeparatorAnchor_2
+#if defined (WINDOWS)
+3  ""                                               Separator_1
+#endif
+#if !defined (WINDOWS)
+4  ""                                               Separator_2
+#endif
+}
+

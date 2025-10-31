@@ -1,0 +1,30 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ MultiLineEdit               1    2    3    4 LargePlain frame | update | absolute | editable NoScroll
+/* [  2] */ MultiLineEdit               1    2    3    4 LargePlain frame | update | absolute | editable NoScroll /* MultiLineEdit comment */
+#if defined (WINDOWS)
+/* [  3] */ MultiLineEdit               1    2    3    4 LargePlain frame | update | absolute | editable NoScroll
+#endif
+#if defined (macintosh)
+/* [  3] */ MultiLineEdit               1    2    3    4 LargePlain frame | update | absolute | editable NoScroll
+#endif
+/* [  4] */ MultiLineEdit               1    2    3    4 LargeItalic frame | noDelay | absolute | readOnly HScroll
+/* [  5] */ MultiLineEdit               1    2    3    4 LargePlain noFrame | update | absolute | editable VScroll
+/* [  6] */ MultiLineEdit               1    2    3    4 LargePlain frame | noUpdate | absolute | editable HVScroll
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               MultiLineEdit_0
+2  ""                                               MultiLineEditAnchor_2
+#if defined (WINDOWS)
+3  ""                                               MultiLineEdit_1
+#endif
+#if defined (macintosh)
+4  ""                                               MultiLineEdit_2
+#endif
+5  ""                                               MultiLineEdit_3
+6  ""                                               MultiLineEdit_4
+7  ""                                               MultiLineEdit_5
+}
+

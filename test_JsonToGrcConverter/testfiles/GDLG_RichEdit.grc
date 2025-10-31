@@ -1,0 +1,28 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ RichEdit                    1    2    3    4 LargePlain frame | editable HScroll
+/* [  2] */ RichEdit                    1    2    3    4 LargePlain frame | editable HScroll /* RichEdit comment */
+#if defined (WINDOWS)
+/* [  3] */ RichEdit                    1    2    3    4 LargePlain frame | editable HScroll
+#endif
+#if defined (macintosh)
+/* [  3] */ RichEdit                    1    2    3    4 LargePlain frame | editable VScroll
+#endif
+/* [  4] */ RichEdit                    1    2    3    4 LargeItalic frame | readOnly HVScroll
+/* [  5] */ RichEdit                    1    2    3    4 LargePlain noFrame | editable NoScroll
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               RichEdit_0
+2  ""                                               RichEditAnchor_2
+#if defined (WINDOWS)
+3  ""                                               RichEdit_1
+#endif
+#if defined (macintosh)
+4  ""                                               RichEdit_2
+#endif
+5  ""                                               RichEdit_3
+6  ""                                               RichEdit_4
+}
+

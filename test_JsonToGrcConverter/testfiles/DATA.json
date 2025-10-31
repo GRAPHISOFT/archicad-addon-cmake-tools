@@ -1,0 +1,24 @@
+{
+	"DATA": [
+		{
+			"#id": "1",
+			"name": "testDataFile.txt",
+			"fileName": {
+				"#value": "testDataFile.txt",
+				"#comment": "data comment"
+			}
+		},
+		{
+			"#id": "2",
+			"name": "testDataFile.txt",
+			"#comment": "data comment",
+			"fileName": "testDataFile.txt"
+		},
+		{
+			"#id": "3",
+			"#condition": "+macintosh",
+			"name": "bytes",
+			"data": "0x2"
+		}
+	]
+}

@@ -1,0 +1,26 @@
+{
+	"GICN": [
+		{
+			"#id": "1234",
+			"name": "Bold",
+			"#comment": "16x16"
+		},
+		{
+			"#id": "2",
+			"name": "TreeViewIcon",
+			"fileName": "TreeViewIcon"
+		},
+		{
+			"#id": "3",
+			"name": "TreeViewIcon",
+			"fileName": "TreeViewIcon",
+			"#comment": "Icon comment"
+		},
+		{
+			"#id": "4",
+			"name": "TreeViewIcon",
+			"fileName": "TreeViewIcon",
+			"#condition": "+WINDOWS"
+		}
+	]
+}

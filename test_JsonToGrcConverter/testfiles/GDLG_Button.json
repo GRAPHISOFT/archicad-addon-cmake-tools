@@ -1,0 +1,83 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"Button": {
+						"#id": "1",
+						"text": "Button1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				},
+				{
+					"Button": {
+						"#comment": "Button comment",
+						"#id": "2",
+						"text": "Button2",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"helpInfo": { "anchor": "ButtonAnchor_2" }
+					}
+				},
+				{
+					"Button": {
+						"#id": "3",
+						"text": { "str": "Button3", "dictId": "0a6ed30c-f595-4161-bd9a-3f1809ab1142" },
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "extraSmall",
+						"appearance": "roundedEdge"
+					}
+				},
+				{
+					"Button": {
+						"#id": "3",
+						"text": "Button3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "smallPlain",
+						"frame": "yes",
+						"appearance": "squaredEdge"
+					}
+				},
+				{
+					"Button": {
+						"#condition": "+WINDOWS",
+						"#id": "4",
+						"text": "Button4_WIN",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "smallItalic",
+						"frame": "no"
+					}
+				},
+				{
+					"Button": {
+						"#condition": "-WINDOWS",
+						"#id": "4",
+						"text": "Button4_MAC",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "smallItalic"
+					}
+				},
+				{
+					"Button": {
+						"#id": "5",
+						"text": "Button5",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "smallUnderline"
+					}
+				},
+				{
+					"Button": {
+						"#id": "6",
+						"text": "Button6",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "largeOutline"
+					}
+				}
+			]
+		}
+	]
+}

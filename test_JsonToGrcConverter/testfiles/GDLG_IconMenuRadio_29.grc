@@ -1,0 +1,28 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ IconMenuRadio               1    2    3    4 8  RoundedEdge
+/* [  2] */ IconMenuRadio               1    2    3    4 8 NoIcon DG_ERROR_ICON NoIcon RoundedEdge /* Icon comment */
+#if defined (WINDOWS)
+/* [  3] */ IconMenuRadio               1    2    3    4 8  RoundedEdge
+#endif
+#if defined (macintosh)
+/* [  3] */ IconMenuRadio               1    2    3    4 8  RoundedEdge
+#endif
+/* [  4] */ IconMenuRadio               1    2    3    4 8 NoIcon RoundedEdge
+/* [  5] */ IconMenuRadio               1    2    3    4 8  SquaredEdge
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               IconMenuRadio_0
+2  ""                                               IconAnchor_2
+#if defined (WINDOWS)
+3  ""                                               IconMenuRadio_1
+#endif
+#if defined (macintosh)
+4  ""                                               IconMenuRadio_2
+#endif
+5  ""                                               IconMenuRadio_3
+6  ""                                               IconMenuRadio_4
+}
+

@@ -1,0 +1,18 @@
+#include "DGDefs.h"
+
+#define Vers_IoGDLMethod                                        1
+#define ACNF_VERSION                                            1
+#define IoGDLMethod                                             1
+
+'ACNF' 32500 "Add-On Information" {
+    ACNF_VERSION
+    PlatformCode
+    0
+    IoGDLMethod
+    0
+    Vers_IoGDLMethod
+    0
+    PersistentFunction + MultiThreadingEnabled
+    "DATETIME"
+}
+

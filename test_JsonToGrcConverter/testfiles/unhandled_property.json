@@ -1,0 +1,14 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modeless",
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor1",
+			"frame": "no",
+			"unhandled_property": "unhandled_value",
+			"controls": [
+			]
+		}
+	]
+}

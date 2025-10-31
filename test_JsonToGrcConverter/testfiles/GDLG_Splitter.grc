@@ -1,0 +1,28 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ Splitter                    1    2    3    4 Normal
+/* [  2] */ Splitter                    1    2    3    4 Normal /* Splitter comment */
+#if defined (WINDOWS)
+/* [  3] */ Splitter                    1    2    3    4 Normal
+#endif
+#if !defined (WINDOWS)
+/* [  3] */ Splitter                    1    2    3    4 Normal
+#endif
+/* [  4] */ Splitter                    1    2    3    4 Normal
+/* [  5] */ Splitter                    1    2    3    4 Transparent
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               Splitter_0
+2  ""                                               SplitterAnchor_2
+#if defined (WINDOWS)
+3  ""                                               Splitter_1
+#endif
+#if !defined (WINDOWS)
+4  ""                                               Splitter_2
+#endif
+5  ""                                               Splitter_3
+6  ""                                               Splitter_4
+}
+

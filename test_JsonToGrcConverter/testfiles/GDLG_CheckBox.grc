@@ -1,0 +1,32 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ CheckBox                    1    2    3    4 LargePlain "CheckBox1"
+/* [  2] */ CheckBox                    1    2    3    4 LargePlain "CheckBox2" /* CheckBox comment */
+/* [  3] */ CheckBox                    1    2    3    4 ExtraSmall "CheckBox3"
+/* [  3] */ CheckBox                    1    2    3    4 SmallPlain "CheckBox3"
+#if defined (WINDOWS)
+/* [  4] */ CheckBox                    1    2    3    4 SmallItalic "CheckBox4_WIN"
+#endif
+#if !defined (WINDOWS)
+/* [  4] */ CheckBox                    1    2    3    4 SmallItalic "CheckBox4_MAC"
+#endif
+/* [  5] */ CheckBox                    1    2    3    4 SmallUnderline "CheckBox5"
+/* [  6] */ CheckBox                    1    2    3    4 LargeOutline "CheckBox6"
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               CheckBox_0
+2  ""                                               CheckBoxAnchor_2
+3  ""                                               CheckBox_1
+4  ""                                               CheckBox_2
+#if defined (WINDOWS)
+5  ""                                               CheckBox_3
+#endif
+#if !defined (WINDOWS)
+6  ""                                               CheckBox_4
+#endif
+7  ""                                               CheckBox_5
+8  ""                                               CheckBox_6
+}
+

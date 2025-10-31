@@ -1,0 +1,49 @@
+{
+	"CMND": [
+		{
+			"#id": "1",
+			"name": { "str": "10 Test", "dictId": "efe4bc8e-27da-4e47-8c5d-d04e0b28a6e7" },
+			"commands": [
+				{
+					"#id": "1",
+					"iconId": "11",
+					"items": [
+						{ "text": { "str": "Test Text 1", "dictId": "c364932e-278d-4e5d-b2dc-fd662c870a4b" }, "description": { "str": "Test Desc 1", "dictId": "0bcff68c-dc30-4382-97a1-b1e004542df7" } }
+					]
+				},
+				{
+					"#id": "2",
+					"iconId": "11",
+					"items": [
+						{ "text": { "str": "Test Text 1", "dictId": "c364932e-278d-4e5d-b2dc-fd662c870a4b" }, "description": { "str": "Test Desc 1", "dictId": "0bcff68c-dc30-4382-97a1-b1e004542df7" }, "#comment": "asd" }
+					]
+				},
+				{
+					"#id": "3",
+					"iconId": "DGNoIcon",
+					"#condition": "+WINDOWS",
+					"items": [
+						{ "text": { "str": "Test Text 3 WIN", "dictId": "18a06961-3876-4c0e-858c-ea605a6b30b6" }, "description": { "str": "Test Desc 3 WIN", "dictId": "99bd3bb6-8995-489a-bcda-aca9f3fbeca9" } }
+					]
+				},
+				{
+					"#id": "3",
+					"iconId": "DGNoIcon",
+					"#condition": "-WINDOWS",
+					"items": [
+						{ "text": { "str": "Test Text 3 MAC", "dictId": "b0bac73e-1a0d-4bd7-aa6e-a1acd0bcaf99" }, "description": { "str": "Test Desc 3 MAC", "dictId": "8069177a-a10f-4804-9114-99676e5bc586" } }
+					]
+				},
+				{
+					"#id": "4",
+					"iconId": "11",
+					"items": [
+						{ "text": { "str": "Test Text 40", "dictId": "c364932e-278d-4e5d-b2dc-fd662c870a4b" }, "description": { "str": "Test Desc 40", "dictId": "0bcff68c-dc30-4382-97a1-b1e004542df7" }, "#comment": "asd" },
+						{ "text": { "str": "Test Text 41", "dictId": "c364932e-278d-4e5d-b2dc-fd662c870a4b" }, "description": { "str": "Test Desc 41", "dictId": "0bcff68c-dc30-4382-97a1-b1e004542df7" }, "#comment": "asd" },
+						{ "text": { "str": "Test Text 42", "dictId": "c364932e-278d-4e5d-b2dc-fd662c870a4b" }, "description": { "str": "Test Desc 42", "dictId": "0bcff68c-dc30-4382-97a1-b1e004542df7" }, "#comment": "asd" }
+					]
+				}
+			]
+		}
+	]
+}

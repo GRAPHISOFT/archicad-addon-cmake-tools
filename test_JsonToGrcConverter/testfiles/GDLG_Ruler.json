@@ -1,0 +1,54 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"Ruler": {
+						"#id": "1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"rulerType": "window"
+					}
+				},
+				{
+					"Ruler": {
+						"#comment": "Ruler comment",
+						"#id": "2",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"rulerType": "table",
+						"editId": "8",
+						"helpInfo": { "anchor": "RulerAnchor_2" }
+					}
+				},
+				{
+					"Ruler": {
+						"#condition": "+WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"rulerType": "window"
+					}
+				},
+				{
+					"Ruler": {
+						"#condition": "-WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"rulerType": "window"
+					}
+				},
+				{
+					"Ruler": {
+						"#id": "4",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"rulerType": "editor",
+						"editId": "8"
+					}
+				}
+			]
+		}
+	]
+}

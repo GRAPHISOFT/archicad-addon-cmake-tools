@@ -1,0 +1,26 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ IconCheckBox                1    2    3    4 NoIcon
+/* [  2] */ IconCheckBox                1    2    3    4 DG_INFORMATION_ICON /* Icon comment */
+#if defined (WINDOWS)
+/* [  3] */ IconCheckBox                1    2    3    4 DG_INFORMATION_ICON
+#endif
+#if defined (macintosh)
+/* [  3] */ IconCheckBox                1    2    3    4 NoIcon
+#endif
+/* [  4] */ IconCheckBox                1    2    3    4 DG_ERROR_ICON
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               IconCheckBox_0
+2  ""                                               IconAnchor_2
+#if defined (WINDOWS)
+3  ""                                               IconCheckBox_1
+#endif
+#if defined (macintosh)
+4  ""                                               IconCheckBox_2
+#endif
+5  ""                                               IconCheckBox_3
+}
+

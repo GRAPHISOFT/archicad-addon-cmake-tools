@@ -1,0 +1,28 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ SingleSelTreeView           1    2    3    4 LargePlain 16 16 16 16 labelEdit dragDrop 80 noRootButton
+/* [  2] */ SingleSelTreeView           1    2    3    4 LargePlain 16 16 16 16 labelEdit dragDrop 80 noRootButton /* SingleSelTreeView comment */
+#if defined (WINDOWS)
+/* [  3] */ MultiSelTreeView            1    2    3    4 LargePlain 16 16 16 16 labelEdit dragDrop 80 noRootButton
+#endif
+#if !defined (WINDOWS)
+/* [  3] */ SingleSelTreeView           1    2    3    4 LargePlain 16 16 16 16 labelEdit dragDrop 80 noRootButton
+#endif
+/* [  4] */ MultiSelTreeView            1    2    3    4 LargeItalic 16 16 16 16 labelEdit dragDrop 80 HasFrame
+/* [  5] */ SingleSelTreeView           1    2    3    4 LargeItalic 16 16 16 16 noLabelEdit noDragDrop 80 noRootButton
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               SingleSelTreeView_0
+2  ""                                               SingleSelTreeViewAnchor_2
+#if defined (WINDOWS)
+3  ""                                               MultiSelTreeView_0
+#endif
+#if !defined (WINDOWS)
+4  ""                                               SingleSelTreeView_1
+#endif
+5  ""                                               MultiSelTreeView_1
+6  ""                                               SingleSelTreeView_2
+}
+

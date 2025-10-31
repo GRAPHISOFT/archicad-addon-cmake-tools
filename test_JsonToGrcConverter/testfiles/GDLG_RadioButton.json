@@ -1,0 +1,67 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"RadioButton": {
+						"#id": "1",
+						"text": "RadioButton Text1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"groupId": 8
+					}
+				},
+				{
+					"RadioButton": {
+						"#comment": "RadioButton comment",
+						"#id": "2",
+						"text": "RadioButton Text",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"groupId": 8,
+						"helpInfo": { "anchor": "RadioButtonAnchor_2" }
+					}
+				},
+				{
+					"RadioButton": {
+						"#condition": "+WINDOWS",
+						"#id": "3",
+						"text": "RadioButton Text",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"groupId": 8
+					}
+				},
+				{
+					"RadioButton": {
+						"#condition": "+macintosh",
+						"#id": "3",
+						"text": "RadioButton Text",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"groupId": 8
+					}
+				},
+				{
+					"RadioButton": {
+						"#id": "4",
+						"text": { "str": "RadioButton Text", "dictId": "8bc728cf-555f-4f5b-b326-e7b031e3c484" },
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"groupId": 8,
+						"font": "largePlain"
+					}
+				},
+				{
+					"RadioButton": {
+						"#id": "4",
+						"text": { "str": "RadioButton Text", "localized": "no" },
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"groupId": 8,
+						"font": "largePlain"
+					}
+				}
+			]
+		}
+	]
+}

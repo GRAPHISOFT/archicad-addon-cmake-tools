@@ -1,0 +1,89 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"SingleSelTreeView": {
+						"#id": "1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"normalIconSize": { "w": 16, "h": 16 },
+						"stateIconSize": { "w": 16, "h": 16 },
+						"editableLabel": "yes",
+						"dragDrop": "yes",
+						"maxCharCount": 80
+					}
+				},
+				{
+					"SingleSelTreeView": {
+						"#comment": "SingleSelTreeView comment",
+						"#id": "2",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"normalIconSize": { "w": 16, "h": 16 },
+						"stateIconSize": { "w": 16, "h": 16 },
+						"editableLabel": "yes",
+						"dragDrop": "yes",
+						"maxCharCount": 80,
+						"helpInfo": { "anchor": "SingleSelTreeViewAnchor_2" }
+					}
+				},
+				{
+					"MultiSelTreeView": {
+						"#condition": "+WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"normalIconSize": { "w": 16, "h": 16 },
+						"stateIconSize": { "w": 16, "h": 16 },
+						"editableLabel": "yes",
+						"dragDrop": "yes",
+						"maxCharCount": 80
+					}
+				},
+				{
+					"SingleSelTreeView": {
+						"#condition": "-WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"normalIconSize": { "w": 16, "h": 16 },
+						"stateIconSize": { "w": 16, "h": 16 },
+						"editableLabel": "yes",
+						"dragDrop": "yes",
+						"maxCharCount": 80
+					}
+				},
+				{
+					"MultiSelTreeView": {
+						"#id": "4",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "largeItalic",
+						"normalIconSize": { "w": 16, "h": 16 },
+						"stateIconSize": { "w": 16, "h": 16 },
+						"editableLabel": "yes",
+						"dragDrop": "yes",
+						"maxCharCount": 80,
+						"rootButton": "yes",
+						"frame": "yes"
+					}
+				},
+				{
+					"SingleSelTreeView": {
+						"#id": "5",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "largeItalic",
+						"normalIconSize": { "w": 16, "h": 16 },
+						"stateIconSize": { "w": 16, "h": 16 },
+						"editableLabel": "no",
+						"dragDrop": "no",
+						"maxCharCount": 80,
+						"rootButton": "no",
+						"frame": "no"
+					}
+				}
+			]
+		}
+	]
+}

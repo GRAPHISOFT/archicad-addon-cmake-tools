@@ -1,0 +1,89 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"LeftText": {
+						"#id": "1",
+						"text": "LeftText1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				},
+				{
+					"LeftText": {
+						"#comment": "LeftText comment",
+						"#id": "2",
+						"text": { "str": "LeftText2", "dictId": "0a6ed30c-f595-4161-bd9a-3f1809ab1142" },
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"helpInfo": { "anchor": "LeftTextAnchor_2" }
+					}
+				},
+				{
+					"LeftText": {
+						"#condition": "+WINDOWS",
+						"#id": "3",
+						"text": "LeftText3_WIN",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				},
+				{
+					"LeftText": {
+						"#condition": "+macintosh",
+						"#id": "3",
+						"text": "LeftText3_MAC",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				},
+				{
+					"LeftText": {
+						"#id": "4",
+						"text": "LeftText4",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "extraSmall",
+						"alignment": "top",
+						"truncation": "no",
+						"edgeType": "default"
+					}
+				},
+				{
+					"LeftText": {
+						"#id": "5",
+						"text": "LeftText5",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "smallOutline",
+						"alignment": "center",
+						"truncation": "end",
+						"edgeType": "staticEdge"
+					}
+				},
+				{
+					"LeftText": {
+						"#id": "6",
+						"text": "LeftText6",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "smallOutline",
+						"alignment": "bottom",
+						"truncation": "middle",
+						"edgeType": "clientEdge"
+					}
+				},
+				{
+					"LeftText": {
+						"#id": "7",
+						"text": "LeftText7",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"font": "smallOutline",
+						"alignment": "bottom",
+						"truncation": "middle",
+						"edgeType": "modalFrame"
+					}
+				}
+			]
+		}
+	]
+}

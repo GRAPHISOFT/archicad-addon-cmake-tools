@@ -1,0 +1,30 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ IconButton                  1    2    3    4 NoIcon frame RoundedEdge
+/* [  2] */ IconButton                  1    2    3    4 DG_INFORMATION_ICON frame RoundedEdge /* Icon comment */
+#if defined (WINDOWS)
+/* [  3] */ IconButton                  1    2    3    4 DG_INFORMATION_ICON frame RoundedEdge
+#endif
+#if defined (macintosh)
+/* [  3] */ IconButton                  1    2    3    4 NoIcon frame RoundedEdge
+#endif
+/* [  4] */ IconButton                  1    2    3    4 DG_ERROR_ICON frame RoundedEdge
+/* [  5] */ IconButton                  1    2    3    4 DG_INFORMATION_ICON noFrame SquaredEdge
+/* [  6] */ IconButton                  1    2    3    4 DG_INFORMATION_ICON frame RoundedEdge
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               IconButton_0
+2  ""                                               IconAnchor_2
+#if defined (WINDOWS)
+3  ""                                               IconButton_1
+#endif
+#if defined (macintosh)
+4  ""                                               IconButton_2
+#endif
+5  ""                                               IconButton_3
+6  ""                                               IconButton_4
+7  ""                                               IconButton_5
+}
+

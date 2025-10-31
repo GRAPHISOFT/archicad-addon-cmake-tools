@@ -1,0 +1,13 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "unsupported",
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor1",
+			"frame": "yes",
+			"controls": [
+			]
+		}
+	]
+}

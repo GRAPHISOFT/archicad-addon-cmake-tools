@@ -1,0 +1,10 @@
+#include "DGDefs.h"
+
+'STR#' 1 "Test Strings" {
+/* [  1] */ "Test\nString 1"
+/* [  2] */ "Test\n\nString 2"
+/* [  3] */ "Test\tString 3"
+/* [  4] */ "Test String 4…"
+/* [  5] */ "Test \"String\" 5"
+}
+

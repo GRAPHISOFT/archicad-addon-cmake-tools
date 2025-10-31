@@ -1,0 +1,32 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ UserItem                    1    2    3    4  Default
+/* [  2] */ UserItem                    1    2    3    4  Default /* UserItem comment */
+#if defined (WINDOWS)
+/* [  3] */ UserItem                    1    2    3    4  Default
+#endif
+#if !defined (WINDOWS)
+/* [  3] */ UserItem                    1    2    3    4  Default
+#endif
+/* [  4] */ UserItem                    1    2    3    4 PartialUpdate Default
+/* [  5] */ UserItem                    1    2    3    4  StaticEdge
+/* [  6] */ UserItem                    1    2    3    4  ClientEdge
+/* [  7] */ UserItem                    1    2    3    4  ModalFrame
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               UserItem_0
+2  ""                                               UserItemAnchor_2
+#if defined (WINDOWS)
+3  ""                                               UserItem_1
+#endif
+#if !defined (WINDOWS)
+4  ""                                               UserItem_2
+#endif
+5  ""                                               UserItem_3
+6  ""                                               UserItem_4
+7  ""                                               UserItem_5
+8  ""                                               UserItem_6
+}
+

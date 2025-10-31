@@ -1,0 +1,6 @@
+#include "DGDefs.h"
+
+'GCSR' 1 "GCSR name" {
+       6   12
+}
+

@@ -1,0 +1,81 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"SingleSpin": {
+						"#id": "1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"minValue": "0",
+						"maxValue": "100"
+					}
+				},
+				{
+					"SingleSpin": {
+						"#comment": "SingleSpin comment",
+						"#id": "2",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"minValue": "0",
+						"maxValue": "100",
+						"helpInfo": { "anchor": "SingleSpinAnchor_2" }
+					}
+				},
+				{
+					"SingleSpin": {
+						"#condition": "+WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"minValue": "0",
+						"maxValue": "100"
+					}
+				},
+				{
+					"SingleSpin": {
+						"#condition": "-WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"minValue": "0",
+						"maxValue": "100"
+					}
+				},
+				{
+					"EditSpin": {
+						"#id": "1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"editId": "8"
+					}
+				},
+				{
+					"EditSpin": {
+						"#comment": "EditSpin comment",
+						"#id": "2",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"editId": "8",
+						"helpInfo": { "anchor": "EditSpinAnchor_2" }
+					}
+				},
+				{
+					"EditSpin": {
+						"#condition": "+WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"editId": "8"
+					}
+				},
+				{
+					"EditSpin": {
+						"#condition": "-WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"editId": "8"
+					}
+				}
+			]
+		}
+	]
+}

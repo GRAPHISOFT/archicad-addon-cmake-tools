@@ -1,0 +1,30 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ TextEdit                    1    2    3    4 LargePlain frame | update | absolute | editable 80
+/* [  2] */ TextEdit                    1    2    3    4 LargePlain frame | update | absolute | editable 80 /* TextEdit comment */
+#if defined (WINDOWS)
+/* [  3] */ TextEdit                    1    2    3    4 LargePlain frame | update | absolute | editable 80
+#endif
+#if defined (macintosh)
+/* [  3] */ TextEdit                    1    2    3    4 LargePlain frame | update | absolute | editable 80
+#endif
+/* [  4] */ TextEdit                    1    2    3    4 LargeItalic frame | noDelay | absolute | readOnly 80
+/* [  5] */ TextEdit                    1    2    3    4 LargePlain noFrame | update | absolute | editable 80
+/* [  6] */ TextEdit                    1    2    3    4 LargePlain frame | noUpdate | absolute | editable 80
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               TextEdit_0
+2  ""                                               TextEditAnchor_2
+#if defined (WINDOWS)
+3  ""                                               TextEdit_1
+#endif
+#if defined (macintosh)
+4  ""                                               TextEdit_2
+#endif
+5  ""                                               TextEdit_3
+6  ""                                               TextEdit_4
+7  ""                                               TextEdit_5
+}
+

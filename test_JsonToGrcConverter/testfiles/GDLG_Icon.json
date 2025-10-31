@@ -1,0 +1,77 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"Icon": {
+						"#id": "1",
+						"iconId": "-1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				},
+				{
+					"Icon": {
+						"#comment": "Icon comment",
+						"#id": "2",
+						"iconId": "DGInfoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"helpInfo": { "anchor": "IconAnchor_2" }
+					}
+				},
+				{
+					"Icon": {
+						"#condition": "+WINDOWS",
+						"#id": "3",
+						"iconId": "DGInfoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				},
+				{
+					"Icon": {
+						"#condition": "+macintosh",
+						"#id": "3",
+						"iconId": "DGNoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				},
+				{
+					"Icon": {
+						"#id": "4",
+						"iconId": "DGErrorIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"edgeType": "default"
+					}
+				},
+				{
+					"Icon": {
+						"#id": "5",
+						"iconId": "DGInfoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"edgeType": "staticEdge"
+					}
+				},
+				{
+					"Icon": {
+						"#id": "6",
+						"iconId": "DGInfoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"edgeType": "clientEdge"
+					}
+				},
+				{
+					"Icon": {
+						"#id": "7",
+						"iconId": "DGInfoIcon",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"edgeType": "modalFrame"
+					}
+				}
+			]
+		}
+	]
+}

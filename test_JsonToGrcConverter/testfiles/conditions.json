@@ -1,0 +1,14 @@
+{
+	"STRS": [
+		{
+			"#id": "1",
+			"name": "Test Strings",
+			"items": [
+				{ "#id": "1", "text": "Test String 1", "#condition": "-GS_SOLO_VERSION & -GS_BTC_VERSION & -GS_START_VERSION" },
+				{ "#id": "2", "text": "Test String 2", "#condition": "(-RUS__APP & -TUR__APP) & (+GER__APP | +CHE__APP)" },
+				{ "#id": "3", "text": "Test String 3", "#condition": "+COMPILE_LOCALIZED_DLL & (+macintosh)" },
+				{ "#id": "4", "text": "Test String 4", "#condition": "-WINDOWS & -GS_ARM64" }
+			]
+		}
+	]
+}

@@ -1,0 +1,23 @@
+{
+	"FILE": [
+		{
+			"#id": "1",
+			"name": "testDataFile.txt",
+			"fileName": {
+				"#value": "testDataFile.txt",
+				"#comment": "data comment"
+			}
+		},
+		{
+			"#id": "2",
+			"name": "testDataFile.txt",
+			"fileName": "testDataFile.txt"
+		},
+		{
+			"#id": "2",
+			"name": "testDataFile.txt",
+			"fileName": "testDataFile.txt",
+			"#condition": "-macintosh"
+		}
+	]
+}

@@ -1,0 +1,32 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ SingleSelList               1    2    3    4 LargePlain PartialItems NoScroll 80 
+/* [  2] */ SingleSelList               1    2    3    4 LargePlain PartialItems NoScroll 80  /* SingleSelList comment */
+#if defined (WINDOWS)
+/* [  3] */ SingleSelList               1    2    3    4 LargePlain PartialItems NoScroll 80 
+#endif
+#if !defined (WINDOWS)
+/* [  3] */ SingleSelList               1    2    3    4 LargePlain PartialItems NoScroll 80 
+#endif
+/* [  4] */ SingleSelList               1    2    3    4 LargeBold PartialItems HScroll 80 HasHeader 30 HasFrame /* SingleSelList comment */
+/* [  5] */ SingleSelList               1    2    3    4 LargeUnderline NoPartialItems VScroll 80 
+/* [  6] */ SingleSelList               1    2    3    4 LargePlain NoPartialItems HVScroll 80 
+/* [  7] */ SingleSelList               1    2    3    4 LargePlain NoPartialItems NoScroll 80 
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               SingleSelList_0
+2  ""                                               SingleSelListAnchor_2
+#if defined (WINDOWS)
+3  ""                                               SingleSelList_1
+#endif
+#if !defined (WINDOWS)
+4  ""                                               SingleSelList_2
+#endif
+5  ""                                               SingleSelListAnchor_4
+6  ""                                               SingleSelList_3
+7  ""                                               SingleSelList_4
+8  ""                                               SingleSelList_5
+}
+

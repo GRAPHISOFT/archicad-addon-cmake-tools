@@ -1,0 +1,73 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"UserItem": {
+						"#id": "1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				},
+				{
+					"UserItem": {
+						"#comment": "UserItem comment",
+						"#id": "2",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"helpInfo": { "anchor": "UserItemAnchor_2" }
+					}
+				},
+				{
+					"UserItem": {
+						"#condition": "+WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				},
+				{
+					"UserItem": {
+						"#condition": "-WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				},
+				{
+					"UserItem": {
+						"#id": "4",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"partialUpdate": "yes",
+						"edgeType": "default"
+					}
+				},
+				{
+					"UserItem": {
+						"#id": "5",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"partialUpdate": "no",
+						"edgeType": "staticEdge"
+					}
+				},
+				{
+					"UserItem": {
+						"#id": "6",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"partialUpdate": "no",
+						"edgeType": "clientEdge"
+					}
+				},
+				{
+					"UserItem": {
+						"#id": "7",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"partialUpdate": "no",
+						"edgeType": "modalFrame"
+					}
+				}
+			]
+		}
+	]
+}

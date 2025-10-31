@@ -1,0 +1,23 @@
+#include "DGDefs.h"
+
+'ACP0' 1 "ACP0 Name"{
+    /* [  1] VarName  */ "var1"
+    /* [  1] Value    */ "val1"
+    /* [  2] VarName  */ "var2" /* var2 */
+    /* [  2] Value    */ "val2" /* var2 */
+    /* [  2] VarName  */ "var3" /* var3 */
+    /* [  2] Value    */ "val3" /* var3 */
+}
+
+'ACP0' 1 "ACP0 Name"{
+    /* [  1] VarName  */ "var1"
+    /* [  1] Value    */ "val1"
+}
+
+#if defined (WINDOWS)
+'ACP0' 1 "ACP0 Name"{
+    /* [  1] VarName  */ "var1"
+    /* [  1] Value    */ "val1"
+}
+#endif
+

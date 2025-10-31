@@ -1,0 +1,19 @@
+#include "DGDefs.h"
+
+'GICN' 1234 "Bold" { /* 16x16 */
+}
+
+'GICN' 2 "TreeViewIcon" {
+    "TreeViewIcon"
+}
+
+'GICN' 3 "TreeViewIcon" { /* Icon comment */
+    "TreeViewIcon"
+}
+
+#if defined (WINDOWS)
+'GICN' 4 "TreeViewIcon" {
+    "TreeViewIcon"
+}
+#endif
+

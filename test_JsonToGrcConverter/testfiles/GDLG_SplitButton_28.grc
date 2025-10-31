@@ -1,0 +1,32 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ SplitButton                 1    2    3    4 LargePlain BevelEdge NoIcon "SplitButton1"
+/* [  2] */ SplitButton                 1    2    3    4 LargePlain BevelEdge NoIcon "SplitButton2" /* SplitButton comment */
+/* [  3] */ SplitButton                 1    2    3    4 ExtraSmall BevelEdge NoIcon "SplitButton3"
+/* [  3] */ SplitButton                 1    2    3    4 SmallPlain RoundedBevelEdge NoIcon "SplitButton3"
+#if defined (WINDOWS)
+/* [  4] */ SplitButton                 1    2    3    4 SmallItalic BevelEdge NoIcon "SplitButton4_WIN"
+#endif
+#if !defined (WINDOWS)
+/* [  4] */ SplitButton                 1    2    3    4 SmallItalic BevelEdge NoIcon "SplitButton4_MAC"
+#endif
+/* [  5] */ SplitButton                 1    2    3    4 SmallUnderline BevelEdge NoIcon "SplitButton5"
+/* [  6] */ SplitButton                 1    2    3    4 LargeOutline BevelEdge NoIcon "SplitButton6"
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               SplitButton_0
+2  ""                                               SplitButtonAnchor_2
+3  ""                                               SplitButton_1
+4  ""                                               SplitButton_2
+#if defined (WINDOWS)
+5  ""                                               SplitButton_3
+#endif
+#if !defined (WINDOWS)
+6  ""                                               SplitButton_4
+#endif
+7  ""                                               SplitButton_5
+8  ""                                               SplitButton_6
+}
+

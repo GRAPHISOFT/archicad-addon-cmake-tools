@@ -1,0 +1,40 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ SingleSpin                  1    2    3    4 0 100
+/* [  2] */ SingleSpin                  1    2    3    4 0 100 /* SingleSpin comment */
+#if defined (WINDOWS)
+/* [  3] */ SingleSpin                  1    2    3    4 0 100
+#endif
+#if !defined (WINDOWS)
+/* [  3] */ SingleSpin                  1    2    3    4 0 100
+#endif
+/* [  1] */ EditSpin                    1    2    3    4 8 
+/* [  2] */ EditSpin                    1    2    3    4 8  /* EditSpin comment */
+#if defined (WINDOWS)
+/* [  3] */ EditSpin                    1    2    3    4 8 
+#endif
+#if !defined (WINDOWS)
+/* [  3] */ EditSpin                    1    2    3    4 8 
+#endif
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               SingleSpin_0
+2  ""                                               SingleSpinAnchor_2
+#if defined (WINDOWS)
+3  ""                                               SingleSpin_1
+#endif
+#if !defined (WINDOWS)
+4  ""                                               SingleSpin_2
+#endif
+5  ""                                               EditSpin_0
+6  ""                                               EditSpinAnchor_2
+#if defined (WINDOWS)
+7  ""                                               EditSpin_1
+#endif
+#if !defined (WINDOWS)
+8  ""                                               EditSpin_2
+#endif
+}
+

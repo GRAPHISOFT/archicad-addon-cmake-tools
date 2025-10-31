@@ -1,0 +1,28 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ PushCheck                   1    2    3    4 LargePlain frame RoundedEdge "PushCheck Text1"
+/* [  2] */ PushCheck                   1    2    3    4 LargePlain frame RoundedEdge "PushCheck Text" /* Icon comment */
+#if defined (WINDOWS)
+/* [  3] */ PushCheck                   1    2    3    4 LargePlain frame RoundedEdge "PushCheck Text"
+#endif
+#if defined (macintosh)
+/* [  3] */ PushCheck                   1    2    3    4 LargePlain frame RoundedEdge "PushCheck Text"
+#endif
+/* [  4] */ PushCheck                   1    2    3    4 LargePlain frame RoundedEdge "PushCheck Text"
+/* [  5] */ PushCheck                   1    2    3    4 LargePlain noFrame SquaredEdge "PushCheck Text"
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               PushCheck_0
+2  ""                                               IconAnchor_2
+#if defined (WINDOWS)
+3  ""                                               PushCheck_1
+#endif
+#if defined (macintosh)
+4  ""                                               PushCheck_2
+#endif
+5  ""                                               PushCheck_3
+6  ""                                               PushCheck_4
+}
+

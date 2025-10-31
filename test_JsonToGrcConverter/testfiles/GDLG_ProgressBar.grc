@@ -1,0 +1,30 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ ProgressBar                 1    2    3    4 0 100 StaticEdge
+/* [  2] */ ProgressBar                 1    2    3    4 0 100 StaticEdge /* ProgressBar comment */
+#if defined (WINDOWS)
+/* [  3] */ ProgressBar                 1    2    3    4 0 100 StaticEdge
+#endif
+#if defined (macintosh)
+/* [  3] */ ProgressBar                 1    2    3    4 0 100 StaticEdge
+#endif
+/* [  4] */ ProgressBar                 1    2    3    4 0 100 StaticEdge
+/* [  5] */ ProgressBar                 1    2    3    4 0 100 ClientEdge
+/* [  6] */ ProgressBar                 1    2    3    4 0 100 ModalFrame
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               ProgressBar_0
+2  ""                                               ProgressBarAnchor_2
+#if defined (WINDOWS)
+3  ""                                               ProgressBar_1
+#endif
+#if defined (macintosh)
+4  ""                                               ProgressBar_2
+#endif
+5  ""                                               ProgressBar_3
+6  ""                                               ProgressBar_4
+7  ""                                               ProgressBar_5
+}
+
