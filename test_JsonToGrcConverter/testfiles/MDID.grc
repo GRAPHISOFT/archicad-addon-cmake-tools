@@ -1,0 +1,20 @@
+#include "DGDefs.h"
+#include "MDIDs_modules.h"
+
+'MDID' 1 "MDID Name" {
+    1
+    2
+}
+
+'MDID' 2 "MDID Name" { /* MDID Comment */
+    1
+    2
+}
+
+#if defined (WINDOWS)
+'MDID' 3 "MDID Name" {
+    1
+    2
+}
+#endif
+

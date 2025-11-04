@@ -1,0 +1,16 @@
+#include "DGDefs.h"
+
+'TEXT' 1 "testDataFile.txt" {
+    "testDataFile.txt"
+}
+
+'TEXT' 2 "testDataFile.txt" {
+    "testDataFile.txt"
+}
+
+#if defined (WINDOWS)
+'TEXT' 2 "testDataFile.txt" {
+    "testDataFile.txt"
+}
+#endif
+

@@ -1,0 +1,32 @@
+name: Test JsonToGrcConverter
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup MSVC
+      if: runner.os == 'Windows'
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.13
+
+    - name: Install requests
+      run: |
+        pip install requests
+
+    - name: Run tests with development kits
+      run: |
+        python ${{ github.workspace }}/test_JsonToGrcConverter/DownloadDevkitsAndRun.py

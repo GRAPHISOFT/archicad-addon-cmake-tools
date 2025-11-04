@@ -1,0 +1,52 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"PopupControl": {
+						"#id": "1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"listHeight": 80,
+						"textOffset": 3
+					}
+				},
+				{
+					"PopupControl": {
+						"#condition": "+WINDOWS",
+						"#id": "1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"listHeight": 80,
+						"textOffset": 3
+					}
+				},
+				{
+					"PopupControl": {
+						"#condition": "-WINDOWS",
+						"#id": "2",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"listHeight": 80,
+						"textOffset": 3
+					}
+				},
+				{
+					"PopupControl": {
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"listHeight": 80,
+						"textOffset": 3,
+						"items": [
+							{ "iconId": "DGNoIcon", "text": "First" },
+							{ "iconId": "DGNoIcon", "text": "Second" }
+						],
+						"helpInfo": { "anchor": "PopUp_0" }
+					}
+				}
+			]
+		}
+	]
+}

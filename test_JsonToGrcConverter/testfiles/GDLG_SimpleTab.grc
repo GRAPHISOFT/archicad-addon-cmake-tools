@@ -1,0 +1,33 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ SimpleTab                   1    2    3    4 frame
+            1
+/* [  2] */ SimpleTab                   1    2    3    4 frame /* SimpleTab comment */
+            1
+#if defined (WINDOWS)
+/* [  3] */ SimpleTab                   1    2    3    4 frame
+            1
+#endif
+#if !defined (WINDOWS)
+/* [  3] */ SimpleTab                   1    2    3    4 frame
+            1
+#endif
+/* [  4] */ SimpleTab                   1    2    3    4 frame
+            1
+            2
+            3 /* item comment */
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               SimpleTab_0
+2  ""                                               SimpleTabAnchor_2
+#if defined (WINDOWS)
+3  ""                                               SimpleTab_1
+#endif
+#if !defined (WINDOWS)
+4  ""                                               SimpleTab_2
+#endif
+5  ""                                               SimpleTab_3
+}
+

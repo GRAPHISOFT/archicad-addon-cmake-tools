@@ -1,0 +1,30 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ UniRichEdit                 1    2    3    4 LargePlain autoResize | eofWrap | frame | editable NoScroll
+/* [  2] */ UniRichEdit                 1    2    3    4 LargePlain autoResize | eofWrap | frame | editable NoScroll /* UniRichEdit comment */
+#if defined (WINDOWS)
+/* [  3] */ UniRichEdit                 1    2    3    4 LargePlain autoResize | eofWrap | frame | editable NoScroll
+#endif
+#if defined (macintosh)
+/* [  3] */ UniRichEdit                 1    2    3    4 LargePlain noAutoResize | eofWrap | frame | editable VScroll
+#endif
+/* [  4] */ UniRichEdit                 1    2    3    4 LargeItalic autoResize | wordWrap | frame | readOnly NoScroll
+/* [  5] */ UniRichEdit                 1    2    3    4 LargePlain noAutoResize | eofWrap | noFrame | editable HVScroll
+/* [  6] */ UniRichEdit                 1    2    3    4 LargePlain noAutoResize | wordWrap | noFrame | editable VScroll
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               UniRichEdit_0
+2  ""                                               UniRichEditAnchor_2
+#if defined (WINDOWS)
+3  ""                                               UniRichEdit_1
+#endif
+#if defined (macintosh)
+4  ""                                               UniRichEdit_2
+#endif
+5  ""                                               UniRichEdit_3
+6  ""                                               UniRichEdit_4
+7  ""                                               UniRichEdit_5
+}
+

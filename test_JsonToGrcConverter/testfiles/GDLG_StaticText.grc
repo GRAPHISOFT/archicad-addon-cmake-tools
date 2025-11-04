@@ -1,0 +1,32 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ LeftText                    1    2    3    4 LargePlain vTop | noTrunc Default "LeftText1"
+/* [  2] */ LeftText                    1    2    3    4 LargePlain vTop | noTrunc Default "LeftText2" /* LeftText comment */
+#if defined (WINDOWS)
+/* [  3] */ LeftText                    1    2    3    4 LargePlain vTop | noTrunc Default "LeftText3_WIN"
+#endif
+#if defined (macintosh)
+/* [  3] */ LeftText                    1    2    3    4 LargePlain vTop | noTrunc Default "LeftText3_MAC"
+#endif
+/* [  4] */ LeftText                    1    2    3    4 ExtraSmall vTop | noTrunc Default "LeftText4"
+/* [  5] */ LeftText                    1    2    3    4 SmallOutline vCenter | truncEnd StaticEdge "LeftText5"
+/* [  6] */ LeftText                    1    2    3    4 SmallOutline vBottom | truncMiddle ClientEdge "LeftText6"
+/* [  7] */ LeftText                    1    2    3    4 SmallOutline vBottom | truncMiddle ModalFrame "LeftText7"
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               LeftText_0
+2  ""                                               LeftTextAnchor_2
+#if defined (WINDOWS)
+3  ""                                               LeftText_1
+#endif
+#if defined (macintosh)
+4  ""                                               LeftText_2
+#endif
+5  ""                                               LeftText_3
+6  ""                                               LeftText_4
+7  ""                                               LeftText_5
+8  ""                                               LeftText_6
+}
+

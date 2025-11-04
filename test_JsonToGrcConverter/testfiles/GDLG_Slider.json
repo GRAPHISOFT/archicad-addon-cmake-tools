@@ -1,0 +1,73 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"Slider": {
+						"#id": "1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"stepValue": 5,
+						"minValue": 0,
+						"maxValue": 100
+					}
+				},
+				{
+					"Slider": {
+						"#comment": "Slider comment",
+						"#id": "2",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"stepValue": 5,
+						"minValue": 0,
+						"maxValue": 100,
+						"helpInfo": { "anchor": "SliderAnchor_2" }
+					}
+				},
+				{
+					"Slider": {
+						"#condition": "+WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"stepValue": 5,
+						"minValue": 0,
+						"maxValue": 100
+					}
+				},
+				{
+					"Slider": {
+						"#condition": "+macintosh",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"stepValue": 5,
+						"minValue": 0,
+						"maxValue": 100
+					}
+				},
+				{
+					"Slider": {
+						"#id": "4",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"stepValue": 5,
+						"minValue": 0,
+						"maxValue": 100,
+						"sliderStyle": "TopLeft"
+					}
+				},
+				{
+					"Slider": {
+						"#id": "5",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"stepValue": 5,
+						"minValue": 0,
+						"maxValue": 100,
+						"sliderStyle": "BottomRight"
+					}
+				}
+			]
+		}
+	]
+}

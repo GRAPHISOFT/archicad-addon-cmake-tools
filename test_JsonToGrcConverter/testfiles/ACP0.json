@@ -1,0 +1,32 @@
+{
+	"ACP0": [
+		{
+			"#id": "1",
+			"name": "ACP0 Name",
+			"localized": "no",
+			"items": [
+				{ "#id": "1", "varName": "var1", "value": "val1" },
+				{ "#id": "2", "varName": "var2", "value": { "str": "val2", "dictId": "7aa82d99-f7a6-4414-bfe0-a28daacfd4d9" }, "#comment": "var2" },
+				{ "#id": "2", "varName": "var3", "value": { "str": "val3", "localized": "no" }, "#comment": "var3" }
+			]
+		},
+		{
+			"#id": "1",
+			"name": {
+				"str": "ACP0 Name",
+				"dictId": "c1d12d0a-2532-4816-9f97-2469a8df6673"
+			},
+			"items": [
+				{ "#id": "1", "varName": "var1", "value": "val1" }
+			]
+		},
+		{
+			"#id": "1",
+			"name": "ACP0 Name",
+			"#condition": "+WINDOWS",
+			"items": [
+				{ "#id": "1", "varName": "var1", "value": "val1" }
+			]
+		}
+	]
+}

@@ -1,0 +1,36 @@
+{
+	"FTYP": [
+		{
+			"#id": "1",
+			"mimeType": "image/jpeg;image/x-jpeg",
+			"description": "JPEG Image Files",
+			"fileExtension": "jpg;jpeg",
+			"creator": "JPEG",
+			"type": "JPEG",
+			"iconId": "-1"
+		}
+	],
+	"FTGP": [
+		{
+			"#id": "1",
+			"mime": "gs/test",
+			"description": "Test description",
+			"group1": [
+			],
+			"group2": [
+				{ "mimeId": "1", "mimeType": "jpeg/jpeg", "#comment": "FTGP comment" }
+			]
+		},
+		{
+			"#id": "2",
+			"mime": "gs/test",
+			"description": "Test description",
+			"#condition": "+WINDOWS",
+			"group1": [
+			],
+			"group2": [
+				{ "mimeId": "1", "mimeType": "jpeg/jpeg", "#comment": "FTGP comment" }
+			]
+		}
+	]
+}

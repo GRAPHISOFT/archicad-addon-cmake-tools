@@ -10,6 +10,9 @@ import json
 import pathlib
 from pathlib import Path
 
+from JsonToGrcConverter import JsonToGrcConverter
+from JsonToGrcConverter import JsonTranslator
+
 class ResourceCompiler (object):
     def __init__ (self, devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path, permissiveLocalization: bool):
         self.devKitPath = devKitPath
@@ -55,8 +58,45 @@ class ResourceCompiler (object):
         grcFileName = grcFilePath.name
         return self.resourceObjectsPath / f'{grcFileName}.i'
 
+    def GetNormalizedAddonName (self, addonName: str) -> str:
+        return addonName.replace (' ', '_')
+
+    def GetXliffPathForLanguage (self, languageCode: str) -> Path:
+        if languageCode == self.defaultLanguageCode:
+            return self.resourcesPath / f'R{self.defaultLanguageCode}' / f'{self.GetNormalizedAddonName (self.addonName)}.xlf'
+        else:
+            return self.resourcesPath / 'ResourceLibrary' / languageCode / 'XLF' / f'{self.GetNormalizedAddonName (self.addonName)}.xlf'
+
+    def GetParentXliffPath (self) -> Path | None:
+        parentTxtPath = self.resourcesPath / 'ResourceLibrary' / self.languageCode / 'XLF' / '_parent.txt'
+        if parentTxtPath.exists ():
+            parentLanguageCode = codecs.open (parentTxtPath, 'r', 'utf-8').read ().strip ()
+            return self.GetXliffPathForLanguage (parentLanguageCode)
+        return None
+
+    def CompileGRCFromJSON (self, jsonFilePath: Path, localized: bool) -> None:
+        with open (jsonFilePath, 'r', encoding='utf-8') as f:
+            jsonData = json.load (f)
+
+        if localized:
+            translations = JsonTranslator.GetMergedTranslations (self.GetXliffPathForLanguage (self.languageCode), self.GetParentXliffPath ())
+            JsonTranslator.TranslateJson (jsonData, translations)
+
+        devkitVersion, _ = self.GetDevKitVersionAndBuildNumber ()
+        grcContent = JsonToGrcConverter.ConvertJsonDataToGrcString (jsonData, devkitVersion)
+        outputGrcFile = self.resourceObjectsPath / f'{jsonFilePath.name}.grc'
+        with open (outputGrcFile, 'w', encoding='utf-8') as f:
+            f.write (grcContent)
+
+        assert self.CompileGRCResourceFile (outputGrcFile), f'GRC compilation command failed: {outputGrcFile}'
+
     def CompileJSONResourceFile (self, jsonFilePath: Path, localized: bool) -> None:
         jsonResourceProcessorPath = self.devKitPath / 'Tools' / 'JSONResourceProcessor'
+
+        if not jsonResourceProcessorPath.exists ():
+            self.CompileGRCFromJSON (jsonFilePath, localized)
+            return
+
         schemaValidationResult = subprocess.call ([
             sys.executable,
             jsonResourceProcessorPath / 'SchemaValidator.py',
@@ -70,33 +110,28 @@ class ResourceCompiler (object):
 
         if localized:
             xliffFileToTranslateWith = None
-            if self.languageCode == self.defaultLanguageCode:
-                xliffFileToTranslateWith = self.resourcesPath / f'R{self.defaultLanguageCode}' / f'{self.addonName}.xlf'
+            childXliffPath = self.GetXliffPathForLanguage (self.languageCode)
+            parentXliffPath = self.GetParentXliffPath ()
+            if parentXliffPath:
+                mergedXliffOutputPath = self.resourceObjectsPath / f'{self.GetNormalizedAddonName (self.addonName)}.merged.xlf'
+                mergeParentChildXliffResult = subprocess.call ([
+                    sys.executable,
+                    jsonResourceProcessorPath / 'MergeParentChildXliff.py',
+                    '--childXliff', childXliffPath,
+                    '--parentXliff', parentXliffPath,
+                    '-o', mergedXliffOutputPath
+                ])
+                assert mergeParentChildXliffResult == 0, f'Merge parent child XLIFF command failed: {jsonFilePath}'
+                xliffFileToTranslateWith = mergedXliffOutputPath
             else:
-                childXliffPath = self.resourcesPath / 'ResourceLibrary' / self.languageCode / 'XLF' / f'{self.addonName}.xlf'
-                parentTxtPath = self.resourcesPath / 'ResourceLibrary' / self.languageCode / 'XLF' / '_parent.txt'
-                if parentTxtPath.exists ():
-                    parentLanguageCode = codecs.open (parentTxtPath, 'r', 'utf-8').read ().strip ()
-                    parentXliffPath = self.resourcesPath / 'ResourceLibrary' / parentLanguageCode / 'XLF' / f'{self.addonName}.xlf'
-                    mergedXliffOutputPath = self.resourceObjectsPath / f'{self.addonName}.merged.xlf'
-                    mergeParentChildXliffResult = subprocess.call ([
-                        sys.executable,
-                        jsonResourceProcessorPath / 'MergeParentChildXliff.py',
-                        '--childXliff', childXliffPath,
-                        '--parentXliff', parentXliffPath,
-                        '-o', mergedXliffOutputPath
-                    ])
-                    assert mergeParentChildXliffResult == 0, f'Merge parent child XLIFF command failed: {jsonFilePath}'
-                    xliffFileToTranslateWith = mergedXliffOutputPath
-                else:
-                    xliffFileToTranslateWith = childXliffPath
+                xliffFileToTranslateWith = childXliffPath
 
             translatedJsonPath = self.resourceObjectsPath / f'{jsonFilePath.name}.translated'
             xliffTranslationCommand = [
                 sys.executable,
                 jsonResourceProcessorPath / 'XliffJsonTranslator.py',
                 '-i', jsonFilePath,
-                '-m', self.addonName,
+                '-m', self.GetNormalizedAddonName (self.addonName),
                 '-d', xliffFileToTranslateWith,
                 '-o', translatedJsonPath,
             ]
@@ -110,14 +145,14 @@ class ResourceCompiler (object):
             dllFolder = jsonResourceProcessorPath / 'dlls'
             envForJson['PATH'] = str (dllFolder) + os.pathsep + envForJson['PATH']
         elif platform.system () == 'Darwin':
-            if platform.processor () == 'arm':
-                envForJson['DYLD_FALLBACK_LIBRARY_PATH'] = jsonResourceProcessorPath / 'dylibs_ARM'
-            else:
-                envForJson['DYLD_FALLBACK_LIBRARY_PATH'] = jsonResourceProcessorPath / 'dylibs'
+            envForJson['DYLD_FALLBACK_LIBRARY_PATH'] = jsonResourceProcessorPath / 'dylibs'
         else:
             assert False, 'Unsupported platform: ' + platform.system ()
 
-        jsonPartsDir = self.resourceObjectsPath / 'JsonParts'
+        if localized:
+            jsonPartsDir = self.resourceObjectsPath / 'RLOC' / 'JsonParts'
+        else:
+            jsonPartsDir = self.resourceObjectsPath / 'RFIX' / 'JsonParts'
 
         if not jsonPartsDir.exists ():
             jsonPartsDir.mkdir (parents=True, exist_ok=True)
@@ -126,7 +161,7 @@ class ResourceCompiler (object):
             sys.executable,
             jsonResourceProcessorPath / 'GSCreateNativeResourceFromJSON.py',
             '-i', translatedJsonPath,
-            '-o', jsonPartsDir / (jsonFilePath.name + self.nativeResourceFileExtension),
+            '-o', jsonPartsDir.parent / (jsonFilePath.name + self.nativeResourceFileExtension),
             '-d', self.GetPlatformDefine (),
         ]
         if not localized:
@@ -148,6 +183,26 @@ class ResourceCompiler (object):
         postCheckersResult = subprocess.call (postCheckersCommand)
         assert postCheckersResult == 0, f'Post-checkers command failed: {jsonFilePath}'
 
+    def GenerateJSONTableOfContents (self, localized: bool) -> None:
+        tocJsonFile = 'JSNL_TOC.json' if localized else 'JSNF_TOC.json'
+        resType = 'TOCL' if localized else 'TOCF'
+
+        tableOfContentsJson = self.resourceObjectsPath / 'JSON_TOC' / tocJsonFile
+        if not tableOfContentsJson.exists ():
+            return
+
+        tableOfContentsJsonRc2 = self.resourceObjectsPath / 'JSON_TOC' / f'{tocJsonFile}.rc2'
+        jsonResourceProcessorPath = self.devKitPath / 'Tools' / 'JSONResourceProcessor'
+        dataResourceGenerator = jsonResourceProcessorPath / 'GenerateDataResourceFromFile.py'
+        result = subprocess.call ([
+            sys.executable,
+            dataResourceGenerator,
+            '-i', tableOfContentsJson,
+            '-o', tableOfContentsJsonRc2,
+            '--resType', resType,
+        ])
+        assert result == 0, f'Failed to generate data resource: {tableOfContentsJson}'
+
     def CompileLocalizedResources (self) -> None:
         locResourcesFolder = self.resourcesPath / f'R{self.languageCode}'
         grcFiles = locResourcesFolder.glob ('*.grc')
@@ -159,6 +214,8 @@ class ResourceCompiler (object):
         for jsonFilePath in jsonFiles:
             self.CompileJSONResourceFile (jsonFilePath, localized=True)
 
+        self.GenerateJSONTableOfContents (localized=True)
+
     def CompileFixResources (self) -> None:
         fixResourcesFolder = self.resourcesPath / 'RFIX'
         grcFiles = fixResourcesFolder.glob ('*.grc')
@@ -168,6 +225,8 @@ class ResourceCompiler (object):
         jsonFiles = fixResourcesFolder.glob ('*.json')
         for jsonFilePath in jsonFiles:
             self.CompileJSONResourceFile (jsonFilePath, localized=False)
+
+        self.GenerateJSONTableOfContents (localized=False)
 
     def RunResConv (self, platformSign: str, codepage: str, inputFilePath: Path) -> bool:
         imageResourcesFolder = self.resourcesPath / 'RFIX' / 'Images'
@@ -186,8 +245,7 @@ class ResourceCompiler (object):
         ]
 
         devkit_main_version, devkit_build_number= self.GetDevKitVersionAndBuildNumber ()
-        if (devkit_main_version > 29 or
-            (devkit_main_version == 29 and devkit_build_number >= 3000)):
+        if (devkit_main_version == 29 and devkit_build_number >= 3000) or (devkit_main_version == 30 and devkit_build_number >= 82) or (devkit_main_version > 30):
             call_params.extend (['-py', sys.executable])        # python executable
             call_params.extend (['-sc', colorChangeScriptPath]) # SVG color change script path for generating Dark Mode icons
         result = subprocess.call (call_params)
@@ -242,8 +300,20 @@ class WinResourceCompiler (ResourceCompiler):
 
         return existingNativeResourceFile
 
+    def CreateNativeResourceFileWithIncludes (self) -> Path:
+        with open (self.GetNativeResourceFile (), 'r', encoding='utf-8', errors='strict') as f:
+            nativeResFileContent = f.read ()
+
+        result = self.resourceObjectsPath / f'{self.addonName}.gen.res.rc2'
+        with open (result, 'w', encoding='utf-8', errors='strict') as f:
+            for rc2File in self.resourceObjectsPath.rglob ('*.rc2'):
+                if rc2File != result:
+                    f.write (f'#include "{rc2File}"\n')
+            f.write (nativeResFileContent)
+        return result
+
     def CompileNativeResource (self, resultResourcePath: Path) -> None:
-        nativeResourceFile = self.GetNativeResourceFile ()
+        nativeResourceFile = self.CreateNativeResourceFileWithIncludes ()
         result = subprocess.call ([
             'rc',
             '/i', self.devKitPath / 'Inc',
@@ -295,7 +365,7 @@ class MacResourceCompiler (ResourceCompiler):
             resultLocalizedResourcePath.mkdir (parents=True)
         resultLocalizableStringsPath = resultLocalizedResourcePath / 'Localizable.strings'
         resultLocalizableStringsFile = codecs.open (resultLocalizableStringsPath, 'w', 'utf-16')
-        for fileName in self.resourceObjectsPath.iterdir ():
+        for fileName in self.resourceObjectsPath.rglob ('*'):
             filePath = self.resourceObjectsPath / fileName
             extension = fileName.suffix.lower ()
             if extension == '.tif':

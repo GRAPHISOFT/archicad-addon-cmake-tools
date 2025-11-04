@@ -1,0 +1,24 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ DateControl                 1    2    3    4 Calendar
+/* [  2] */ DateControl                 1    2    3    4 Standard /* Date comment */
+#if defined (WINDOWS)
+/* [  3] */ DateControl                 1    2    3    4 Calendar
+#endif
+#if !defined (WINDOWS)
+/* [  3] */ DateControl                 1    2    3    4 Calendar
+#endif
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               DateControl_0
+2  ""                                               DateAnchor_2
+#if defined (WINDOWS)
+3  ""                                               DateControl_1
+#endif
+#if !defined (WINDOWS)
+4  ""                                               DateControl_2
+#endif
+}
+

@@ -1,0 +1,22 @@
+{
+	"ACNF": [
+		{
+			"#id": "32500",
+			"name": "Add-On Information",
+			"version": "ACNF_VERSION",
+			"platform": "PlatformCode",
+			"flag": "0",
+			"method": "IoGDLMethod",
+			"subMethod": "0",
+			"methodVersion": "Vers_IoGDLMethod",
+			"methodIndex": "0",
+			"function": ["PersistentFunction", "MultiThreadingEnabled"],
+			"modulName": "DATETIME"
+		}
+	],
+	"macroDictionary": [
+		{ "macro": "Vers_IoGDLMethod", "value": "1" },
+		{ "macro": "ACNF_VERSION", "value": "1" },
+		{ "macro": "IoGDLMethod", "value": "1" }
+	]
+}

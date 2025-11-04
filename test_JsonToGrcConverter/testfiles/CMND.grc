@@ -1,0 +1,16 @@
+#include "DGDefs.h"
+
+'CMND' 1 "10 Test" {
+    1                                                11                                               "Test Text 1"                                                    "Test Desc 1"
+    2                                                11                                               "Test Text 1"                                                    "Test Desc 1" /* asd */
+#if defined (WINDOWS)
+    3                                                noIcon                                           "Test Text 3 WIN"                                                "Test Desc 3 WIN"
+#endif
+#if !defined (WINDOWS)
+    3                                                noIcon                                           "Test Text 3 MAC"                                                "Test Desc 3 MAC"
+#endif
+    4                                                11                                               "Test Text 40"                                                   "Test Desc 40" /* asd */
+                                                                                                      "Test Text 41"                                                   "Test Desc 41" /* asd */
+                                                                                                      "Test Text 42"                                                   "Test Desc 42" /* asd */
+}
+

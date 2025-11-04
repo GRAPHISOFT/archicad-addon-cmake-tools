@@ -1,0 +1,82 @@
+#include "DGDefs.h"
+
+'GDLG' 6 Modal |noGrow 0 0 100 200 "" {
+/* [  1] */ LeftText                    1    2    3    4 LargePlain vTop | noTrunc Default "LeftText1"
+}
+
+'DLGH' 6 Dialog_anchor6 {
+1  ""                                               LeftText_0
+}
+
+'GDLG' 7 Modal |noGrow | thickFrame 0 0 100 200 "Dialog name" {
+/* [  1] */ LeftText                    1    2    3    4 LargePlain vTop | noTrunc Default "LeftText1"
+}
+
+'DLGH' 7 Dialog_anchor7 {
+1  ""                                               LeftText_0
+}
+
+'GDLG' 8 Modal |hGrow | normalFrame 0 0 100 200 "Dialog name" {
+/* [  1] */ LeftText                    1    2    3    4 LargePlain vTop | noTrunc Default "LeftText1"
+}
+
+'DLGH' 8 Dialog_anchor8 {
+1  ""                                               LeftText_0
+}
+
+'GDLG' 9 Modal |vGrow | noCaption | normalFrame 0 0 100 200 "Dialog name" {
+/* [  1] */ LeftText                    1    2    3    4 LargePlain vTop | noTrunc Default "LeftText1"
+}
+
+'DLGH' 9 Dialog_anchor9 {
+1  ""                                               LeftText_0
+}
+
+'GDLG' 10 Modal |grow | normalFrame 0 0 100 200 "Dialog name" {
+/* [  1] */ LeftText                    1    2    3    4 LargePlain vTop | noTrunc Default "LeftText1"
+}
+
+'DLGH' 10 Dialog_anchor10 {
+1  ""                                               LeftText_0
+}
+
+'GDLG' 11 Palette  0 0 100 200 "" {
+/* [  1] */ LeftText                    1    2    3    4 LargePlain vTop | noTrunc Default "LeftText1"
+}
+
+'DLGH' 11 Dialog_anchor11 {
+1  ""                                               LeftText_0
+}
+
+'GDLG' 12 Palette |noGrow | topCaption | close | thickFrame 0 0 100 200 "Dialog name" {
+/* [  1] */ LeftText                    1    2    3    4 LargePlain vTop | noTrunc Default "LeftText1"
+}
+
+'DLGH' 12 Dialog_anchor12 {
+1  ""                                               LeftText_0
+}
+
+'GDLG' 13 Palette |hGrow | leftCaption | noClose | normalFrame 0 0 100 200 "Dialog name" {
+/* [  1] */ LeftText                    1    2    3    4 LargePlain vTop | noTrunc Default "LeftText1"
+}
+
+'DLGH' 13 Dialog_anchor13 {
+1  ""                                               LeftText_0
+}
+
+'GDLG' 14 Palette |vGrow | noCaption | normalFrame 0 0 100 200 "Dialog name" {
+/* [  1] */ LeftText                    1    2    3    4 LargePlain vTop | noTrunc Default "LeftText1"
+}
+
+'DLGH' 14 Dialog_anchor14 {
+1  ""                                               LeftText_0
+}
+
+'GDLG' 15 Palette |grow 0 0 100 200 "Dialog name" {
+/* [  1] */ LeftText                    1    2    3    4 LargePlain vTop | noTrunc Default "LeftText1"
+}
+
+'DLGH' 15 Dialog_anchor15 {
+1  ""                                               LeftText_0
+}
+

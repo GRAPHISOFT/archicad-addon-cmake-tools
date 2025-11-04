@@ -1,0 +1,15 @@
+{
+	"STRS": [
+		{
+			"#id": "1",
+			"name": "Test Strings",
+			"items": [
+				{ "#id": "1", "text": "Test\nString 1" },
+				{ "#id": "2", "text": "Test\n\nString 2" },
+				{ "#id": "3", "text": "Test\tString 3" },
+				{ "#id": "4", "text": "Test String 4…" },
+				{ "#id": "5", "text": "Test \"String\" 5" }
+			]
+		}
+	]
+}

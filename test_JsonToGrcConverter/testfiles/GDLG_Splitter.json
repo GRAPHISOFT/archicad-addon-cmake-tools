@@ -1,0 +1,55 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"Splitter": {
+						"#id": "1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				},
+				{
+					"Splitter": {
+						"#comment": "Splitter comment",
+						"#id": "2",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"helpInfo": { "anchor": "SplitterAnchor_2" }
+					}
+				},
+				{
+					"Splitter": {
+						"#condition": "+WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				},
+				{
+					"Splitter": {
+						"#condition": "-WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 }
+					}
+				},
+				{
+					"Splitter": {
+						"#id": "4",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"splitterType": "normal"
+					}
+				},
+				{
+					"Splitter": {
+						"#id": "5",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"splitterType": "transparent"
+					}
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,79 @@
+{
+	"GDLG": [
+		{
+			"#id": "1",
+			"type": "Modal",
+			"name": { "str": "Dialog name", "dictId": "aeb8805f-b873-4226-af45-81600222efae" },
+			"size": { "w": 100, "h": 200 },
+			"anchor": "Dialog_anchor",
+			"controls": [
+				{
+					"SingleSelListView": {
+						"#id": "1",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"imageSize": { "w": 16, "h": 16 },
+						"cellSize": { "w": 100, "h": 20 },
+						"mode": "bottomText"
+					}
+				},
+				{
+					"SingleSelListView": {
+						"#comment": "SingleSelListView comment",
+						"#id": "2",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"imageSize": { "w": 16, "h": 16 },
+						"cellSize": { "w": 100, "h": 20 },
+						"mode": "bottomText",
+						"helpInfo": { "anchor": "SingleSelListViewAnchor_2" }
+					}
+				},
+				{
+					"SingleSelListView": {
+						"#condition": "+WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"imageSize": { "w": 16, "h": 16 },
+						"cellSize": { "w": 100, "h": 20 },
+						"mode": "bottomText"
+					}
+				},
+				{
+					"SingleSelListView": {
+						"#condition": "-WINDOWS",
+						"#id": "3",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"imageSize": { "w": 16, "h": 16 },
+						"cellSize": { "w": 100, "h": 20 },
+						"mode": "bottomText"
+					}
+				},
+				{
+					"SingleSelListView": {
+						"#comment": "SingleSelListView comment",
+						"#id": "4",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"imageSize": { "w": 16, "h": 16 },
+						"cellSize": { "w": 100, "h": 20 },
+						"mode": "rightText",
+						"font": "smallPlain",
+						"scroll": "no",
+						"frame": "yes",
+						"helpInfo": { "anchor": "SingleSelListViewAnchor_4" }
+					}
+				},
+				{
+					"SingleSelListView": {
+						"#id": "5",
+						"rect": { "x": 1, "y": 2, "w": 3, "h": 4 },
+						"imageSize": { "w": 16, "h": 16 },
+						"cellSize": { "w": 100, "h": 20 },
+						"mode": "singleColumn",
+						"font": "smallPlain",
+						"scroll": "auto",
+						"frame": "no"
+					}
+				}
+			]
+		}
+	]
+}

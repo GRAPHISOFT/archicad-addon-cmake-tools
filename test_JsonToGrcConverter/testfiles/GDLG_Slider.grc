@@ -1,0 +1,28 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ Slider                      1    2    3    4 5 0 100 BottomRight 
+/* [  2] */ Slider                      1    2    3    4 5 0 100 BottomRight  /* Slider comment */
+#if defined (WINDOWS)
+/* [  3] */ Slider                      1    2    3    4 5 0 100 BottomRight 
+#endif
+#if defined (macintosh)
+/* [  3] */ Slider                      1    2    3    4 5 0 100 BottomRight 
+#endif
+/* [  4] */ Slider                      1    2    3    4 5 0 100 TopLeft 
+/* [  5] */ Slider                      1    2    3    4 5 0 100 BottomRight 
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               Slider_0
+2  ""                                               SliderAnchor_2
+#if defined (WINDOWS)
+3  ""                                               Slider_1
+#endif
+#if defined (macintosh)
+4  ""                                               Slider_2
+#endif
+5  ""                                               Slider_3
+6  ""                                               Slider_4
+}
+

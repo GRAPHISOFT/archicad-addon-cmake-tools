@@ -1,0 +1,28 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ ScrollBar                   1    2    3    4 200 0 100 Normal | Focusable | AutoScroll
+/* [  2] */ ScrollBar                   1    2    3    4 200 0 100 Normal | Focusable | AutoScroll /* ScrollBar comment */
+#if defined (WINDOWS)
+/* [  3] */ ScrollBar                   1    2    3    4 200 0 100 Normal | Focusable | AutoScroll
+#endif
+#if defined (macintosh)
+/* [  3] */ ScrollBar                   1    2    3    4 200 0 100 Normal | Focusable | AutoScroll
+#endif
+/* [  4] */ ScrollBar                   1    2    3    4 200 0 100 Proportional | Focusable | AutoScroll
+/* [  5] */ ScrollBar                   1    2    3    4 200 0 100 Normal | NonFocusable | NoAutoScroll
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               ScrollBar_0
+2  ""                                               ScrollBarAnchor_2
+#if defined (WINDOWS)
+3  ""                                               ScrollBar_1
+#endif
+#if defined (macintosh)
+4  ""                                               ScrollBar_2
+#endif
+5  ""                                               ScrollBar_3
+6  ""                                               ScrollBar_4
+}
+

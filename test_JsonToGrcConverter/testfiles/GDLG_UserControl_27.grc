@@ -1,0 +1,28 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ UserControl                 1    2    3    4 257  frame BevelEdge
+/* [  2] */ UserControl                 1    2    3    4 257  frame BevelEdge /* UserControl comment */
+#if defined (WINDOWS)
+/* [  3] */ UserControl                 1    2    3    4 257  frame BevelEdge
+#endif
+#if !defined (WINDOWS)
+/* [  3] */ UserControl                 1    2    3    4 257  frame BevelEdge
+#endif
+/* [  4] */ UserControl                 1    2    3    4 257 0x0001 0x0002 0x0003 0x0004 0x0005 frame BevelEdge
+/* [  4] */ UserControl                 1    2    3    4 257 0x0001 0x0002 0x0003 0x0004 0x0005 noFrame RoundedBevelEdge
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               UserControl_0
+2  ""                                               UserControlAnchor_2
+#if defined (WINDOWS)
+3  ""                                               UserControl_1
+#endif
+#if !defined (WINDOWS)
+4  ""                                               UserControl_2
+#endif
+5  ""                                               UserControl_3
+6  ""                                               UserControl_4
+}
+

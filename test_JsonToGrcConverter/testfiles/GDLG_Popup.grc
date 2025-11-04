@@ -1,0 +1,26 @@
+#include "DGDefs.h"
+
+'GDLG' 1 Modal |noGrow 0 0 100 200 "Dialog name" {
+/* [  1] */ PopupControl                1    2    3    4 80 3
+#if defined (WINDOWS)
+/* [  1] */ PopupControl                1    2    3    4 80 3
+#endif
+#if !defined (WINDOWS)
+/* [  2] */ PopupControl                1    2    3    4 80 3
+#endif
+/* [  3] */ PopupControl                1    2    3    4 80 3
+            NoIcon "First"
+            NoIcon "Second"
+}
+
+'DLGH' 1 Dialog_anchor {
+1  ""                                               PopupControl_0
+#if defined (WINDOWS)
+2  ""                                               PopupControl_1
+#endif
+#if !defined (WINDOWS)
+3  ""                                               PopupControl_2
+#endif
+4  ""                                               PopUp_0
+}
+
