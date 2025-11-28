@@ -28,6 +28,7 @@ function (SetCompilerOptions target acVersion)
             /Zc:wchar_t-
             /wd4499
             /EHsc
+            /MP
             -D_CRT_SECURE_NO_WARNINGS
         )
     else ()
