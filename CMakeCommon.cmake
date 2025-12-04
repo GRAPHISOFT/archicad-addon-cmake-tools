@@ -227,12 +227,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
         ${addOnResourcesFolder}/ResourceLibrary/*/XLF/${addOnName}.xlf
     )
 
-    set (minimumPython3Version "3.8")
-    if (NOT AddOnJSONResourceFiles STREQUAL "")
-        set (minimumPython3Version "3.10")
-    endif ()
-
-    find_package (Python3 ${minimumPython3Version} REQUIRED COMPONENTS Interpreter)
+    find_package (Python3 3.10 REQUIRED COMPONENTS Interpreter)
 
     message (STATUS "Using Python3 interpreter: ${Python3_EXECUTABLE}")
 
