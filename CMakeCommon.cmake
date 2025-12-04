@@ -1,3 +1,5 @@
+set (CMAKE_VS_GLOBALS UseMultiToolTask=true EnforceProcessCountAcrossBuilds=true)
+
 function (SetGlobalCompilerDefinitions acVersion)
 
     if (WIN32)
@@ -28,7 +30,6 @@ function (SetCompilerOptions target acVersion)
             /Zc:wchar_t-
             /wd4499
             /EHsc
-            /MP
             -D_CRT_SECURE_NO_WARNINGS
         )
     else ()
