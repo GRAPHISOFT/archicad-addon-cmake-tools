@@ -918,7 +918,7 @@ def ConvertSelListBase (outputBuilder: GrcOutputBuilder, controlProps: dict, ind
     comment = ConvertComment (controlProps)
     fontSpec = ConvertFontSpec (controlProps)
     partialItems = ConvertPartialItems (controlProps)
-    scroll = ConvertScroll (controlProps.pop ('scroll', 'no'))
+    scroll = ConvertScroll (controlProps.pop ('scroll', 'v'))
     listItemHeight = controlProps.pop ('itemHeight')
     listFlags = ConvertListFlags (controlProps)
 
