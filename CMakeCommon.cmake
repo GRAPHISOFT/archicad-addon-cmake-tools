@@ -1,3 +1,5 @@
+set (CMAKE_VS_GLOBALS UseMultiToolTask=true EnforceProcessCountAcrossBuilds=true)
+
 function (SetGlobalCompilerDefinitions acVersion)
 
     if (WIN32)
