@@ -363,22 +363,10 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
     if (addOnPCH)
         target_precompile_headers("${target}" PRIVATE "${addOnPCH}")
     else()
-        if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-            get_filename_component(new_hpp "${devKitDir}/Modules/GSRoot/GSNew.hpp" REALPATH)
-            get_filename_component(malloc_hpp "${devKitDir}/Modules/GSRoot/GSMalloc.hpp" REALPATH)
-            target_compile_options(
-                "${target}" PRIVATE
-                "SHELL:/FI \"${new_hpp}\""
-                "SHELL:/FI \"${malloc_hpp}\""
-            )
-        elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang\$")
-            target_precompile_headers(
-                "${target}" PRIVATE
-                "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/AddOn.pch"
-            )
-        else()
-            message(FATAL_ERROR "Unknown compiler ID. Please open an issue at https://github.com/GRAPHISOFT/archicad-addon-cmake-tools")
-        endif()
+        target_precompile_headers(
+            "${target}" PRIVATE
+            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/AddOn.hpp"
+        )
     endif()
 
     LinkGSLibrariesToProject (${target} ${acVersion} ${devKitDir})
