@@ -26,6 +26,6 @@
 		<key>CFBundleExecutable</key>
 		<string>@addOnName@</string>
 		<key>GSAddOnDescription</key>
-		<string>@addOnDescription@</string>@privateBuild@
+		<string>@addOnDescription@</string>@privateBuild@@autoupdate@
 	</dict>
 </plist>
