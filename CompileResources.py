@@ -269,7 +269,8 @@ class ResourceCompiler (object):
 
 class WinResourceCompiler (ResourceCompiler):
     def __init__ (self, devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path, permissiveLocalization: bool):
-        super (WinResourceCompiler, self).__init__ (devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, '', sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization)
+        super (WinResourceCompiler, self).__init__ (devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode,
+            r'#define\s+VERSION_APPENDIX\s+"([A-Z]+)"[\s\S]*?#define\s+WIN_LANGCHARSET_STR\s+"([^"]+)"', sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization)
         self.resConvPath = devKitPath / 'Tools' / 'Win' / 'ResConv.exe'
         self.nativeResourceFileExtension = '.rc2'
 

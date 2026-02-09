@@ -149,6 +149,12 @@ function (generate_add_on_version_info outSemver)
 
         string (REGEX REPLACE [[(\\|")]] [[\\\1]] addOnDescription "${addOnDescription}")
 
+        if (autoupdate STREQUAL "1")
+            set (autoupdate "\n\t\t\tVALUE \"Autoupdate\", \"1\"")
+        else ()
+            set (autoupdate "")
+        endif ()
+
         set (out "${CMAKE_CURRENT_BINARY_DIR}/${target}-VersionInfo.rc")
         configure_file ("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/VersionInfo.rc.in" "${out}" @ONLY)
         target_sources ("${target}" PRIVATE "${out}")

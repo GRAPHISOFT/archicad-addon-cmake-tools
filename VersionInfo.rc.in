@@ -43,8 +43,7 @@ BEGIN
             VALUE "PrivateBuild", "Not for distribution"
 #endif
             VALUE "ProductName", "@addOnName@"
-            VALUE "ProductVersion", "@version@"
-            VALUE "Autoupdate", "@autoupdate@"
+            VALUE "ProductVersion", "@version@"@autoupdate@
         END
     END
     /* https://learn.microsoft.com/en-us/windows/win32/menurc/varfileinfo-block */
