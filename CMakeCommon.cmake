@@ -126,7 +126,7 @@ function (parse_version inValue outList)
     endif ()
 endfunction ()
 
-function (generate_add_on_version_info outSemver)
+function (generate_add_on_version_info outSemver addOnLanguage)
     parse_version ("${addOnVersion}" vers)
     if (NOT DEFINED vers)
         message (FATAL_ERROR "'${addOnVersion}' does not follow the '123' or '1.23' or '1.2.3' version format.")
@@ -180,6 +180,8 @@ function (generate_add_on_version_info outSemver)
         string (REPLACE > &gt\; addOnDescription "${addOnDescription}")
         string (REPLACE ' &apos\; addOnDescription "${addOnDescription}")
         string (REPLACE \" &quot\; addOnDescription "${addOnDescription}")
+
+        set (languageCode "${addOnLanguage}")
 
         set (privateBuild "\n\t\t<key>GSPrivateBuild</key>\n\t\t<string>1</string>")
         if (NOT AC_ADDON_FOR_DISTRIBUTION)
@@ -362,7 +364,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
             )
         endif ()
     endif ()
-    generate_add_on_version_info (semver)
+    generate_add_on_version_info (semver ${addOnLanguage})
     target_compile_definitions (
         "${target}" PRIVATE
         "ADDON_VERSION=\"${semver}\""
