@@ -9,6 +9,7 @@ import re
 import json
 import pathlib
 from pathlib import Path
+from LocalizationMappingTable import FillLocalizationMappingTable
 
 from JsonToGrcConverter import JsonToGrcConverter
 from JsonToGrcConverter import JsonTranslator
@@ -28,22 +29,10 @@ class ResourceCompiler (object):
         self.permissiveLocalization = permissiveLocalization
         self.resConvPath = None
         self.nativeResourceFileExtension = None
-        self.localizationMappingTable = self.FillLocalizationMappingTable (pattern)
+        self.localizationMappingTable = FillLocalizationMappingTable (devKitPath, pattern)
 
     def GetPlatformDevKitLinkKey (self) -> str:
         return ""
-
-    def FillLocalizationMappingTable (self, pattern: str) -> str:
-        # Dynamically generate a mapping table from GSLocalization.h
-        gsLocalizationPath = self.devKitPath / 'Inc' / 'GSLocalization.h'
-        with open(gsLocalizationPath, 'r', encoding='utf-8') as f:
-            gsLocalizationContent = f.read ()
-
-        if not pattern:
-            return {}
-
-        patternRegex = re.compile (pattern, re.MULTILINE)
-        return { m.group(1): m.group(2) for m in patternRegex.finditer (gsLocalizationContent) }
 
     def GetDevKitVersionAndBuildNumber (self) -> tuple[int, int]:
         if self.buildNum != "default":

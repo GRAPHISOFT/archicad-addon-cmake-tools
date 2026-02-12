@@ -155,11 +155,14 @@ function (generate_add_on_version_info outSemver addOnLanguage)
             set (autoupdate "")
         endif ()
 
+        set (winLangCharsetStr "${AC_WIN_LANGCHARSET_STR}")
+
         set (out "${CMAKE_CURRENT_BINARY_DIR}/${target}-VersionInfo.rc")
         configure_file ("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/VersionInfo.rc.in" "${out}" @ONLY)
 
         set (addOnRes "${CMAKE_CURRENT_BINARY_DIR}/${target}-AddOn.rc")
         configure_file ("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/AddOn.rc.in" "${addOnRes}" @ONLY)
+
         target_sources ("${target}" PRIVATE "${out}" "${addOnRes}")
     else ()
         # BE on the safe side; load the info from an existing framework
