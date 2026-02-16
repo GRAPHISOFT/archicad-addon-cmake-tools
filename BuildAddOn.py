@@ -215,7 +215,7 @@ def GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformNa
             '-G', GetInstalledVisualStudioGenerator (),
             '-T', GetToolset (int (version)),
         ])
-        localizationMappingTable = FillLocalizationMappingTable (devkitDir, r'#define\s+VERSION_APPENDIX\s+"([A-Z]+)"[\s\S]*?#define\s+WIN_LANGCHARSET_STR\s+"([^"]+)"')
+        localizationMappingTable = FillLocalizationMappingTable (devkitDir)
         winLangCharsetStr = '040904b0'
         if languageCode != 'INT':
             winLangCharsetStr = localizationMappingTable.get (languageCode, winLangCharsetStr)
