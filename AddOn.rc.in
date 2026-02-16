@@ -6,7 +6,10 @@
 
 18000 STRS
 BEGIN
-	3 + 1,													/* VERSION_APPENDIX length */
-	0
-	"@addOnLanguage@" "\0"									/* Version appendix for localized data */
+    4,													/* VERSION_APPENDIX length */
+    0
+    "@addOnLanguage@\0"									/* Version appendix for localized data */
 END
+
+
+
