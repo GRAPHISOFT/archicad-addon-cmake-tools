@@ -1,8 +1,9 @@
 import platform
 import re
+from pathlib import Path
 
 
-def FillLocalizationMappingTable (devKitPath) -> str:
+def FillLocalizationMappingTable (devKitPath: Path) -> dict[str, str]:
     # Dynamically generate a mapping table from GSLocalization.h
     pattern = None
     system = platform.system ()
@@ -16,9 +17,6 @@ def FillLocalizationMappingTable (devKitPath) -> str:
     gsLocalizationPath = devKitPath / 'Inc' / 'GSLocalization.h'
     with open(gsLocalizationPath, 'r', encoding='utf-8') as f:
         gsLocalizationContent = f.read ()
-
-    if not pattern:
-        return {}
 
     patternRegex = re.compile (pattern, re.MULTILINE)
     return { m.group(1): m.group(2) for m in patternRegex.finditer (gsLocalizationContent) }
