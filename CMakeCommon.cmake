@@ -126,7 +126,7 @@ function (parse_version inValue outList)
     endif ()
 endfunction ()
 
-function (generate_add_on_version_info outSemver addOnLanguage)
+function (generate_add_on_version_info addOnLanguage outSemver)
     parse_version ("${addOnVersion}" vers)
     if (NOT DEFINED vers)
         message (FATAL_ERROR "'${addOnVersion}' does not follow the '123' or '1.23' or '1.2.3' version format.")
@@ -149,12 +149,13 @@ function (generate_add_on_version_info outSemver addOnLanguage)
 
         string (REGEX REPLACE [[(\\|")]] [[\\\1]] addOnDescription "${addOnDescription}")
 
-        set (autoupdate "")
         if (autoupdate STREQUAL "1")
             set (autoupdate "\n\t\t\tVALUE \"Autoupdate\", \"1\"")
+        else ()
+            set (autoupdate "")
         endif ()
 
-        set (winLangCharsetStr "${AC_WIN_LANGCHARSET_STR}")
+        set (winLangCharsetStr "${AC_WIN_LANGCHARSET}")
 
         foreach (res IN ITEMS VersionInfo AddOn)
             set (out "${CMAKE_CURRENT_BINARY_DIR}/${target}-${res}.rc")
@@ -188,9 +189,10 @@ function (generate_add_on_version_info outSemver addOnLanguage)
             set (privateBuild "")
         endif ()
 
-        set (autoupdate "")
         if (autoupdate STREQUAL "1")
             set (autoupdate "\n\t\t<key>autoupdate</key>\n\t\t<string>1</string>")
+        else ()
+            set (autoupdate "")
         endif ()
 
         string (TOLOWER "${addOnName}" lowerAddOnName)
@@ -363,7 +365,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
             )
         endif ()
     endif ()
-    generate_add_on_version_info (semver ${addOnLanguage})
+    generate_add_on_version_info (${addOnLanguage} semver)
     target_compile_definitions (
         "${target}" PRIVATE
         "ADDON_VERSION=\"${semver}\""
@@ -432,7 +434,6 @@ function (ReadConfigJson)
         set ("${out}" "${${out}}" PARENT_SCOPE)
     endforeach ()
 
-    # optional members (macOS code signing for start, autoupdate next)
     set (optionalMembers codesignIdentity developmentTeamId autoupdate)
     set (returnAs codesignIdentity developmentTeamId autoupdate)
     foreach (out members IN ZIP_LISTS returnAs optionalMembers)
@@ -443,7 +444,6 @@ function (ReadConfigJson)
         set ("${out}" "${${out}}" PARENT_SCOPE)
     endforeach ()
 
-    # language list
     string (JSON languagesType ERROR_VARIABLE error TYPE "${json}" languages)
     if (error OR NOT languagesType STREQUAL "ARRAY")
         message (FATAL_ERROR "'languages' in config.json must be an array: ${error}")

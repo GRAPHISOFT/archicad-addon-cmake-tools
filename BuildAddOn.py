@@ -216,10 +216,10 @@ def GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformNa
             '-T', GetToolset (int (version)),
         ])
         localizationMappingTable = FillLocalizationMappingTable (devkitDir)
-        winLangCharsetStr = '040904b0'
+        winLangCharset = '040904b0'
         if languageCode != 'INT':
-            winLangCharsetStr = localizationMappingTable.get (languageCode, winLangCharsetStr)
-        projGenParams.append (f'-DAC_WIN_LANGCHARSET_STR={winLangCharsetStr}')
+            winLangCharset = localizationMappingTable.get (languageCode, winLangCharset)
+        projGenParams.append (f'-DAC_WIN_LANGCHARSET={winLangCharset}')
     elif platformName == 'MAC':
         projGenParams.append ('-GXcode')
 
