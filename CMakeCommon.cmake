@@ -149,21 +149,18 @@ function (generate_add_on_version_info outSemver addOnLanguage)
 
         string (REGEX REPLACE [[(\\|")]] [[\\\1]] addOnDescription "${addOnDescription}")
 
+        set (autoupdate "")
         if (autoupdate STREQUAL "1")
             set (autoupdate "\n\t\t\tVALUE \"Autoupdate\", \"1\"")
-        else ()
-            set (autoupdate "")
         endif ()
 
         set (winLangCharsetStr "${AC_WIN_LANGCHARSET_STR}")
 
-        set (out "${CMAKE_CURRENT_BINARY_DIR}/${target}-VersionInfo.rc")
-        configure_file ("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/VersionInfo.rc.in" "${out}" @ONLY)
-
-        set (addOnRes "${CMAKE_CURRENT_BINARY_DIR}/${target}-AddOn.rc")
-        configure_file ("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/AddOn.rc.in" "${addOnRes}" @ONLY)
-
-        target_sources ("${target}" PRIVATE "${out}" "${addOnRes}")
+        foreach (res IN ITEMS VersionInfo AddOn)
+            set (out "${CMAKE_CURRENT_BINARY_DIR}/${target}-${res}.rc")
+            configure_file ("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/${res}.rc.in" "${out}" @ONLY)
+            target_sources ("${target}" PRIVATE "${out}")
+        endforeach ()
     else ()
         # BE on the safe side; load the info from an existing framework
         file (READ "${devKitDir}/Frameworks/GSRoot.framework/Versions/A/Resources/Info.plist" plist_content NEWLINE_CONSUME)
@@ -191,10 +188,9 @@ function (generate_add_on_version_info outSemver addOnLanguage)
             set (privateBuild "")
         endif ()
 
+        set (autoupdate "")
         if (autoupdate STREQUAL "1")
             set (autoupdate "\n\t\t<key>autoupdate</key>\n\t\t<string>1</string>")
-        else ()
-            set (autoupdate "")
         endif ()
 
         string (TOLOWER "${addOnName}" lowerAddOnName)
