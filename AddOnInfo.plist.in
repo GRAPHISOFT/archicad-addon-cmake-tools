@@ -28,6 +28,6 @@
 		<key>GSAddOnDescription</key>
 		<string>@addOnDescription@</string>
 		<key>GSVersionAppendix</key>
-		<string>@languageCode@</string>@privateBuild@@autoupdate@
+		<string>@addOnLanguage@</string>@privateBuild@@autoupdate@
 	</dict>
 </plist>
