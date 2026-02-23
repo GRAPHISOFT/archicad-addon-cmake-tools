@@ -3,13 +3,8 @@
 /* UTF-8 */
 #pragma code_page(65001)
 
-
 18000 STRS
 BEGIN
-    4,													/* VERSION_APPENDIX length */
-    0
-    "@addOnLanguage@\0"									/* Version appendix for localized data */
+    4L, 												/* addOnLanguage length null terminated */
+    "@addOnLanguage@\0"									/* Language code for localized data */
 END
-
-
-
