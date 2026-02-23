@@ -31,7 +31,7 @@ BEGIN
     /* https://learn.microsoft.com/en-us/windows/win32/menurc/stringfileinfo-block */
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904b0"
+        BLOCK "@winLangCharset@"
         BEGIN
             VALUE "CompanyName", "@addOnCompanyName@"
             VALUE "FileDescription", "@addOnDescription@"
@@ -43,7 +43,7 @@ BEGIN
             VALUE "PrivateBuild", "Not for distribution"
 #endif
             VALUE "ProductName", "@addOnName@"
-            VALUE "ProductVersion", "@version@"
+            VALUE "ProductVersion", "@version@"@autoupdate@
         END
     END
     /* https://learn.microsoft.com/en-us/windows/win32/menurc/varfileinfo-block */

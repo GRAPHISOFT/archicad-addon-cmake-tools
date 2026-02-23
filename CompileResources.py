@@ -9,12 +9,14 @@ import re
 import json
 import pathlib
 from pathlib import Path
+from LocalizationMappingTable import FillLocalizationMappingTable
 
 from JsonToGrcConverter import JsonToGrcConverter
 from JsonToGrcConverter import JsonTranslator
 
 class ResourceCompiler (object):
-    def __init__ (self, devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path, permissiveLocalization: bool):
+    def __init__ (self, devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str,
+                  sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path, permissiveLocalization: bool):
         self.devKitPath = devKitPath
         self.acVersion = acVersion
         self.buildNum = buildNum
@@ -27,7 +29,8 @@ class ResourceCompiler (object):
         self.permissiveLocalization = permissiveLocalization
         self.resConvPath = None
         self.nativeResourceFileExtension = None
-    
+        self.localizationMappingTable = FillLocalizationMappingTable (devKitPath)
+
     def GetPlatformDevKitLinkKey (self) -> str:
         return ""
 
@@ -255,7 +258,8 @@ class ResourceCompiler (object):
 
 class WinResourceCompiler (ResourceCompiler):
     def __init__ (self, devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path, permissiveLocalization: bool):
-        super (WinResourceCompiler, self).__init__ (devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization)
+        super (WinResourceCompiler, self).__init__ (devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode,
+            sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization)
         self.resConvPath = devKitPath / 'Tools' / 'Win' / 'ResConv.exe'
         self.nativeResourceFileExtension = '.rc2'
 
@@ -327,7 +331,8 @@ class WinResourceCompiler (ResourceCompiler):
 
 class MacResourceCompiler (ResourceCompiler):
     def __init__ (self, devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path, permissiveLocalization: bool):
-        super (MacResourceCompiler, self).__init__ (devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization)
+        super (MacResourceCompiler, self).__init__ (devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode,
+            sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization)
         self.resConvPath = devKitPath / 'Tools' / 'OSX' / 'ResConv'
         self.nativeResourceFileExtension = '.ro'
 
@@ -360,7 +365,8 @@ class MacResourceCompiler (ResourceCompiler):
         return self.RunResConv ('M', 'utf16', precompiledGrcFilePath)
 
     def CompileNativeResource (self, resultResourcePath: Path) -> None:
-        resultLocalizedResourcePath = resultResourcePath / 'English.lproj'
+        region_name = self.localizationMappingTable.get (self.languageCode, 'English')
+        resultLocalizedResourcePath = resultResourcePath / f'{region_name}.lproj'
         if not resultLocalizedResourcePath.exists ():
             resultLocalizedResourcePath.mkdir (parents=True)
         resultLocalizableStringsPath = resultLocalizedResourcePath / 'Localizable.strings'

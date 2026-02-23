@@ -12,6 +12,9 @@ import urllib.request
 import zipfile
 import tarfile
 
+from LocalizationMappingTable import FillLocalizationMappingTable
+
+
 def ParseArguments ():
     parser = argparse.ArgumentParser ()
     parser.add_argument ('-c', '--configFile', dest = 'configFile', required = True, help = 'JSON Configuration file')
@@ -206,16 +209,22 @@ def GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformNa
         '-B', str (buildPath)
     ]
 
+    devkitDir = devKitFolder / "Support"
     if platformName == 'WIN':
         projGenParams.extend ([
             '-G', GetInstalledVisualStudioGenerator (),
             '-T', GetToolset (int (version)),
         ])
+        localizationMappingTable = FillLocalizationMappingTable (devkitDir)
+        winLangCharset = '040904b0'
+        if languageCode != 'INT':
+            winLangCharset = localizationMappingTable.get (languageCode, winLangCharset)
+        projGenParams.append (f'-DAC_WIN_LANGCHARSET={winLangCharset}')
     elif platformName == 'MAC':
         projGenParams.append ('-GXcode')
 
     projGenParams.append (f'-DAC_VERSION={version}')
-    projGenParams.append (f'-DAC_API_DEVKIT_DIR={str (devKitFolder / "Support")}')
+    projGenParams.append (f'-DAC_API_DEVKIT_DIR={str (devkitDir)}')
     projGenParams.append (f'-DAC_ADDON_LANGUAGE={languageCode}')
 
     if release:

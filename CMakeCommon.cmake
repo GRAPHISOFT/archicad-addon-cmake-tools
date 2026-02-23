@@ -126,7 +126,7 @@ function (parse_version inValue outList)
     endif ()
 endfunction ()
 
-function (generate_add_on_version_info outSemver)
+function (generate_add_on_version_info addOnLanguage outSemver)
     parse_version ("${addOnVersion}" vers)
     if (NOT DEFINED vers)
         message (FATAL_ERROR "'${addOnVersion}' does not follow the '123' or '1.23' or '1.2.3' version format.")
@@ -149,9 +149,19 @@ function (generate_add_on_version_info outSemver)
 
         string (REGEX REPLACE [[(\\|")]] [[\\\1]] addOnDescription "${addOnDescription}")
 
-        set (out "${CMAKE_CURRENT_BINARY_DIR}/${target}-VersionInfo.rc")
-        configure_file ("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/VersionInfo.rc.in" "${out}" @ONLY)
-        target_sources ("${target}" PRIVATE "${out}")
+        if (autoupdate STREQUAL "1")
+            set (autoupdate "\n            VALUE \"Autoupdate\", \"1\"")
+        else ()
+            set (autoupdate "")
+        endif ()
+
+        set (winLangCharset "${AC_WIN_LANGCHARSET}")
+
+        foreach (res IN ITEMS VersionInfo AddOn)
+            set (out "${CMAKE_CURRENT_BINARY_DIR}/${target}-${res}.rc")
+            configure_file ("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/${res}.rc.in" "${out}" @ONLY)
+            target_sources ("${target}" PRIVATE "${out}")
+        endforeach ()
     else ()
         # BE on the safe side; load the info from an existing framework
         file (READ "${devKitDir}/Frameworks/GSRoot.framework/Versions/A/Resources/Info.plist" plist_content NEWLINE_CONSUME)
@@ -175,6 +185,12 @@ function (generate_add_on_version_info outSemver)
         set (privateBuild "\n\t\t<key>GSPrivateBuild</key>\n\t\t<string>1</string>")
         if (NOT AC_ADDON_FOR_DISTRIBUTION)
             set (privateBuild "")
+        endif ()
+
+        if (autoupdate STREQUAL "1")
+            set (autoupdate "\n\t\t<key>autoupdate</key>\n\t\t<string>1</string>")
+        else ()
+            set (autoupdate "")
         endif ()
 
         string (TOLOWER "${addOnName}" lowerAddOnName)
@@ -347,7 +363,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
             )
         endif ()
     endif ()
-    generate_add_on_version_info (semver)
+    generate_add_on_version_info (${addOnLanguage} semver)
     target_compile_definitions (
         "${target}" PRIVATE
         "ADDON_VERSION=\"${semver}\""
@@ -416,9 +432,8 @@ function (ReadConfigJson)
         set ("${out}" "${${out}}" PARENT_SCOPE)
     endforeach ()
 
-    # optional members (macOS code signing for start)
-    set (optionalMembers codesignIdentity developmentTeamId)
-    set (returnAs codesignIdentity developmentTeamId)
+    set (optionalMembers codesignIdentity developmentTeamId autoupdate)
+    set (returnAs codesignIdentity developmentTeamId autoupdate)
     foreach (out members IN ZIP_LISTS returnAs optionalMembers)
         string (JSON "${out}" ERROR_VARIABLE error GET "${json}" ${members})
         if (error)
@@ -427,7 +442,6 @@ function (ReadConfigJson)
         set ("${out}" "${${out}}" PARENT_SCOPE)
     endforeach ()
 
-    # language list
     string (JSON languagesType ERROR_VARIABLE error TYPE "${json}" languages)
     if (error OR NOT languagesType STREQUAL "ARRAY")
         message (FATAL_ERROR "'languages' in config.json must be an array: ${error}")
