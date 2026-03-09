@@ -186,7 +186,9 @@ def GetInstalledVisualStudioGenerator ():
     if len (vsWhereOutput) == 0:
         raise Exception ('No installed Visual Studio detected!')
     vsVersion = vsWhereOutput[0]['installationVersion'].split ('.')[0]
-    if vsVersion == '17':
+    if vsVersion == '18':
+        return 'Visual Studio 18 2026'
+    elif vsVersion == '17':
         return 'Visual Studio 17 2022'
     elif vsVersion == '16':
         return 'Visual Studio 16 2019'
@@ -367,3 +369,4 @@ def Main ():
 
 if __name__ == "__main__":
     Main ()
+
