@@ -156,6 +156,8 @@ function (generate_add_on_version_info addOnLanguage outSemver)
         endif ()
 
         set (winLangCharset "${AC_WIN_LANGCHARSET}")
+        set (winLanguageId "${AC_WIN_LANGUAGEID}")
+        set (winCharsetId "${AC_WIN_CHARSETID}")
 
         foreach (res IN ITEMS VersionInfo AddOn)
             set (out "${CMAKE_CURRENT_BINARY_DIR}/${target}-${res}.rc")

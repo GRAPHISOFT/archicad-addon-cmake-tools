@@ -49,6 +49,6 @@ BEGIN
     /* https://learn.microsoft.com/en-us/windows/win32/menurc/varfileinfo-block */
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x0409, 1200
+        VALUE "Translation", @winLanguageId@, @winCharsetId@
     END
 END
