@@ -91,7 +91,7 @@ class ResourceCompiler (object):
         with open (outputGrcFile, 'w', encoding='utf-8') as f:
             f.write (grcContent)
 
-        assert self.CompileGRCResourceFile (outputGrcFile), f'GRC compilation command failed: {outputGrcFile}'
+        assert self.CompileGRCResourceFile (outputGrcFile, localized), f'GRC compilation command failed: {outputGrcFile}'
 
     def CompileJSONResourceFile (self, jsonFilePath: Path, localized: bool) -> None:
         jsonResourceProcessorPath = self.devKitPath / 'Tools' / 'JSONResourceProcessor'
@@ -210,7 +210,7 @@ class ResourceCompiler (object):
         locResourcesFolder = self.resourcesPath / f'R{self.languageCode}'
         grcFiles = locResourcesFolder.glob ('*.grc')
         for grcFilePath in grcFiles:
-            assert self.CompileGRCResourceFile (grcFilePath), f'Failed to compile resource: {grcFilePath}'
+            assert self.CompileGRCResourceFile (grcFilePath, localized=True), f'Failed to compile resource: {grcFilePath}'
 
         locResourcesFolderDefault = self.resourcesPath / f'R{self.defaultLanguageCode}'
         jsonFiles = locResourcesFolderDefault.glob ('*.json')
@@ -223,7 +223,7 @@ class ResourceCompiler (object):
         fixResourcesFolder = self.resourcesPath / 'RFIX'
         grcFiles = fixResourcesFolder.glob ('*.grc')
         for grcFilePath in grcFiles:
-            assert self.CompileGRCResourceFile (grcFilePath), f'Failed to compile resource: {grcFilePath}'
+            assert self.CompileGRCResourceFile (grcFilePath, localized=False), f'Failed to compile resource: {grcFilePath}'
 
         jsonFiles = fixResourcesFolder.glob ('*.json')
         for jsonFilePath in jsonFiles:
@@ -290,7 +290,7 @@ class WinResourceCompiler (ResourceCompiler):
         assert result == 0, f'Failed to precompile resource {grcFilePath}'
         return precompiledGrcFilePath
 
-    def CompileGRCResourceFile (self, grcFilePath: Path) -> bool:
+    def CompileGRCResourceFile (self, grcFilePath: Path, localized: bool) -> bool:
         precompiledGrcFilePath = self.PrecompileGRCResourceFile (grcFilePath)
         return self.RunResConv ('W', '1252', precompiledGrcFilePath)
 
@@ -335,6 +335,7 @@ class MacResourceCompiler (ResourceCompiler):
             sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization)
         self.resConvPath = devKitPath / 'Tools' / 'OSX' / 'ResConv'
         self.nativeResourceFileExtension = '.ro'
+        self.generatedFileNames = set ()
 
     def GetPlatformDevKitLinkKey(self) -> str:
         return "MAC"
@@ -360,9 +361,19 @@ class MacResourceCompiler (ResourceCompiler):
         assert result == 0, f'Failed to precompile resource {grcFilePath}'
         return precompiledGrcFilePath
 
-    def CompileGRCResourceFile (self, grcFilePath: Path) -> bool:
+    def CompileGRCResourceFile (self, grcFilePath: Path, localized: bool) -> bool:
         precompiledGrcFilePath = self.PrecompileGRCResourceFile (grcFilePath)
-        return self.RunResConv ('M', 'utf16', precompiledGrcFilePath)
+
+        if not localized:
+            with open (precompiledGrcFilePath, 'r', encoding='utf-8') as f:
+                for match in re.finditer (r"'([A-Za-z0-9]{4})'\s+(\d+)", f.read ()):
+                    resId = match.group (1)
+                    resNum = match.group (2)
+                    self.generatedFileNames.add (f'{resId}_{resNum}.rsrd')
+
+        resConvResult = self.RunResConv ('M', 'utf16', precompiledGrcFilePath)
+
+        return resConvResult
 
     def CompileNativeResource (self, resultResourcePath: Path) -> None:
         region_name = self.localizationMappingTable.get (self.languageCode, 'English')
@@ -377,7 +388,10 @@ class MacResourceCompiler (ResourceCompiler):
             if extension == '.tif':
                 shutil.copy (filePath, resultResourcePath)
             elif extension == '.rsrd':
-                shutil.copy (filePath, resultLocalizedResourcePath)
+                if filePath.name in self.generatedFileNames:
+                    shutil.copy (filePath, resultResourcePath)
+                else:
+                    shutil.copy (filePath, resultLocalizedResourcePath)
             elif extension == '.strings':
                 stringsFile = codecs.open (filePath, 'r', 'utf-16')
                 resultLocalizableStringsFile.write (stringsFile.read ())
