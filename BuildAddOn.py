@@ -86,7 +86,7 @@ def PrepareParameters (args):
     if args.buildConfig:
         buildConfigList = args.buildConfig
     else:
-        buildConfigList = ['RelWithDebInfo']    
+        buildConfigList = ['RelWithDebInfo']
 
     # Get needed language codes
     languageList = [configData['defaultLanguage'].upper ()]
@@ -228,6 +228,9 @@ def GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformNa
         projGenParams.append (f'-DAC_WIN_CHARSETID={winCharsetId}')
     elif platformName == 'MAC':
         projGenParams.append ('-GXcode')
+        localizationMappingTable = FillLocalizationMappingTable (devkitDir)
+        addOnRegion = localizationMappingTable.get (languageCode, 'English')
+        projGenParams.append (f'-DAC_ADDON_REGION={addOnRegion}')
 
     projGenParams.append (f'-DAC_VERSION={version}')
     projGenParams.append (f'-DAC_API_DEVKIT_DIR={str (devkitDir)}')
