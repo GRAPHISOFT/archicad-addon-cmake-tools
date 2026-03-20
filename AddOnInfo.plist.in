@@ -20,7 +20,7 @@
 		<key>LSMinimumSystemVersion</key>
 		<string>@lsMinimumSystemVersion@</string>
 		<key>CFBundleDevelopmentRegion</key>
-		<string>en-US</string>
+		<string>@addOnRegion@</string>
 		<key>CFBundleIconFile</key>
 		<string>ArchiCADPlugin</string>
 		<key>CFBundleExecutable</key>

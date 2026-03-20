@@ -199,6 +199,12 @@ function (generate_add_on_version_info addOnLanguage outSemver)
         string (REGEX REPLACE "[ _]" "-" addOnNameIdentifier "${lowerAddOnName}")
         set (bundleIdentifier "com.graphisoft.${addOnNameIdentifier}")
 
+        if (DEFINED AC_ADDON_REGION AND NOT AC_ADDON_REGION STREQUAL "")
+            set (addOnRegion "${AC_ADDON_REGION}")
+        else ()
+            set (addOnRegion "English")
+        endif ()
+
         set (out "${CMAKE_CURRENT_BINARY_DIR}/AddOnInfo.plist")
         configure_file ("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/AddOnInfo.plist.in" "${out}" @ONLY)
         set_target_properties (

@@ -29,7 +29,6 @@ class ResourceCompiler (object):
         self.permissiveLocalization = permissiveLocalization
         self.resConvPath = None
         self.nativeResourceFileExtension = None
-        self.localizationMappingTable = FillLocalizationMappingTable (devKitPath)
 
     def GetPlatformDevKitLinkKey (self) -> str:
         return ""
@@ -335,6 +334,7 @@ class MacResourceCompiler (ResourceCompiler):
             sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization)
         self.resConvPath = devKitPath / 'Tools' / 'OSX' / 'ResConv'
         self.nativeResourceFileExtension = '.ro'
+        self.localizationMappingTable = FillLocalizationMappingTable (devKitPath)
         self.generatedFileNames = set ()
 
     def GetPlatformDevKitLinkKey(self) -> str:
