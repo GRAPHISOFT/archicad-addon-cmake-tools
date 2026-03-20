@@ -335,7 +335,7 @@ class MacResourceCompiler (ResourceCompiler):
         self.resConvPath = devKitPath / 'Tools' / 'OSX' / 'ResConv'
         self.nativeResourceFileExtension = '.ro'
         self.localizationMappingTable = FillLocalizationMappingTable (devKitPath)
-        self.generatedFileNames = set ()
+        self.generatedFixFileNames = set ()
 
     def GetPlatformDevKitLinkKey(self) -> str:
         return "MAC"
@@ -369,7 +369,7 @@ class MacResourceCompiler (ResourceCompiler):
                 for match in re.finditer (r"'([A-Za-z0-9]{4})'\s+(\d+)", f.read ()):
                     resId = match.group (1)
                     resNum = match.group (2)
-                    self.generatedFileNames.add (f'{resId}_{resNum}.rsrd')
+                    self.generatedFixFileNames.add (f'{resId}_{resNum}.rsrd')
 
         resConvResult = self.RunResConv ('M', 'utf16', precompiledGrcFilePath)
 
@@ -388,7 +388,7 @@ class MacResourceCompiler (ResourceCompiler):
             if extension == '.tif':
                 shutil.copy (filePath, resultResourcePath)
             elif extension == '.rsrd':
-                if filePath.name in self.generatedFileNames:
+                if filePath.name in self.generatedFixFileNames:
                     shutil.copy (filePath, resultResourcePath)
                 else:
                     shutil.copy (filePath, resultLocalizedResourcePath)
