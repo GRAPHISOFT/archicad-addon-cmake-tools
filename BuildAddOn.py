@@ -109,7 +109,9 @@ def PrepareParameters (args):
                         raise Exception (f'Value not provided for {key}!')
                     additionalParams[key] = value
 
-    return [devKitData, addOnName, buildConfigList, acVersionList, languageList, additionalParams]
+    dependencies = configData.get ('dependencies', [])
+
+    return [devKitData, addOnName, buildConfigList, acVersionList, languageList, additionalParams, dependencies]
 
 
 def PrepareDirectories (args, devKitData, addOnName, acVersionList):
@@ -297,7 +299,7 @@ def Check7ZInstallation ():
         raise Exception ('7Zip not installed!')
 
 
-def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, configuration, languageCode):
+def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, configuration, languageCode, dependencies=None):
     packageFolder = packageRootFolder / version / languageCode / configuration
     sourceFolder = buildFolder / addOnName / version / languageCode / configuration
 
@@ -322,6 +324,27 @@ def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, pla
             packageFolder / f'{addOnName}.bundle'
         ])
 
+    if dependencies:
+        for pattern in dependencies:
+            for matchPath in sourceFolder.glob (pattern):
+                relativePath = matchPath.relative_to (sourceFolder)
+                destPath = packageFolder / relativePath
+                if platformName == 'WIN':
+                    if matchPath.is_dir ():
+                        if destPath.exists ():
+                            shutil.rmtree (destPath)
+                        shutil.copytree (matchPath, destPath)
+                    else:
+                        destPath.parent.mkdir (parents=True, exist_ok=True)
+                        shutil.copy (matchPath, destPath)
+                elif platformName == 'MAC':
+                    destPath.parent.mkdir (parents=True, exist_ok=True)
+                    CallCommand ([
+                        'cp', '-R',
+                        str (matchPath),
+                        str (destPath)
+                    ])
+
 
 def GetDevKitVersion (args, devKitData, version, platformName):
     if args.devKitPath:
@@ -334,7 +357,7 @@ def GetDevKitVersion (args, devKitData, version, platformName):
 
 
 # Zip packages
-def PackageAddOns (args, devKitData, addOnName, buildConfigList, acVersionList, languageList, buildFolder, packageRootFolder):
+def PackageAddOns (args, devKitData, addOnName, buildConfigList, acVersionList, languageList, buildFolder, packageRootFolder, dependencies=None):
     platformName = GetPlatformName ()
     Check7ZInstallation ()
 
@@ -343,7 +366,7 @@ def PackageAddOns (args, devKitData, addOnName, buildConfigList, acVersionList, 
 
         for languageCode in languageList:
             for config in buildConfigList:
-                CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, config, languageCode)
+                CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, config, languageCode, dependencies)
                 CallCommand ([
                         '7z', 'a',
                         str (packageRootFolder.parent / version / f'{addOnName}-{versionAndBuildNum}_{platformName}_{languageCode}_{config}.zip'),
@@ -355,7 +378,7 @@ def Main ():
     try:
         args = ParseArguments ()
 
-        [devKitData, addOnName, buildConfigList, acVersionList, languageList, additionalParams] = PrepareParameters (args)
+        [devKitData, addOnName, buildConfigList, acVersionList, languageList, additionalParams, dependencies] = PrepareParameters (args)
 
         [workspaceRootFolder, buildFolder, packageRootFolder, devKitFolderList] = PrepareDirectories (args, devKitData, addOnName, acVersionList)
 
@@ -364,7 +387,7 @@ def Main ():
         BuildAddOns (args, addOnName, buildConfigList, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, args.release, args.quiet)
 
         if args.package:
-            PackageAddOns (args, devKitData, addOnName, buildConfigList, acVersionList, languageList, buildFolder, packageRootFolder)
+            PackageAddOns (args, devKitData, addOnName, buildConfigList, acVersionList, languageList, buildFolder, packageRootFolder, dependencies)
 
         print ('Build succeeded!')
         sys.exit (0)
