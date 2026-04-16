@@ -325,15 +325,21 @@ def CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, pla
         ])
 
     if dependencies:
+        skipPdb = platformName == 'WIN' and configuration == 'Release'
         for pattern in dependencies:
             for matchPath in sourceFolder.glob (pattern):
+                if skipPdb and matchPath.suffix.lower () == '.pdb':
+                    continue
                 relativePath = matchPath.relative_to (sourceFolder)
                 destPath = packageFolder / relativePath
                 if platformName == 'WIN':
                     if matchPath.is_dir ():
                         if destPath.exists ():
                             shutil.rmtree (destPath)
-                        shutil.copytree (matchPath, destPath)
+                        if skipPdb:
+                            shutil.copytree (matchPath, destPath, ignore=shutil.ignore_patterns ('*.pdb'))
+                        else:
+                            shutil.copytree (matchPath, destPath)
                     else:
                         destPath.parent.mkdir (parents=True, exist_ok=True)
                         shutil.copy (matchPath, destPath)
