@@ -20,3 +20,16 @@ The repo includes a BuildAddOn.py python script, that handles the building of th
 - -r, --forDistribution (optional): Passes `-DAC_ADDON_FOR_DISTRIBUTION=ON` to the build to mark it as a release workflow.
 - -a, --additionalCMakeParams (optional): A list of additional AddOn-specific CMake parameters as keys or key=value pairs. The build script will forward it to CMake. Ex: -a var1=value1 var2="value 2" var3.
 - -q, --quiet (optional): Suppresses output of the build tool.
+
+## JSON configuration file
+
+The JSON configuration file contains the following build parameters:
+
+- `addOnName`: name of the Add-On.
+- `description`: description of the Add-On.
+- `defaultLanguage`: a single language for which the Add-On is built when localization is not enabled. Must be one of the languages specified in `languages`.
+- `languages`: list of languages, for which localization can be done / for which the .grc files are present in their respective directories.
+- `version`: version of the Add-On. Must have 1, 2 or 3 numeric components (`123`, `1.23` or `1.2.3` respectively) all of which must be in the `0-65535` range.
+- `copyright`: an object with fields `name` and `year`. These will be used to embed a copyright notice in the Add-On.
+- `additionalCMakeParams` (optional): a list of additional Add-On specific CMake parameters as JSON key-value pairs. The build script will forward it to CMake.
+- `dependencies` (optional): a list of glob patterns specifying additional files or folders from the build output directory to include in the package alongside the Add-On binary. Patterns are resolved relative to the build output folder. If not specified, only the Add-On binary (`.apx` on Windows, `.bundle` on macOS) is packaged. Ex: `["AddOnCore.*", "AddOnData/*"]`. **Warning:** Use precise patterns to avoid accidentally including unwanted files (e.g. `.pdb` debug symbols) in the package.
