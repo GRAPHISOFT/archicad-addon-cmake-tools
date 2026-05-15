@@ -322,10 +322,14 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
         ${addOnSourcesFolder}/*.c
         ${addOnSourcesFolder}/*.cpp
     )
+    file (GLOB_RECURSE AddOnSrcJSONFiles CONFIGURE_DEPENDS
+        ${addOnSourcesFolder}/*.json
+    )
     set (
         AddOnFiles
         ${AddOnHeaderFiles}
         ${AddOnSourceFiles}
+        ${AddOnSrcJSONFiles}
         ${AddOnImageFiles}
         ${AddOnResourceFiles}
         ${AddOnJSONResourceFiles}
@@ -333,7 +337,17 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
         ${ResourceStampFile}
     )
 
-    source_group ("Sources" FILES ${AddOnHeaderFiles} ${AddOnSourceFiles})
+    # Mirror the source directory tree in VS Solution Explorer filters.
+    foreach (_sg_file ${AddOnHeaderFiles} ${AddOnSourceFiles} ${AddOnSrcJSONFiles})
+        file (RELATIVE_PATH _sg_rel "${CMAKE_SOURCE_DIR}/${addOnSourcesFolder}" "${_sg_file}")
+        get_filename_component (_sg_dir "${_sg_rel}" DIRECTORY)
+        if (_sg_dir)
+            string (REPLACE "/" "\\" _sg_group "Sources\\${_sg_dir}")
+        else ()
+            set (_sg_group "Sources")
+        endif ()
+        source_group ("${_sg_group}" FILES "${_sg_file}")
+    endforeach ()
     source_group ("Images" FILES ${AddOnImageFiles})
     source_group ("Resources" FILES ${AddOnResourceFiles} ${AddOnJSONResourceFiles} ${AddOnXLIFFFiles})
     if (WIN32)
