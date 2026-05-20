@@ -338,7 +338,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
     )
 
     # Mirror the source directory tree in VS Solution Explorer filters.
-    foreach (_sg_file ${AddOnHeaderFiles} ${AddOnSourceFiles} ${AddOnSrcJSONFiles})
+    foreach (file IN LISTS AddOnHeaderFiles AddOnSourceFiles AddOnSrcJSONFiles)
         file (RELATIVE_PATH _sg_rel "${CMAKE_SOURCE_DIR}/${addOnSourcesFolder}" "${_sg_file}")
         get_filename_component (_sg_dir "${_sg_rel}" DIRECTORY)
         if (_sg_dir)
