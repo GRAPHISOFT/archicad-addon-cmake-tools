@@ -182,7 +182,7 @@ function (generate_add_on_version_info addOnLanguage outSemver)
         string (REPLACE < &lt\; addOnDescription "${addOnDescription}")
         string (REPLACE > &gt\; addOnDescription "${addOnDescription}")
         string (REPLACE ' &apos\; addOnDescription "${addOnDescription}")
-        string (REPLACE \" &quot\; addOnDescription "${addOnDescription}")
+        string (REPLACE "\"" "&quot;" addOnDescription "${addOnDescription}")
 
         set (privateBuild "\n\t\t<key>GSPrivateBuild</key>\n\t\t<string>1</string>")
         if (NOT AC_ADDON_FOR_DISTRIBUTION)
