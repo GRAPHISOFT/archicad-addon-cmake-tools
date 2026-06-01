@@ -182,7 +182,7 @@ function (generate_add_on_version_info addOnLanguage outSemver)
         string (REPLACE < &lt\; addOnDescription "${addOnDescription}")
         string (REPLACE > &gt\; addOnDescription "${addOnDescription}")
         string (REPLACE ' &apos\; addOnDescription "${addOnDescription}")
-        string (REPLACE \" &quot\; addOnDescription "${addOnDescription}")
+        string (REPLACE "\"" "&quot;" addOnDescription "${addOnDescription}")
 
         set (privateBuild "\n\t\t<key>GSPrivateBuild</key>\n\t\t<string>1</string>")
         if (NOT AC_ADDON_FOR_DISTRIBUTION)
@@ -322,10 +322,14 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
         ${addOnSourcesFolder}/*.c
         ${addOnSourcesFolder}/*.cpp
     )
+    file (GLOB_RECURSE AddOnSrcJSONFiles CONFIGURE_DEPENDS
+        ${addOnSourcesFolder}/*.json
+    )
     set (
         AddOnFiles
         ${AddOnHeaderFiles}
         ${AddOnSourceFiles}
+        ${AddOnSrcJSONFiles}
         ${AddOnImageFiles}
         ${AddOnResourceFiles}
         ${AddOnJSONResourceFiles}
@@ -333,7 +337,12 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
         ${ResourceStampFile}
     )
 
-    source_group ("Sources" FILES ${AddOnHeaderFiles} ${AddOnSourceFiles})
+    # Mirror the source directory tree in VS Solution Explorer filters.
+    source_group (
+        TREE "${PROJECT_SOURCE_DIR}/${addOnSourcesFolder}"
+        PREFIX "Sources"
+        FILES ${AddOnHeaderFiles} ${AddOnSourceFiles} ${AddOnSrcJSONFiles}
+    )
     source_group ("Images" FILES ${AddOnImageFiles})
     source_group ("Resources" FILES ${AddOnResourceFiles} ${AddOnJSONResourceFiles} ${AddOnXLIFFFiles})
     if (WIN32)
