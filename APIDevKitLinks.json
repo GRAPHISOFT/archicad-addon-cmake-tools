@@ -1,6 +1,8 @@
 {
     "WIN": {
+        "30": "https://github.com/GRAPHISOFT/archicad-api-devkit-internal/releases/download/30.238/API.Development.Kit.WIN.30.238.zip",
         "29": "https://github.com/GRAPHISOFT/archicad-api-devkit/releases/download/29.3100/API.Development.Kit.WIN.29.3100.zip",
+        "LP29": "https://github.com/GRAPHISOFT/archicad-api-devkit/releases/download/29.3000/LP_XMLConverter.WIN.29.3000.zip",
         "28": "https://github.com/GRAPHISOFT/archicad-api-devkit/releases/download/28.4001/API.Development.Kit.WIN.28.4001.zip",
         "27": "https://github.com/GRAPHISOFT/archicad-api-devkit/releases/download/27.6003/API.Development.Kit.WIN.27.6003.zip",
         "26": "https://github.com/GRAPHISOFT/archicad-api-devkit/releases/download/26.7000/API.Development.Kit.WIN.26.7000.zip",
@@ -8,6 +10,7 @@
     },
     "MAC": {
         "29": "https://github.com/GRAPHISOFT/archicad-api-devkit/releases/download/29.3100/API.Development.Kit.MAC.29.3100.zip",
+        "LP29": "https://github.com/GRAPHISOFT/archicad-api-devkit/releases/download/29.3000/LP_XMLConverter.MAC.29.3000.zipp",
         "28": "https://github.com/GRAPHISOFT/archicad-api-devkit/releases/download/28.4001/API.Development.Kit.MAC.28.4001.zip",
         "27": "https://github.com/GRAPHISOFT/archicad-api-devkit/releases/download/27.6003/API.Development.Kit.MAC.27.6003.zip",
         "26": "https://github.com/GRAPHISOFT/archicad-api-devkit/releases/download/26.7000/API.Development.Kit.MAC.26.7000.zip",

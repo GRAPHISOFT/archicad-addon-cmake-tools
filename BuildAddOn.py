@@ -22,6 +22,7 @@ def ParseArguments ():
     parser.add_argument ('-b', '--buildConfig', dest = 'buildConfig', nargs = '+', type = str, required = False, help = 'Build configuration list. Ex: Debug Release RelWithDebInfo')
     parser.add_argument ('-l', '--allLocalizedVersions', dest = 'allLocalizedVersions', required = False, action='store_true', help = 'Create localized release builds for all configured languages.')
     parser.add_argument ('-d', '--devKitPath', dest = 'devKitPath', type = str, required = False, help = 'Path to local APIDevKit')
+    parser.add_argument ('-x', '--lpXMLConverterPath', dest = 'lpXMLConverterPath', type = str, required = False, help = 'Path to local LP_XMLConverter')
     parser.add_argument ('-n', '--buildNum', dest = 'buildNum', type = str, required = False, help = 'Build number of local APIDevKit')
     parser.add_argument ('-p', '--package', dest = 'package', required = False, action='store_true', help = 'Create zip archive.')
     parser.add_argument ('-r', '--forDistribution', dest = 'release', required = False, action='store_true', help = 'Mark the add-on "for distribution". Will be marked "private" otherwise.')
@@ -82,6 +83,10 @@ def PrepareParameters (args):
         acVersionList = args.acVersion
     else:
         acVersionList = devKitData[platformName].keys ()
+    
+    #Only for 29 yet
+    if 29 in acVersionList:
+        acVersionList.append ('LP29')
 
     if args.buildConfig:
         buildConfigList = args.buildConfig
@@ -120,6 +125,7 @@ def PrepareDirectories (args, devKitData, addOnName, acVersionList):
     buildFolder = workspaceRootFolder / 'Build'
     packageRootFolder = buildFolder / 'Package' / addOnName
     devKitFolderList = {}
+    lpXMLConverterFolderList = {}
 
     platformName = GetPlatformName ()
 
@@ -150,7 +156,29 @@ def PrepareDirectories (args, devKitData, addOnName, acVersionList):
             else:
                 raise Exception ('APIDevKit download link not provided!')
 
-    return [workspaceRootFolder, buildFolder, packageRootFolder, devKitFolderList]
+    # Set LP_XMLConverter directory if local is used, else create new directories
+    if args.lpXMLConverterPath is not None:
+        lpXMLConverterPath = pathlib.Path (args.lpXMLConverterPath)
+        if not lpXMLConverterPath.is_dir ():
+            raise Exception (f'{lpXMLConverterPath} is not a directory!')
+        lpXMLConverterFolderList[acVersionList[0]] = str (lpXMLConverterPath.absolute ())
+    else:
+        for version in acVersionList:
+            if 'LP' + version in devKitData[platformName]:
+
+                lpXMLConverterPath = devKitFolderList[version] / 'Support' / 'LP_XMLConverter'
+                if not lpXMLConverterPath.exists ():
+                    lpXMLConverterPath.mkdir (parents=True)
+
+                DownloadAndUnzip (devKitData[platformName]['LP' + version], lpXMLConverterPath)
+                print (f'LP_XMLConverter path: {lpXMLConverterPath}')
+                lpXMLConverterPath = lpXMLConverterPath / devKitData[platformName]['LP' + version].split ('/')[-1].replace ('.zip', '').replace ('.tar.gz', '')
+                lpXMLConverterFolderList[version] = str (lpXMLConverterPath.absolute ())
+
+            else:
+                lpXMLConverterPath = devKitFolderList[version] / 'Support' / 'LP_XMLConverter'
+    
+    return [workspaceRootFolder, buildFolder, packageRootFolder, devKitFolderList, lpXMLConverterFolderList]
 
 
 def DownloadAndUnzip (url, dest):
@@ -206,7 +234,7 @@ def GetToolset (version):
     return 'v143'
 
 
-def GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, release, additionalParams):
+def GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformName, devKitFolder, lpXMLConverterFolder, version, languageCode, release, additionalParams):
     # Add params to configure cmake
     projGenParams = [
         'cmake',
@@ -236,6 +264,7 @@ def GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformNa
 
     projGenParams.append (f'-DAC_VERSION={version}')
     projGenParams.append (f'-DAC_API_DEVKIT_DIR={str (devkitDir)}')
+    projGenParams.append (f'-DLP_XML_CONVERTER_FOLDER={str (lpXMLConverterFolder)}')
     projGenParams.append (f'-DAC_ADDON_LANGUAGE={languageCode}')
 
     if release:
@@ -254,11 +283,11 @@ def GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformNa
     return projGenParams
 
 
-def BuildAddOn (args, addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, configuration, languageCode, release, quiet):
+def BuildAddOn (args, addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, lpXMLConverterFolder, version, configuration, languageCode, release, quiet):
     buildPath = buildFolder / addOnName / version / languageCode
 
     # Add params to configure cmake
-    projGenParams = GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformName, devKitFolder, version, languageCode, release, additionalParams)
+    projGenParams = GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformName, devKitFolder, lpXMLConverterFolder, version, languageCode, release, additionalParams)
     projGenResult = CallCommand (projGenParams, quiet)
 
     if projGenResult != 0:
@@ -277,16 +306,17 @@ def BuildAddOn (args, addOnName, platformName, additionalParams, workspaceRootFo
         raise Exception ('Failed to build project!')
 
 
-def BuildAddOns (args, addOnName, buildConfigList, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, release, quiet):
+def BuildAddOns (args, addOnName, buildConfigList, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, lpXMLConverterFolderList , release, quiet):
     platformName = GetPlatformName ()
 
     try:
         for version in devKitFolderList:
             devKitFolder = devKitFolderList[version]
+            lpXMLConverterFolder = lpXMLConverterFolderList[version]
 
             for languageCode in languageList:
                 for config in buildConfigList:
-                    BuildAddOn (args, addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, version, config, languageCode, release, quiet)
+                    BuildAddOn (args, addOnName, platformName, additionalParams, workspaceRootFolder, buildFolder, devKitFolder, lpXMLConverterFolder, version, config, languageCode, release, quiet)
 
     except Exception as e:
         raise e
@@ -386,11 +416,11 @@ def Main ():
 
         [devKitData, addOnName, buildConfigList, acVersionList, languageList, additionalParams, dependencies] = PrepareParameters (args)
 
-        [workspaceRootFolder, buildFolder, packageRootFolder, devKitFolderList] = PrepareDirectories (args, devKitData, addOnName, acVersionList)
+        [workspaceRootFolder, buildFolder, packageRootFolder, devKitFolderList, lpXMLConverterFolderList] = PrepareDirectories (args, devKitData, addOnName, acVersionList)
 
         os.chdir (workspaceRootFolder)
 
-        BuildAddOns (args, addOnName, buildConfigList, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, args.release, args.quiet)
+        BuildAddOns (args, addOnName, buildConfigList, languageList, additionalParams, workspaceRootFolder, buildFolder, devKitFolderList, lpXMLConverterFolderList, args.release, args.quiet)
 
         if args.package:
             PackageAddOns (args, devKitData, addOnName, buildConfigList, acVersionList, languageList, buildFolder, packageRootFolder, dependencies)
