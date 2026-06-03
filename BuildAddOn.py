@@ -173,10 +173,11 @@ def PrepareDirectories (args, devKitData, addOnName, acVersionList):
                 DownloadAndUnzip (devKitData[platformName]['LP' + version], lpXMLConverterPath)
                 print (f'LP_XMLConverter path: {lpXMLConverterPath}')
                 lpXMLConverterPath = lpXMLConverterPath / devKitData[platformName]['LP' + version].split ('/')[-1].replace ('.zip', '').replace ('.tar.gz', '')
-                lpXMLConverterFolderList[version] = str (lpXMLConverterPath.absolute ())
 
             else:
                 lpXMLConverterPath = devKitFolderList[version] / 'Support' / 'LP_XMLConverter'
+
+            lpXMLConverterFolderList[version] = str (lpXMLConverterPath.absolute ())
     
     return [workspaceRootFolder, buildFolder, packageRootFolder, devKitFolderList, lpXMLConverterFolderList]
 
