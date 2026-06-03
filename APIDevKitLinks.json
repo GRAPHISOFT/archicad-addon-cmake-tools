@@ -1,6 +1,5 @@
 {
     "WIN": {
-        "30": "https://github.com/GRAPHISOFT/archicad-api-devkit-internal/releases/download/30.238/API.Development.Kit.WIN.30.238.zip",
         "29": "https://github.com/GRAPHISOFT/archicad-api-devkit/releases/download/29.3100/API.Development.Kit.WIN.29.3100.zip",
         "LP29": "https://github.com/GRAPHISOFT/archicad-api-devkit/releases/download/29.3000/LP_XMLConverter.WIN.29.3000.zip",
         "28": "https://github.com/GRAPHISOFT/archicad-api-devkit/releases/download/28.4001/API.Development.Kit.WIN.28.4001.zip",
