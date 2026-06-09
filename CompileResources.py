@@ -465,7 +465,11 @@ class LibraryCompiler (Compiler):
 class MacLibraryCompiler (LibraryCompiler):
     def __init__ (self, devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path, libToolPath: Path):
         super (MacLibraryCompiler, self).__init__ (devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath)
-        self.libToolPath = libToolPath / 'LP_XMLConverter.app' / 'Contents' / 'MacOS' / 'LP_XMLConverter'
+        xmlConverterApp = libToolPath / 'LP_XMLConverter.app'
+        if xmlConverterApp.exists ():
+            self.libToolPath = xmlConverterApp / 'Contents' / 'MacOS' / 'LP_XMLConverter'
+        else:
+            self.libToolPath = libToolPath / 'LP_XMLConverter'
 
     def GetPlatformDevKitLinkKey(self) -> str:
         return "MAC"

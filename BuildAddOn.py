@@ -258,7 +258,19 @@ def GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformNa
         projGenParams.append (f'-DAC_WIN_LANGUAGEID={winLanguageId}')
         projGenParams.append (f'-DAC_WIN_CHARSETID={winCharsetId}')
     elif platformName == 'MAC':
-        projGenParams.append ('-GXcode')
+        # Check if xcodebuild is available (requires full Xcode, not just Command Line Tools)
+        hasXcodebuild = subprocess.call ('xcodebuild -version', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0
+        if hasXcodebuild:
+            projGenParams.append ('-GXcode')
+        else:
+            # When only Command Line Tools are installed (not full Xcode), xcodebuild is not available.
+            # Use Unix Makefiles generator and explicitly specify the compilers and SDK.
+            projGenParams.append ('-GUnix Makefiles')
+            projGenParams.extend ([
+                '-DCMAKE_C_COMPILER=/usr/bin/clang',
+                '-DCMAKE_CXX_COMPILER=/usr/bin/clang++',
+                f'-DCMAKE_OSX_SYSROOT={subprocess.check_output(["xcode-select", "-p"]).decode().strip()}/SDKs/MacOSX.sdk'
+            ])
         localizationMappingTable = FillLocalizationMappingTable (devkitDir)
         addOnRegion = localizationMappingTable.get (languageCode, 'English')
         projGenParams.append (f'-DAC_ADDON_REGION={addOnRegion}')
@@ -396,7 +408,8 @@ def GetDevKitVersion (args, devKitData, version, platformName):
 # Zip packages
 def PackageAddOns (args, devKitData, addOnName, buildConfigList, acVersionList, languageList, buildFolder, packageRootFolder, dependencies=None):
     platformName = GetPlatformName ()
-    Check7ZInstallation ()
+    if (platformName == 'WIN'):
+        Check7ZInstallation ()
 
     for version in acVersionList:
         versionAndBuildNum = GetDevKitVersion (args, devKitData, version, platformName)
@@ -404,12 +417,19 @@ def PackageAddOns (args, devKitData, addOnName, buildConfigList, acVersionList, 
         for languageCode in languageList:
             for config in buildConfigList:
                 CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, config, languageCode, dependencies)
-                CallCommand ([
-                        '7z', 'a',
-                        str (packageRootFolder.parent / version / f'{addOnName}-{versionAndBuildNum}_{platformName}_{languageCode}_{config}.zip'),
-                        str (packageRootFolder / version / languageCode / config / '*')
-                    ], args.quiet)
-
+                if (platformName == 'WIN'):
+                    CallCommand ([
+                            '7z', 'a',
+                            str (packageRootFolder.parent / version / f'{addOnName}-{versionAndBuildNum}_{platformName}_{languageCode}_{config}.zip'),
+                            str (packageRootFolder / version / languageCode / config / '*')
+                        ], args.quiet)
+                else:
+                    # ditto preserves extended Finder attributes
+                    CallCommand ([
+                            'ditto', '-ck', '--sequesterRsrc',
+                            str (packageRootFolder / version / languageCode / config / '*'),
+                            str (packageRootFolder.parent / version / f'{addOnName}-{versionAndBuildNum}_{platformName}_{languageCode}_{config}.zip')
+                        ], args.quiet)
 
 def Main ():
     try:
