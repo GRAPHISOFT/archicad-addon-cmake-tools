@@ -15,6 +15,7 @@ The repo includes a BuildAddOn.py python script, that handles the building of th
 - -b, --buildConfig (optional): List of Archicad build configurations. If not specified, defaults to RelWithDebInfo only. Ex: -b Debug Release RelWithDebInfo.
 - -l, --allLocalizedVersions (optional): Toggles creating localized builds for all languages listed in the language object of the JSON configuration file. If not enabled, the configured defaultLanguage will be used.
 - -d, --devKitPath (optional): Path to a single local APIDevKit folder. When this argument is used, only one Archicad version should be provided in the --acVersion list.
+- -x, --lpXMLConverterPath (optional): Path to a single local LP_XMLConverter folder. When this argument is used, only one Archicad version should be provided in the --acVersion list.
 - -n, --buildNum (optional, but mandatory if --devKitPath is used): Build number of the used local APIDevKit. Ex: -n 3001.
 - -p, --package (optional): Toggles creating zip archive with the built Add-On files.
 - -r, --forDistribution (optional): Passes `-DAC_ADDON_FOR_DISTRIBUTION=ON` to the build to mark it as a release workflow.
