@@ -37,6 +37,7 @@ function (SetCompilerOptions target acVersion)
     else ()
         target_compile_options (${target} PUBLIC -Wall -Wextra -Werror
             -fvisibility=hidden
+            -fno-constant-cfstrings
             -Wno-multichar
             -Wno-ctor-dtor-privacy
             -Wno-invalid-offsetof
