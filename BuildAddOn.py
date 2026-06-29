@@ -82,12 +82,8 @@ def PrepareParameters (args):
     if args.acVersion:
         acVersionList = args.acVersion
     else:
-        acVersionList = devKitData[platformName].keys ()
+        acVersionList = [ver for ver in devKitData[platformName].keys () if not ver.startswith ("LP")]
     
-    #Only for 29 yet
-    if 29 in acVersionList:
-        acVersionList.append ('LP29')
-
     if args.buildConfig:
         buildConfigList = args.buildConfig
     else:

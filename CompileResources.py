@@ -418,19 +418,6 @@ class MacResourceCompiler (ResourceCompiler):
                 stringsFile.close ()
         resultLocalizableStringsFile.close ()
 
-
-def CreateResourceCompiler(devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path, permissiveLocalization: bool, hasLibpartCompiler: bool) -> ResourceCompiler:
-    """Create and return the appropriate resource compiler based on the current platform."""
-    system = platform.system()
-
-    if system == 'Windows':
-        return WinResourceCompiler(devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization, hasLibpartCompiler)
-    elif system == 'Darwin':
-        return MacResourceCompiler(devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath, permissiveLocalization, hasLibpartCompiler)
-    else:
-        raise RuntimeError('Platform is not supported')
-
-
 class LibraryCompiler (Compiler):
     def __init__ (self, devKitPath: Path, acVersion: str, buildNum: str, addonName: str, languageCode: str, defaultLanguageCode: str, sourcesPath: Path, resourcesPath: Path, resourceObjectsPath: Path):
         super (LibraryCompiler, self).__init__ (devKitPath, acVersion, buildNum, addonName, languageCode, defaultLanguageCode, sourcesPath, resourcesPath, resourceObjectsPath)
