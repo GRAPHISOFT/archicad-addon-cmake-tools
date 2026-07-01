@@ -219,7 +219,7 @@ function (generate_add_on_version_info addOnLanguage outSemver)
     endif ()
 endfunction ()
 
-function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder addOnResourcesFolder addOnLanguage addOnDefaultLanguage addOnPCH)
+function (GenerateAddOnProject target acVersion devKitDir lpXMLConverterFolder addOnSourcesFolder addOnResourcesFolder addOnLanguage addOnDefaultLanguage addOnPCH)
     verify_api_devkit_folder ("${devKitDir}")
     if (NOT addOnLanguage IN_LIST addOnLanguages)
         message (FATAL_ERROR "Language '${addOnLanguage}' is not among the configured languages in config.json.")
@@ -285,6 +285,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
                 "${acVersion}"
                 "${DEVKIT_BUILDNUM_VALUE}"
                 "${devKitDir}"
+                "${lpXMLConverterFolder}"
                 "${AddOnSourcesFolderAbsolute}"
                 "${AddOnResourcesFolderAbsolute}"
                 "${ResourceObjectsDir}"
@@ -305,6 +306,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
                 "${acVersion}"
                 "${DEVKIT_BUILDNUM_VALUE}"
                 "${devKitDir}"
+                "${lpXMLConverterFolder}"
                 "${AddOnSourcesFolderAbsolute}"
                 "${AddOnResourcesFolderAbsolute}"
                 "${ResourceObjectsDir}"

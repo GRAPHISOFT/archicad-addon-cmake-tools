@@ -27,6 +27,8 @@ def Main () -> None:
             raise RuntimeError ('Unsupported platform')
 
         for version, urlStr in apiDevKitLinks[platformSign].items ():
+            if version.startswith ('LP'):
+                continue
             url = Path (urlStr)
 
             print (f'Downloading: {url}')
