@@ -219,12 +219,13 @@ function (generate_add_on_version_info addOnLanguage outSemver)
     endif ()
 endfunction ()
 
-function (GenerateAddOnProject target acVersion devKitDir lpXMLConverterFolder addOnSourcesFolder addOnResourcesFolder addOnLanguage addOnDefaultLanguage addOnPCH)
+function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder addOnResourcesFolder addOnLanguage addOnDefaultLanguage addOnPCH)
     verify_api_devkit_folder ("${devKitDir}")
     if (NOT addOnLanguage IN_LIST addOnLanguages)
         message (FATAL_ERROR "Language '${addOnLanguage}' is not among the configured languages in config.json.")
     endif ()
-
+    
+    set (lpXMLConverterFolder "${LP_XML_CONVERTER_FOLDER}")
     set (ResourceObjectsDir "${CMAKE_CURRENT_BINARY_DIR}/ResourceObjects")
     set (ResourceStampFile "${ResourceObjectsDir}/AddOnResources.stamp")
 
