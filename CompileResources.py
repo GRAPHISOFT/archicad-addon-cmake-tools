@@ -86,7 +86,7 @@ class ResourceCompiler (Compiler):
     def GetParentXliffPath (self) -> Path | None:
         parentTxtPath = self.resourcesPath / 'ResourceLibrary' / self.languageCode / 'XLF' / '_parent.txt'
         if parentTxtPath.exists ():
-            parentLanguageCode = codecs.open (parentTxtPath, 'r', 'utf-8').read ().strip ()
+            parentLanguageCode = open (parentTxtPath, 'r', 'utf-8').read ().strip ()
             return self.GetXliffPathForLanguage (parentLanguageCode)
         return None
 
@@ -401,7 +401,7 @@ class MacResourceCompiler (ResourceCompiler):
         if not resultLocalizedResourcePath.exists ():
             resultLocalizedResourcePath.mkdir (parents=True)
         resultLocalizableStringsPath = resultLocalizedResourcePath / 'Localizable.strings'
-        resultLocalizableStringsFile = codecs.open (resultLocalizableStringsPath, 'w', 'utf-16')
+        resultLocalizableStringsFile = open (resultLocalizableStringsPath, 'w', 'utf-16')
         for fileName in self.resourceObjectsPath.rglob ('*'):
             filePath = self.resourceObjectsPath / fileName
             extension = fileName.suffix.lower ()
@@ -413,7 +413,7 @@ class MacResourceCompiler (ResourceCompiler):
                 else:
                     shutil.copy (filePath, resultLocalizedResourcePath)
             elif extension == '.strings':
-                stringsFile = codecs.open (filePath, 'r', 'utf-16')
+                stringsFile = open (filePath, 'r', 'utf-16')
                 resultLocalizableStringsFile.write (stringsFile.read ())
                 stringsFile.close ()
         resultLocalizableStringsFile.close ()
