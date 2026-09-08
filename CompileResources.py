@@ -401,7 +401,7 @@ class MacResourceCompiler (ResourceCompiler):
         if not resultLocalizedResourcePath.exists ():
             resultLocalizedResourcePath.mkdir (parents=True)
         resultLocalizableStringsPath = resultLocalizedResourcePath / 'Localizable.strings'
-        resultLocalizableStringsFile = open (resultLocalizableStringsPath, 'w', 'utf-16')
+        resultLocalizableStringsFile = open (resultLocalizableStringsPath, 'w', encoding='utf-16')
         for fileName in self.resourceObjectsPath.rglob ('*'):
             filePath = self.resourceObjectsPath / fileName
             extension = fileName.suffix.lower ()
@@ -413,7 +413,7 @@ class MacResourceCompiler (ResourceCompiler):
                 else:
                     shutil.copy (filePath, resultLocalizedResourcePath)
             elif extension == '.strings':
-                stringsFile = open (filePath, 'r', 'utf-16')
+                stringsFile = open (filePath, 'r', encoding='utf-16')
                 resultLocalizableStringsFile.write (stringsFile.read ())
                 stringsFile.close ()
         resultLocalizableStringsFile.close ()
