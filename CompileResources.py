@@ -3,7 +3,6 @@ import sys
 import platform
 import subprocess
 import shutil
-import codecs
 import argparse
 import re
 import json
