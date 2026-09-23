@@ -173,6 +173,24 @@ function (generate_add_on_version_info addOnLanguage outSemver)
         string (REGEX MATCH "LSMinimumSystemVersion[^0-9]+([0-9.]+)" unused "${plist_content}")
         set (lsMinimumSystemVersion "${CMAKE_MATCH_1}")
 
+        # unless the compiler requires a higher minimum system version, use the one from the Info.plist
+        execute_process (
+            COMMAND xcrun --sdk macosx --show-sdk-path
+            OUTPUT_VARIABLE macOSSDKPath
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            COMMAND_ERROR_IS_FATAL ANY
+        )
+        execute_process (
+            COMMAND plutil -extract SupportedTargets.macosx.MinimumDeploymentTarget raw "${macOSSDKPath}/SDKSettings.plist"
+            OUTPUT_VARIABLE compilerMinimumSystemVersion
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            COMMAND_ERROR_IS_FATAL ANY
+        )
+        if (lsMinimumSystemVersion VERSION_LESS compilerMinimumSystemVersion)
+            message (STATUS "Raising macOS deployment target from ${lsMinimumSystemVersion} to ${compilerMinimumSystemVersion} (minimum supported by the active SDK).")
+            set (lsMinimumSystemVersion "${compilerMinimumSystemVersion}")
+        endif ()
+
         list (JOIN vers . shortVersion)
 
         math (EXPR combined "${acVersion} * 100000 + ${gsBuildNum}")
@@ -224,7 +242,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
     if (NOT addOnLanguage IN_LIST addOnLanguages)
         message (FATAL_ERROR "Language '${addOnLanguage}' is not among the configured languages in config.json.")
     endif ()
-    
+
     set (lpXMLConverterFolder "${LP_XML_CONVERTER_FOLDER}")
     set (ResourceObjectsDir "${CMAKE_CURRENT_BINARY_DIR}/ResourceObjects")
     set (ResourceStampFile "${ResourceObjectsDir}/AddOnResources.stamp")
