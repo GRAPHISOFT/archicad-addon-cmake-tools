@@ -127,6 +127,31 @@ function (parse_version inValue outList)
     endif ()
 endfunction ()
 
+function (get_minimum_macos_deployment_target devKitDir outVar)
+    file (READ "${devKitDir}/Frameworks/GSRoot.framework/Versions/A/Resources/Info.plist" plist_content NEWLINE_CONSUME)
+    string (REGEX MATCH "LSMinimumSystemVersion[^0-9]+([0-9.]+)" unused "${plist_content}")
+    set (lsMinimumSystemVersion "${CMAKE_MATCH_1}")
+
+    execute_process (
+        COMMAND xcrun --sdk macosx --show-sdk-path
+        OUTPUT_VARIABLE macOSSDKPath
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        COMMAND_ERROR_IS_FATAL ANY
+    )
+    execute_process (
+        COMMAND plutil -extract SupportedTargets.macosx.MinimumDeploymentTarget raw "${macOSSDKPath}/SDKSettings.plist"
+        OUTPUT_VARIABLE compilerMinimumSystemVersion
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        COMMAND_ERROR_IS_FATAL ANY
+    )
+    if (lsMinimumSystemVersion VERSION_LESS compilerMinimumSystemVersion)
+        message (STATUS "Raising macOS deployment target from ${lsMinimumSystemVersion} to ${compilerMinimumSystemVersion} (minimum supported by the active SDK).")
+        set (lsMinimumSystemVersion "${compilerMinimumSystemVersion}")
+    endif ()
+
+    set ("${outVar}" "${lsMinimumSystemVersion}" PARENT_SCOPE)
+endfunction ()
+
 function (generate_add_on_version_info addOnLanguage outSemver)
     parse_version ("${addOnVersion}" vers)
     if (NOT DEFINED vers)
@@ -170,26 +195,7 @@ function (generate_add_on_version_info addOnLanguage outSemver)
         file (READ "${devKitDir}/Frameworks/GSRoot.framework/Versions/A/Resources/Info.plist" plist_content NEWLINE_CONSUME)
         string (REGEX MATCH "GSBuildNum[^0-9]+([0-9]+)" unused "${plist_content}")
         set (gsBuildNum "${CMAKE_MATCH_1}")
-        string (REGEX MATCH "LSMinimumSystemVersion[^0-9]+([0-9.]+)" unused "${plist_content}")
-        set (lsMinimumSystemVersion "${CMAKE_MATCH_1}")
-
-        # unless the compiler requires a higher minimum system version, use the one from the Info.plist
-        execute_process (
-            COMMAND xcrun --sdk macosx --show-sdk-path
-            OUTPUT_VARIABLE macOSSDKPath
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-            COMMAND_ERROR_IS_FATAL ANY
-        )
-        execute_process (
-            COMMAND plutil -extract SupportedTargets.macosx.MinimumDeploymentTarget raw "${macOSSDKPath}/SDKSettings.plist"
-            OUTPUT_VARIABLE compilerMinimumSystemVersion
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-            COMMAND_ERROR_IS_FATAL ANY
-        )
-        if (lsMinimumSystemVersion VERSION_LESS compilerMinimumSystemVersion)
-            message (STATUS "Raising macOS deployment target from ${lsMinimumSystemVersion} to ${compilerMinimumSystemVersion} (minimum supported by the active SDK).")
-            set (lsMinimumSystemVersion "${compilerMinimumSystemVersion}")
-        endif ()
+        get_minimum_macos_deployment_target ("${devKitDir}" lsMinimumSystemVersion)
 
         list (JOIN vers . shortVersion)
 
@@ -367,6 +373,10 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
     )
     source_group ("Images" FILES ${AddOnImageFiles})
     source_group ("Resources" FILES ${AddOnResourceFiles} ${AddOnJSONResourceFiles} ${AddOnXLIFFFiles})
+    if (APPLE)
+        get_minimum_macos_deployment_target ("${devKitDir}" minimumMacOSDeploymentTarget)
+        set (CMAKE_OSX_DEPLOYMENT_TARGET "${minimumMacOSDeploymentTarget}")
+    endif ()
     if (WIN32)
         add_library (${target} SHARED ${AddOnFiles})
     else ()
@@ -390,6 +400,7 @@ function (GenerateAddOnProject target acVersion devKitDir addOnSourcesFolder add
         set_target_properties(
             "${target}" PROPERTIES
             BUNDLE TRUE
+            MACOSX_DEPLOYMENT_TARGET "${minimumMacOSDeploymentTarget}"
             LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/\$<CONFIG>"
         )
         if ((NOT codesignIdentity STREQUAL "") AND (NOT developmentTeamId STREQUAL ""))
