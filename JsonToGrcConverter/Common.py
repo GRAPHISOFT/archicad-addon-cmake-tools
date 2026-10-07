@@ -79,11 +79,12 @@ def CheckForNotImplementedConditionHandling (obj) -> None:
         raise ConditionHandlingNotImplementedError (f'Condition handling is not implemented for:\n{obj}')
 
 
-def CheckIfAllKeysWereHandled (obj: dict) -> None:
+def CheckIfAllKeysWereHandled (obj: dict, optionalKeys: set[str] | None = None) -> None:
     assert isinstance (obj, dict)
 
-    if len (obj) != 0:
-        raise UnhandledJsonPropertyError (list (obj.keys ()))
+    unhandledKeys = [key for key in obj if optionalKeys is None or key not in optionalKeys]
+    if unhandledKeys:
+        raise UnhandledJsonPropertyError (unhandledKeys)
 
 
 def MapPropertyToGrc (valueInJson: str | list, mapping: dict[str, str]) -> str:

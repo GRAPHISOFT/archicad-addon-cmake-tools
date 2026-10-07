@@ -151,6 +151,11 @@ class TestJsonToGrcConverter (unittest.TestCase):
     def test_unhandled_property (self):
         self.assertRaises (JsonToGrcConverter.Common.UnhandledJsonPropertyError, self.RunTestCase, TESTFILES_DIR_NAME / 'unhandled_property.json', TESTFILES_DIR_NAME / 'unhandled_property.grc')
 
+    def test_optional_unhandled_properties (self):
+        JsonToGrcConverter.Common.CheckIfAllKeysWereHandled ({'optional': 'ignored'}, {'optional'})
+        with self.assertRaises (JsonToGrcConverter.Common.UnhandledJsonPropertyError):
+            JsonToGrcConverter.Common.CheckIfAllKeysWereHandled ({'optional': 'ignored', 'unknown': 'error'}, {'optional'})
+
     def test_unsupported_property_value (self):
         self.assertRaises (JsonToGrcConverter.Common.UnsupportedGDLGControlPropertyError, self.RunTestCase, TESTFILES_DIR_NAME / 'unsupported_property_value.json', TESTFILES_DIR_NAME / 'unsupported_property_value.grc')
 

@@ -1,4 +1,5 @@
 import copy
+import resource
 
 from .Common import (
     CheckForNotImplementedConditionHandling,
@@ -244,12 +245,12 @@ def ConvertGDLG (outputBuilder: GrcOutputBuilder, resource: dict, targetAcVersio
     if resourceCondition:
         outputBuilder.AddLine (GetConditionEnd ())
 
-    CheckIfAllKeysWereHandled (resource)
+    CheckIfAllKeysWereHandled (resource, {'guid'} if targetAcVersion >= 31 else set())
 
     for i, control in enumerate (controls, 1):
         controlType = list (control.keys ())[0]
         controlProps = control[controlType]
-        CheckIfAllKeysWereHandled (controlProps)
+        CheckIfAllKeysWereHandled (controlProps, {'guid'} if targetAcVersion >= 31 else set())
 
 
 def ConvertRect (controlProps: dict) -> str:
