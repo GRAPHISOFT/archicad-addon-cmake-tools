@@ -76,7 +76,7 @@ def ConvertJsonDataToGrcString (jsonData: dict, targetAcVersion: int, ignoredRes
 
             resourceTypeConverterMapping[resourceType] (outputBuilder, resource, targetAcVersion)
 
-            CheckIfAllKeysWereHandled (resource)
+            CheckIfAllKeysWereHandled (resource, {'guid'} if resourceType == 'GDLG' and targetAcVersion < 31 else None)
 
             outputBuilder.AddLine ()
 
