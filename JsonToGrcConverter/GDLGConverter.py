@@ -244,12 +244,12 @@ def ConvertGDLG (outputBuilder: GrcOutputBuilder, resource: dict, targetAcVersio
     if resourceCondition:
         outputBuilder.AddLine (GetConditionEnd ())
 
-    CheckIfAllKeysWereHandled (resource, {'guid'} if targetAcVersion >= 31 else set())
+    CheckIfAllKeysWereHandled (resource, {'guid'} if targetAcVersion < 31 else None)
 
     for i, control in enumerate (controls, 1):
         controlType = list (control.keys ())[0]
         controlProps = control[controlType]
-        CheckIfAllKeysWereHandled (controlProps, {'guid'} if targetAcVersion >= 31 else set())
+        CheckIfAllKeysWereHandled (controlProps, {'guid'} if targetAcVersion < 31 else None)
 
 
 def ConvertRect (controlProps: dict) -> str:
