@@ -59,6 +59,12 @@ def CallCommand (params, quiet = False):
     return result
 
 
+def CallCommandChecked (params, quiet = False):
+    result = CallCommand (params, quiet)
+    if result != 0:
+        raise Exception (f'Command failed with exit code {result}: {params}')
+
+
 def PrepareParameters (args):
     # Check platform operating system
     platformName = GetPlatformName ()
@@ -414,16 +420,16 @@ def PackageAddOns (args, devKitData, addOnName, buildConfigList, acVersionList, 
             for config in buildConfigList:
                 CopyResultToPackage (packageRootFolder, buildFolder, version, addOnName, platformName, config, languageCode, dependencies)
                 if (platformName == 'WIN'):
-                    CallCommand ([
+                    CallCommandChecked ([
                             '7z', 'a',
                             str (packageRootFolder.parent / version / f'{addOnName}-{versionAndBuildNum}_{platformName}_{languageCode}_{config}.zip'),
                             str (packageRootFolder / version / languageCode / config / '*')
                         ], args.quiet)
                 else:
-                    # ditto preserves extended Finder attributes
-                    CallCommand ([
+                    # ditto preserves extended Finder attributes; no shell here, so a '*' glob would not expand
+                    CallCommandChecked ([
                             'ditto', '-ck', '--sequesterRsrc',
-                            str (packageRootFolder / version / languageCode / config / '*'),
+                            str (packageRootFolder / version / languageCode / config),
                             str (packageRootFolder.parent / version / f'{addOnName}-{versionAndBuildNum}_{platformName}_{languageCode}_{config}.zip')
                         ], args.quiet)
 
