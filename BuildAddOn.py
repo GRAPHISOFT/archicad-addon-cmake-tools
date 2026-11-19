@@ -310,12 +310,15 @@ def BuildAddOn (args, addOnName, platformName, additionalParams, workspaceRootFo
     if projGenResult != 0:
         raise Exception ('Failed to generate project!')
 
+    # Explicit job count: a bare --parallel ignores CMAKE_BUILD_PARALLEL_LEVEL and means unlimited `make -j`.
+    parallelLevel = os.environ.get ('CMAKE_BUILD_PARALLEL_LEVEL') or str (os.cpu_count () or 1)
+
     # Add params to build AddOn
     buildParams = [
         'cmake',
         '--build', str (buildPath),
         '--config', configuration,
-        '--parallel'
+        '--parallel', parallelLevel
     ]
 
     buildResult = CallCommand (buildParams, quiet)
