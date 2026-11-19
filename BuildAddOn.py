@@ -237,7 +237,7 @@ def GetToolset (version):
     return 'v143'
 
 
-def GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformName, devKitFolder, lpXMLConverterFolder, version, languageCode, release, additionalParams):
+def GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformName, devKitFolder, lpXMLConverterFolder, version, configuration, languageCode, release, additionalParams):
     # Add params to configure cmake
     projGenParams = [
         'cmake',
@@ -266,9 +266,11 @@ def GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformNa
             projGenParams.append ('-GXcode')
         else:
             # When only Command Line Tools are installed (not full Xcode), xcodebuild is not available.
-            # Use Unix Makefiles generator and explicitly specify the compilers and SDK.
-            projGenParams.append ('-GUnix Makefiles')
+            # Prefer Ninja (faster), fall back to Unix Makefiles, and explicitly specify the compilers and SDK.
+            # Both are single-config generators, so the build type must be set at configure time.
+            projGenParams.append ('-GNinja' if shutil.which ('ninja') else '-GUnix Makefiles')
             projGenParams.extend ([
+                f'-DCMAKE_BUILD_TYPE={configuration}',
                 '-DCMAKE_C_COMPILER=/usr/bin/clang',
                 '-DCMAKE_CXX_COMPILER=/usr/bin/clang++',
                 f'-DCMAKE_OSX_SYSROOT={subprocess.check_output(["xcode-select", "-p"]).decode().strip()}/SDKs/MacOSX.sdk'
@@ -302,17 +304,21 @@ def BuildAddOn (args, addOnName, platformName, additionalParams, workspaceRootFo
     buildPath = buildFolder / addOnName / version / languageCode
 
     # Add params to configure cmake
-    projGenParams = GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformName, devKitFolder, lpXMLConverterFolder, version, languageCode, release, additionalParams)
+    projGenParams = GetProjectGenerationParams (args, workspaceRootFolder, buildPath, platformName, devKitFolder, lpXMLConverterFolder, version, configuration, languageCode, release, additionalParams)
     projGenResult = CallCommand (projGenParams, quiet)
 
     if projGenResult != 0:
         raise Exception ('Failed to generate project!')
 
+    # Explicit job count: a bare --parallel ignores CMAKE_BUILD_PARALLEL_LEVEL and means unlimited `make -j`.
+    parallelLevel = os.environ.get ('CMAKE_BUILD_PARALLEL_LEVEL') or str (os.cpu_count () or 1)
+
     # Add params to build AddOn
     buildParams = [
         'cmake',
         '--build', str (buildPath),
-        '--config', configuration
+        '--config', configuration,
+        '--parallel', parallelLevel
     ]
 
     buildResult = CallCommand (buildParams, quiet)
